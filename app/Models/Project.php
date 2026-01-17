@@ -27,21 +27,15 @@ class Project extends Model
         'blockers',
         'owner_id',
         'planned_release',
-        'submission_date',
         'target_date',
-        'go_live_date',
+        'submission_date',
         'rag_status',
         'completion_percent',
-        'service_type',
-        'remarks',
-        'last_update',
     ];
 
     protected $casts = [
-        'submission_date' => 'date',
         'target_date' => 'date',
-        'go_live_date' => 'date',
-        'last_update' => 'datetime',
+        'submission_date' => 'date',
         'completion_percent' => 'integer',
     ];
 
@@ -124,7 +118,7 @@ class Project extends Model
     public function scopeAwaitingAction(Builder $query): Builder
     {
         return $query->where(function ($q) {
-            $q->whereIn('dev_status', ['On Hold', 'Not Started'])
+            $q->where('dev_status', 'Not Started')
               ->orWhereNotNull('blockers');
         });
     }
@@ -214,9 +208,6 @@ class Project extends Model
             }
         });
 
-        static::updating(function (Project $project) {
-            $project->last_update = now();
-        });
 
         static::created(function (Project $project) {
             $phases = ['FRS', 'Development', 'Testing', 'UAT', 'Deployment'];

@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(composer create-project:*)",
-      "Bash(docker-compose:*)"
+      "Bash(docker-compose:*)",
+      "Bash(Remove-Item -Recurse -Force \"c:\\\\Users\\\\black\\\\OneDrive\\\\Documents\\\\Web Projects\\\\projekt\\\\app\\\\Http\\\\Controllers\\\\Api\")"
     ]
   }
 }

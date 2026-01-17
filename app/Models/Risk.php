@@ -23,13 +23,6 @@ class Risk extends Model
         'mitigation_plan',
         'owner_id',
         'status',
-        'identified_at',
-        'resolved_at',
-    ];
-
-    protected $casts = [
-        'identified_at' => 'datetime',
-        'resolved_at' => 'datetime',
     ];
 
     // =====================
@@ -51,8 +44,6 @@ class Risk extends Model
                 $nextNumber = $lastCode ? (int) substr($lastCode, 5) + 1 : 1;
                 $risk->risk_code = 'RISK-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
             }
-
-            $risk->identified_at = $risk->identified_at ?? now();
         });
     }
 
@@ -139,11 +130,4 @@ class Risk extends Model
         return in_array($this->status, ['Open', 'In Progress']);
     }
 
-    public function getDaysOpenAttribute(): int
-    {
-        if ($this->resolved_at) {
-            return $this->identified_at->diffInDays($this->resolved_at);
-        }
-        return $this->identified_at->diffInDays(now());
-    }
 }

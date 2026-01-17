@@ -20,8 +20,6 @@ return new class extends Migration
             $table->text('mitigation_plan')->nullable();
             $table->foreignId('owner_id')->nullable()->constrained('users')->nullOnDelete();
             $table->enum('status', ['Open', 'In Progress', 'Mitigated', 'Closed'])->default('Open');
-            $table->timestamp('identified_at')->nullable();
-            $table->timestamp('resolved_at')->nullable();
             $table->timestamps();
 
             $table->index(['status', 'risk_score']);

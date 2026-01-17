@@ -17,7 +17,6 @@ class ChangeRequest extends Model
         'project_id',
         'change_type',
         'description',
-        'impact_analysis',
         'requested_by_id',
         'approved_by_id',
         'status',

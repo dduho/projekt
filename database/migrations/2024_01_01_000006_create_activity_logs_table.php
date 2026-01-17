@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('user_agent')->nullable();
             $table->timestamps();
 
-            $table->index(['loggable_type', 'loggable_id']);
             $table->index('created_at');
         });
     }

@@ -15,8 +15,6 @@ return new class extends Migration
             $table->text('content');
             $table->foreignId('parent_id')->nullable()->constrained('comments')->cascadeOnDelete();
             $table->timestamps();
-
-            $table->index(['commentable_type', 'commentable_id']);
         });
     }
 

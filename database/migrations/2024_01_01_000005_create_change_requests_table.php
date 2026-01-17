@@ -12,9 +12,8 @@ return new class extends Migration
             $table->id();
             $table->string('change_code', 20)->unique();
             $table->foreignId('project_id')->constrained()->cascadeOnDelete();
-            $table->enum('change_type', ['Scope Change', 'Schedule Change', 'Budget Change', 'Resource Change']);
+            $table->enum('change_type', ['Scope', 'Schedule', 'Budget', 'Resource']);
             $table->text('description');
-            $table->text('impact_analysis')->nullable();
             $table->foreignId('requested_by_id')->constrained('users');
             $table->foreignId('approved_by_id')->nullable()->constrained('users')->nullOnDelete();
             $table->enum('status', ['Pending', 'Under Review', 'Approved', 'Rejected'])->default('Pending');

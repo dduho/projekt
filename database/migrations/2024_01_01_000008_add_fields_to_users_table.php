@@ -10,14 +10,15 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('avatar')->nullable()->after('email');
-            $table->json('settings')->nullable()->after('avatar');
+            $table->string('role')->default('user')->after('avatar'); // admin, manager, user
+            $table->json('settings')->nullable()->after('role');
         });
     }
 
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['avatar', 'settings']);
+            $table->dropColumn(['avatar', 'role', 'settings']);
         });
     }
 };

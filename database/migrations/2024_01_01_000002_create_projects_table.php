@@ -22,21 +22,16 @@ return new class extends Migration
                 'In Development',
                 'Testing',
                 'UAT',
-                'Deployed',
-                'On Hold'
+                'Deployed'
             ])->default('Not Started');
             $table->string('current_progress', 100)->nullable();
             $table->text('blockers')->nullable();
             $table->foreignId('owner_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('planned_release', 50)->nullable();
-            $table->date('submission_date')->nullable();
             $table->date('target_date')->nullable();
-            $table->date('go_live_date')->nullable();
+            $table->date('submission_date')->nullable();
             $table->enum('rag_status', ['Green', 'Amber', 'Red'])->default('Green');
             $table->unsignedTinyInteger('completion_percent')->default(0);
-            $table->string('service_type', 50)->nullable();
-            $table->text('remarks')->nullable();
-            $table->timestamp('last_update')->nullable();
             $table->softDeletes();
             $table->timestamps();
 

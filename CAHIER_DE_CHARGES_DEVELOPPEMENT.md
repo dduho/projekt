@@ -2651,42 +2651,47 @@ jobs:
 ## 12. CHECKLIST DE LIVRAISON
 
 ### Phase 1: Setup (Semaine 1)
-- [ ] Init projet Laravel 11
-- [ ] Config Docker + docker-compose
-- [ ] Config PostgreSQL
-- [ ] Config Redis
-- [ ] Config Laravel Sanctum
+- [x] Init projet Laravel 11
+- [x] Config Docker + docker-compose
+- [x] Config PostgreSQL
+- [x] Config Redis
+- [x] Config Laravel Sanctum
 - [ ] Setup CI/CD GitHub Actions
 - [ ] Config ESLint + Prettier
 
 ### Phase 2: Backend Core (Semaines 2-3)
-- [ ] Toutes les migrations
-- [ ] Tous les Models avec relations
-- [ ] Seeders categories + admin user
-- [ ] ProjectService
-- [ ] RiskService
-- [ ] DashboardService
-- [ ] Form Requests validation
-- [ ] API Resources
-- [ ] Controllers API complets
-- [ ] Routes API
+- [x] Toutes les migrations
+- [x] Tous les Models avec relations
+- [x] Seeders categories + admin user
+- [x] ProjectService
+- [x] RiskService
+- [x] DashboardService
+- [x] Form Requests validation
+- [x] API Resources
+- [x] Controllers API complets
+- [x] Routes API
 
-### Phase 3: Frontend Base (Semaines 4-5)
-- [ ] Config Vue.js 3 + Inertia
-- [ ] Config TailwindCSS theme Glass
-- [ ] AppLayout + Sidebar + Header
-- [ ] Tous composants Glass/
-- [ ] Composants Charts/
-- [ ] Pinia stores
-- [ ] Routing Inertia
+### Phase 3: Frontend Base (Semaines 4-5) ✅ COMPLÉTÉE
+- [x] Config Vue.js 3 + Inertia
+- [x] Config TailwindCSS theme Glass
+- [x] AppLayout + Sidebar + Header
+- [x] Tous composants Glass/
+- [x] Composants Charts/
+- [x] Pinia stores
+- [x] Routing Inertia
+- [x] Pages Login + Dashboard
+- [x] NotificationToast + DataTable
+- [x] Middleware HandleInertiaRequests
 
 ### Phase 4: Dashboard (Semaine 6)
-- [ ] Page Dashboard
-- [ ] KPIs widgets
-- [ ] Charts RAG + Categories
-- [ ] Critical Projects widget
-- [ ] Activity Feed
+- [x] Page Dashboard
+- [x] KPIs widgets
+- [x] Charts RAG + Categories
+- [x] Critical Projects widget
+- [x] Activity Feed
 - [ ] Deadlines widget
+- [ ] Filtres de date
+- [ ] Export PDF/Excel
 
 ### Phase 5: Projects (Semaines 7-8)
 - [ ] Liste projets + DataTable
