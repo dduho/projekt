@@ -86,23 +86,37 @@ class ProjectController extends Controller
         }
 
         $validated = $request->validate([
+            'project_code' => 'nullable|string|unique:projects,project_code|max:20',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'business_area' => 'nullable|string|max:100',
             'priority' => 'required|in:High,Medium,Low',
             'frs_status' => 'nullable|in:Draft,Review,Signoff',
-            'dev_status' => 'nullable|in:Not Started,In Development,Testing,UAT,Deployed,On Hold',
-            'submission_date' => 'nullable|date',
-            'target_date' => 'nullable|date',
-            'planned_release' => 'nullable|string|max:50',
+            'dev_status' => 'nullable|in:Not Started,In Development,Testing,UAT,Deployed',
+            'current_progress' => 'nullable|string|max:100',
+            'blockers' => 'nullable|string',
             'owner_id' => 'nullable|exists:users,id',
+            'planned_release' => 'nullable|string|max:50',
+            'target_date' => 'nullable|date',
+            'submission_date' => 'nullable|date',
+            'rag_status' => 'nullable|in:Green,Amber,Red',
+            'completion_percent' => 'nullable|integer|min:0|max:100',
         ]);
+
+        // Auto-generate project code if empty
+        if (empty($validated['project_code'])) {
+            $lastCode = Project::where('project_code', 'like', 'MOOV-%')
+                ->orderByRaw("CAST(SUBSTRING(project_code, 6) AS UNSIGNED) DESC")
+                ->value('project_code');
+            $nextNumber = $lastCode ? (int) substr($lastCode, 5) + 1 : 1;
+            $validated['project_code'] = 'MOOV-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        }
 
         $validated['frs_status'] = $validated['frs_status'] ?? 'Draft';
         $validated['dev_status'] = $validated['dev_status'] ?? 'Not Started';
-        $validated['rag_status'] = 'Green';
-        $validated['completion_percent'] = 0;
+        $validated['rag_status'] = $validated['rag_status'] ?? 'Green';
+        $validated['completion_percent'] = $validated['completion_percent'] ?? 0;
         $validated['submission_date'] = $validated['submission_date'] ?? now();
 
         $project = Project::create($validated);

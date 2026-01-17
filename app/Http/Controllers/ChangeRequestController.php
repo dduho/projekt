@@ -42,8 +42,7 @@ class ChangeRequestController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('change_code', 'like', '%' . $request->search . '%')
+                $q->where('change_code', 'like', '%' . $request->search . '%')
                   ->orWhere('description', 'like', '%' . $request->search . '%')
                   ->orWhereHas('project', fn($q) => $q->where('name', 'like', '%' . $request->search . '%'));
             });
@@ -69,7 +68,6 @@ class ChangeRequestController extends Controller
             'pending' => ChangeRequest::whereIn('status', ['Pending', 'Under Review'])->count(),
             'approved' => ChangeRequest::where('status', 'Approved')->count(),
             'rejected' => ChangeRequest::where('status', 'Rejected')->count(),
-            'total_cost' => ChangeRequest::where('status', 'Approved')->sum('cost_impact') ?? 0,
         ];
 
         return Inertia::render('ChangeRequests/Index', [
@@ -107,19 +105,20 @@ class ChangeRequestController extends Controller
         }
 
         $validated = $request->validate([
+            'change_code' => 'nullable|string|unique:change_requests,change_code|max:20',
             'project_id' => 'required|exists:projects,id',
-            'title' => 'nullable|string|max:255',
+            'change_type' => 'required|in:Scope,Schedule,Budget,Resource',
             'description' => 'required|string',
-            'change_type' => 'required|in:Scope Change,Schedule Change,Budget Change,Resource Change',
-            'impact_analysis' => 'nullable|string',
-            'priority' => 'nullable|in:Low,Medium,High',
-            'cost_impact' => 'nullable|numeric|min:0',
-            'schedule_impact' => 'nullable|integer|min:0'
+            'requested_by_id' => 'nullable|exists:users,id',
+            'approved_by_id' => 'nullable|exists:users,id',
+            'status' => 'nullable|in:Pending,Under Review,Approved,Rejected',
+            'requested_at' => 'nullable|date',
+            'resolved_at' => 'nullable|date'
         ]);
 
-        $validated['status'] = 'Pending';
-        $validated['requested_by_id'] = Auth::id();
-        $validated['requested_at'] = now();
+        $validated['status'] = $validated['status'] ?? 'Pending';
+        $validated['requested_by_id'] = $validated['requested_by_id'] ?? Auth::id();
+        $validated['requested_at'] = $validated['requested_at'] ?? now();
 
         $changeRequest = ChangeRequest::create($validated);
 
