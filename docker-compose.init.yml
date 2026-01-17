@@ -1,0 +1,41 @@
+services:
+  init:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.init
+    container_name: prism_init
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    command: >
+      sh -c "
+        echo '=== Creating Laravel Project ===' &&
+        rm -rf /tmp/laravel-temp &&
+        composer create-project laravel/laravel /tmp/laravel-temp '11.*' --prefer-dist --no-interaction &&
+        cp -rn /tmp/laravel-temp/. /var/www/ 2>/dev/null || true &&
+        cp -r /tmp/laravel-temp/app /var/www/ &&
+        cp -r /tmp/laravel-temp/bootstrap /var/www/ &&
+        cp -r /tmp/laravel-temp/config /var/www/ &&
+        cp -r /tmp/laravel-temp/database /var/www/ &&
+        cp -r /tmp/laravel-temp/public /var/www/ &&
+        cp -r /tmp/laravel-temp/resources /var/www/ &&
+        cp -r /tmp/laravel-temp/routes /var/www/ &&
+        cp -r /tmp/laravel-temp/storage /var/www/ &&
+        cp -r /tmp/laravel-temp/tests /var/www/ &&
+        cp /tmp/laravel-temp/artisan /var/www/ &&
+        cp /tmp/laravel-temp/composer.json /var/www/ &&
+        cp /tmp/laravel-temp/composer.lock /var/www/ &&
+        cp /tmp/laravel-temp/package.json /var/www/ &&
+        cp /tmp/laravel-temp/vite.config.js /var/www/ &&
+        cp /tmp/laravel-temp/phpunit.xml /var/www/ &&
+        rm -rf /tmp/laravel-temp &&
+        echo '=== Laravel installed ===' &&
+        composer require inertiajs/inertia-laravel laravel/sanctum spatie/laravel-permission maatwebsite/excel laravel/horizon --no-interaction &&
+        echo '=== PHP packages installed ===' &&
+        npm install &&
+        npm install -D @inertiajs/vue3 vue @vitejs/plugin-vue tailwindcss postcss autoprefixer @tailwindcss/forms @tailwindcss/typography pinia @vueuse/core apexcharts vue3-apexcharts lucide-vue-next axios &&
+        echo '=== NPM packages installed ===' &&
+        npx tailwindcss init -p &&
+        chmod -R 777 /var/www/storage /var/www/bootstrap/cache &&
+        echo '=== Setup complete ==='
+      "

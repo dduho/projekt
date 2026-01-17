@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100">
+  <defs>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Mini prisme -->
+  <g transform="translate(40, 50) scale(0.5)">
+    <polygon points="0,-40 -35,20 35,20" fill="url(#textGradient)"/>
+    <polygon points="0,-40 -35,20 0,45" fill="#667eea"/>
+    <polygon points="0,-40 35,20 0,45" fill="#818cf8"/>
+    <polygon points="-5,-35 -28,15 -15,15" fill="rgba(255,255,255,0.3)"/>
+    <line x1="35" y1="20" x2="55" y2="12" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="35" y1="20" x2="57" y2="24" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="35" y1="20" x2="53" y2="36" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Texte PRISM -->
+  <text x="90" y="62" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="700" fill="url(#textGradient)">
+    PRISM
+  </text>
+
+  <!-- Tagline -->
+  <text x="92" y="82" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="400" fill="#94a3b8" letter-spacing="2">
+    PROJECT INTELLIGENCE
+  </text>
+</svg>

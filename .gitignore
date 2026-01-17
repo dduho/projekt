@@ -1,0 +1,64 @@
+# ==================================================
+# PRISM - .gitignore
+# ==================================================
+
+# Laravel
+/vendor
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/app/public/*
+/bootstrap/cache/*
+
+# Environment
+.env
+.env.backup
+.env.local
+.env.*.local
+.phpunit.result.cache
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# NPM
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+/coverage
+.phpunit.cache
+
+# Docker volumes data (if stored locally)
+/docker/postgres/data
+/docker/redis/data
+
+# Compiled assets
+*.css.map
+*.js.map
+
+# Temporary
+*.tmp
+*.temp
+*.bak
+
+# Homestead / Vagrant
+Homestead.json
+Homestead.yaml
+.vagrant

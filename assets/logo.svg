@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <!-- Gradient principal -->
+    <linearGradient id="prismGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+
+    <!-- Gradient effet verre -->
+    <linearGradient id="glassGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0.4)"/>
+      <stop offset="50%" style="stop-color:rgba(255,255,255,0.1)"/>
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0.2)"/>
+    </linearGradient>
+
+    <!-- Filtre ombre -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#667eea" flood-opacity="0.3"/>
+    </filter>
+
+    <!-- Filtre flou pour effet glass -->
+    <filter id="blur">
+      <feGaussianBlur stdDeviation="2"/>
+    </filter>
+  </defs>
+
+  <!-- Fond cercle avec effet glass -->
+  <circle cx="100" cy="100" r="90" fill="url(#prismGradient)" filter="url(#shadow)"/>
+  <circle cx="100" cy="100" r="85" fill="url(#glassGradient)" opacity="0.3"/>
+
+  <!-- Prisme principal -->
+  <g transform="translate(100, 95)">
+    <!-- Face arriere du prisme -->
+    <polygon
+      points="0,-50 -43,25 43,25"
+      fill="#4f46e5"
+      opacity="0.8"
+    />
+
+    <!-- Face gauche -->
+    <polygon
+      points="0,-50 -43,25 0,55"
+      fill="#667eea"
+    />
+
+    <!-- Face droite -->
+    <polygon
+      points="0,-50 43,25 0,55"
+      fill="#818cf8"
+    />
+
+    <!-- Reflet sur le prisme -->
+    <polygon
+      points="-5,-45 -35,20 -20,20"
+      fill="rgba(255,255,255,0.3)"
+    />
+
+    <!-- Rayons de lumiere sortants -->
+    <g opacity="0.8">
+      <line x1="43" y1="25" x2="70" y2="15" stroke="#10B981" stroke-width="3" stroke-linecap="round"/>
+      <line x1="43" y1="25" x2="72" y2="30" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+      <line x1="43" y1="25" x2="68" y2="45" stroke="#EF4444" stroke-width="3" stroke-linecap="round"/>
+    </g>
+
+    <!-- Rayon entrant -->
+    <line x1="-70" y1="-30" x2="-5" y2="-35" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  </g>
+
+  <!-- Points decoratifs effet glass -->
+  <circle cx="50" cy="50" r="3" fill="white" opacity="0.5"/>
+  <circle cx="150" cy="45" r="2" fill="white" opacity="0.4"/>
+  <circle cx="45" cy="140" r="2" fill="white" opacity="0.3"/>
+</svg>
