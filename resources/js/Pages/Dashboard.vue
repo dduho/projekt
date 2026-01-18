@@ -4,23 +4,26 @@
         :page-description="t('Project overview')"
     >
         <!-- Alerts Banner -->
-        <div v-if="alerts?.length" class="mb-6 space-y-3">
+        <div v-if="alerts?.length" class="mb-6 space-y-2">
             <div
                 v-for="alert in alerts"
                 :key="alert.title_key"
                 :class="[
-                    'p-4 rounded-xl flex items-center justify-between',
+                    'rounded-lg p-4 flex items-center justify-between transition-all duration-200 hover:shadow-md',
                     getAlertClass(alert.type)
                 ]"
             >
-                <div class="flex items-center gap-3">
-                    <component :is="getAlertIcon(alert.icon)" class="w-5 h-5" />
+                <!-- Content -->
+                <div class="flex items-center gap-3 flex-1">
+                    <div :class="['flex-shrink-0 rounded-md p-2', getAlertIconBg(alert.type)]">
+                        <component :is="getAlertIcon(alert.icon)" class="w-5 h-5 text-white" />
+                    </div>
                     <div>
-                        <p class="font-semibold">{{ t(alert.title_key) }}</p>
-                        <p class="text-sm opacity-80">{{ t(alert.message_key, { count: alert.count }) }}</p>
+                        <p class="font-bold text-white">{{ t(alert.title_key) }}</p>
+                        <p class="text-sm text-white/90">{{ t(alert.message_key, { count: alert.count }) }}</p>
                     </div>
                 </div>
-                <span class="text-2xl font-bold">{{ alert.count }}</span>
+                <span class="text-3xl font-bold text-white ml-4">{{ alert.count }}</span>
             </div>
         </div>
 
@@ -458,10 +461,16 @@ const getArcLength = (name) => {
 };
 
 const getAlertClass = (type) => ({
-    'danger': 'bg-red-500/20 text-red-500 border border-red-500/30',
-    'warning': 'bg-amber-500/20 text-amber-500 border border-amber-500/30',
-    'info': 'bg-blue-500/20 text-blue-500 border border-blue-500/30',
-}[type] || 'bg-gray-500/20 text-gray-500');
+    'danger': 'bg-red-500',
+    'warning': 'bg-amber-500',
+    'info': 'bg-blue-500',
+}[type] || 'bg-gray-500');
+
+const getAlertIconBg = (type) => ({
+    'danger': 'bg-red-600',
+    'warning': 'bg-amber-600',
+    'info': 'bg-blue-600',
+}[type] || 'bg-gray-600');
 
 const getAlertIcon = (icon) => ({
     'clock': Clock,
