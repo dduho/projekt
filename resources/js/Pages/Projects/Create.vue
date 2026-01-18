@@ -219,7 +219,7 @@ const form = useForm({
   current_progress: '',
   blockers: '',
   owner_id: '',
-  planned_release: '',
+  planned_release: 'TBD',
   target_date: '',
   submission_date: '',
   rag_status: 'Green',

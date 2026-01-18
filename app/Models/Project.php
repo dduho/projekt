@@ -41,7 +41,6 @@ class Project extends Model
     protected $casts = [
         'target_date' => 'date',
         'submission_date' => 'date',
-        'planned_release' => 'date',
         'completion_percent' => 'integer',
         'need_po' => 'boolean',
         'name_translations' => 'array',

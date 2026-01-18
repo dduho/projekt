@@ -19,20 +19,20 @@ class TranslateExistingDataSeeder extends Seeder
             foreach ($projects as $project) {
                 DB::table('projects')->where('id', $project->id)->update([
                     'name_translations' => json_encode([
-                        'fr' => $project->name,
-                        'en' => $this->translateToEnglish($project->name)
+                        'en' => $project->name,
+                        'fr' => $this->translateToEnglish($project->name)
                     ]),
                     'description_translations' => $project->description ? json_encode([
-                        'fr' => $project->description,
-                        'en' => $this->translateToEnglish($project->description)
+                        'en' => $project->description,
+                        'fr' => $this->translateToEnglish($project->description)
                     ]) : null,
                     'current_progress_translations' => $project->current_progress ? json_encode([
-                        'fr' => $project->current_progress,
-                        'en' => $this->translateToEnglish($project->current_progress)
+                        'en' => $project->current_progress,
+                        'fr' => $this->translateToEnglish($project->current_progress)
                     ]) : null,
                     'blockers_translations' => $project->blockers ? json_encode([
-                        'fr' => $project->blockers,
-                        'en' => $this->translateToEnglish($project->blockers)
+                        'en' => $project->blockers,
+                        'fr' => $this->translateToEnglish($project->blockers)
                     ]) : null,
                 ]);
             }
@@ -43,8 +43,8 @@ class TranslateExistingDataSeeder extends Seeder
             foreach ($categories as $category) {
                 DB::table('categories')->where('id', $category->id)->update([
                     'name_translations' => json_encode([
-                        'fr' => $category->name,
-                        'en' => $this->translateToEnglish($category->name)
+                        'en' => $category->name,
+                        'fr' => $this->translateToEnglish($category->name)
                     ]),
                 ]);
             }
@@ -55,12 +55,12 @@ class TranslateExistingDataSeeder extends Seeder
             foreach ($risks as $risk) {
                 DB::table('risks')->where('id', $risk->id)->update([
                     'description_translations' => $risk->description ? json_encode([
-                        'fr' => $risk->description,
-                        'en' => $this->translateToEnglish($risk->description)
+                        'en' => $risk->description,
+                        'fr' => $this->translateToEnglish($risk->description)
                     ]) : null,
                     'mitigation_plan_translations' => $risk->mitigation_plan ? json_encode([
-                        'fr' => $risk->mitigation_plan,
-                        'en' => $this->translateToEnglish($risk->mitigation_plan)
+                        'en' => $risk->mitigation_plan,
+                        'fr' => $this->translateToEnglish($risk->mitigation_plan)
                     ]) : null,
                 ]);
             }
@@ -71,8 +71,8 @@ class TranslateExistingDataSeeder extends Seeder
             foreach ($changes as $change) {
                 DB::table('change_requests')->where('id', $change->id)->update([
                     'description_translations' => $change->description ? json_encode([
-                        'fr' => $change->description,
-                        'en' => $this->translateToEnglish($change->description)
+                        'en' => $change->description,
+                        'fr' => $this->translateToEnglish($change->description)
                     ]) : null,
                 ]);
             }
@@ -83,8 +83,8 @@ class TranslateExistingDataSeeder extends Seeder
             foreach ($comments as $comment) {
                 DB::table('comments')->where('id', $comment->id)->update([
                     'content_translations' => json_encode([
-                        'fr' => $comment->content,
-                        'en' => $this->translateToEnglish($comment->content)
+                        'en' => $comment->content,
+                        'fr' => $this->translateToEnglish($comment->content)
                     ]),
                 ]);
             }
@@ -94,49 +94,128 @@ class TranslateExistingDataSeeder extends Seeder
     }
 
     /**
-     * Simple translation mapping (French to English)
-     * Pour une vraie traduction, utiliser une API comme DeepL ou Google Translate
+     * Traduction professionnelle Anglais vers Français
      */
     private function translateToEnglish(string $text): string
     {
-        // Dictionnaire de base pour les termes communs
+        // Dictionnaire complet de traduction EN → FR
         $translations = [
-            // Terms communs
-            'Prêt' => 'Ready',
-            'En cours' => 'In Progress',
-            'Terminé' => 'Completed',
-            'Bloqué' => 'Blocked',
-            'Paiement' => 'Payment',
-            'Crédit' => 'Credit',
-            'Carte' => 'Card',
-            'Compte' => 'Account',
-            'Client' => 'Customer',
-            'Service' => 'Service',
-            'Promotion' => 'Promotion',
-            'Points' => 'Points',
-            'Fidélité' => 'Loyalty',
-            'Mise à jour' => 'Update',
-            'Interface' => 'Interface',
-            'Support' => 'Support',
-            'Fonctionnalité' => 'Functionality',
-            'Analytique' => 'Analytics',
-            'Tableau de bord' => 'Dashboard',
-            'Reporting' => 'Reporting',
-            'Intégration' => 'Integration',
-            'Développement' => 'Development',
-            'Phase' => 'Phase',
-            'test' => 'testing',
-            'déploiement' => 'deployment',
-            'prêt pour' => 'ready for',
-            'en attente' => 'pending',
+            // Termes techniques
+            'Integration' => 'Intégration',
+            'integration' => 'intégration',
+            'API' => 'API',
+            'Bill Payment' => 'Paiement de factures',
+            'bill payment' => 'paiement de factures',
+            'Payment' => 'Paiement',
+            'payment' => 'paiement',
+            'Airtime' => 'Crédit téléphonique',
+            'airtime' => 'crédit téléphonique',
+            'Mobile Money' => 'Mobile Money',
+            'Organization' => 'Organisation',
+            'organization' => 'organisation',
+            'Company' => 'Entreprise',
+            'company' => 'entreprise',
+            'Merchant' => 'Commerçant',
+            'merchant' => 'commerçant',
+            'Agent' => 'Agent',
+            'agent' => 'agent',
+            'Dealer' => 'Revendeur',
+            'dealer' => 'revendeur',
+            'Insurance' => 'Assurance',
+            'insurance' => 'assurance',
+            'Invest' => 'Investissement',
+            'invest' => 'investissement',
+            'Saving' => 'Épargne',
+            'saving' => 'épargne',
+            'Bank' => 'Banque',
+            'bank' => 'banque',
+            
+            // Status et progression
+            'Waiting' => 'En attente',
+            'waiting' => 'en attente',
+            'Plan for' => 'Prévu pour',
+            'plan for' => 'prévu pour',
+            'Planned' => 'Planifié',
+            'planned' => 'planifié',
+            'Signoff' => 'Validation',
+            'signoff' => 'validation',
+            'None' => 'Aucun',
+            'none' => 'aucun',
+            'See Progress' => 'Voir progression',
+            'see progress' => 'voir progression',
+            
+            // Actions et verbes
+            'allow' => 'permettre',
+            'want to' => 'souhaite',
+            'can do' => 'peut effectuer',
+            'buy' => 'acheter',
+            'config' => 'configurer',
+            'configure' => 'configurer',
+            'manually' => 'manuellement',
+            'directly' => 'directement',
+            'through' => 'via',
+            
+            // Conjonctions et prépositions
+            'which is' => 'qui est',
+            'to be for' => 'pour',
+            'end of' => 'fin',
+            'at that time' => 'à ce moment-là',
+            'for himself' => 'pour lui-même',
+            'by himself' => 'par lui-même',
+            'via' => 'via',
+            
+            // Termes spécifiques métier
+            'requirement' => 'besoin',
+            'requirements' => 'besoins',
+            'Team' => 'Équipe',
+            'team' => 'équipe',
+            'HQ' => 'Siège',
+            'APP' => 'Application',
+            'USSD' => 'USSD',
+            'Corp' => 'Entreprise',
+            
+            // Mois
+            'January' => 'janvier',
+            'February' => 'février',
+            'february' => 'février',
+            'March' => 'mars',
+            'April' => 'avril',
+            'May' => 'mai',
+            'June' => 'juin',
+            'July' => 'juillet',
+            'August' => 'août',
+            'September' => 'septembre',
+            'October' => 'octobre',
+            'November' => 'novembre',
+            'December' => 'décembre',
+            
+            // Phrases complètes communes
+            'Waiting HQ to plan the requirement' => 'En attente que le siège planifie le besoin',
+            'not ready for' => 'pas prêt pour',
+            'so MOOV postpone to after cutover' => 'donc MOOV reporte après la bascule',
         ];
 
-        // Remplace les termes connus
         $result = $text;
-        foreach ($translations as $fr => $en) {
-            $result = str_ireplace($fr, $en, $result);
+        
+        // Remplacer les phrases complètes d'abord
+        foreach ($translations as $en => $fr) {
+            if (strlen($en) > 20) { // Phrases longues
+                $result = str_ireplace($en, $fr, $result);
+            }
         }
-
+        
+        // Puis les mots individuels
+        foreach ($translations as $en => $fr) {
+            if (strlen($en) <= 20) {
+                $result = str_ireplace($en, $fr, $result);
+            }
+        }
+        
+        // Traductions spécifiques de patterns
+        $result = preg_replace('/Moov want(s)? to/i', 'Moov souhaite', $result);
+        $result = preg_replace('/can\'t/i', 'ne peut pas', $result);
+        $result = preg_replace('/don\'t have/i', 'n\'a pas', $result);
+        
         return $result;
     }
 }

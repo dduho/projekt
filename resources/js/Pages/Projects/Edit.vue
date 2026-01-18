@@ -275,7 +275,7 @@ const form = useForm({
   blockers_fr: props.project.blockers_translations?.fr || props.project.blockers || '',
   blockers_en: props.project.blockers_translations?.en || '',
   owner_id: props.project.owner_id || '',
-  planned_release: props.project.planned_release || '',
+  planned_release: props.project.planned_release || 'TBD',
   target_date: props.project.target_date || '',
   submission_date: props.project.submission_date || '',
   rag_status: props.project.rag_status,

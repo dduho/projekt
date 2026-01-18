@@ -160,6 +160,7 @@ class ProjectController extends Controller
         $validated['rag_status'] = $validated['rag_status'] ?? 'Green';
         $validated['completion_percent'] = $validated['completion_percent'] ?? 0;
         $validated['submission_date'] = $validated['submission_date'] ?? now();
+        $validated['planned_release'] = !empty($validated['planned_release']) ? $validated['planned_release'] : 'TBD';
 
         $project = Project::create($validated);
 
@@ -227,8 +228,9 @@ class ProjectController extends Controller
         if ($project->target_date) {
             $projectData['target_date'] = $project->target_date->format('Y-m-d');
         }
+        // planned_release is a text field, not a date - keep as is
         if ($project->planned_release) {
-            $projectData['planned_release'] = $project->planned_release->format('Y-m-d');
+            $projectData['planned_release'] = $project->planned_release;
         }
         
         return Inertia::render('Projects/Edit', [
@@ -267,7 +269,7 @@ class ProjectController extends Controller
             'submission_date' => 'nullable|date',
             'target_date' => 'nullable|date',
             'go_live_date' => 'nullable|date',
-            'planned_release' => 'nullable|date',
+            'planned_release' => 'nullable|string|max:100',
             'completion_percent' => 'nullable|integer|min:0|max:100',
             'current_progress_fr' => 'nullable|string',
             'current_progress_en' => 'nullable|string',
@@ -318,6 +320,11 @@ class ProjectController extends Controller
                 'en' => $validated['blockers_en'] ?? $validated['blockers_fr']
             ];
             unset($updateData['blockers_fr'], $updateData['blockers_en']);
+        }
+        
+        // Définir "TBD" par défaut si planned_release est vide
+        if (isset($updateData['planned_release']) && empty($updateData['planned_release'])) {
+            $updateData['planned_release'] = 'TBD';
         }
 
         $project->update($updateData);

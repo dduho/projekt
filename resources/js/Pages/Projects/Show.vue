@@ -145,7 +145,7 @@
               </div>
               <div v-if="project.planned_release">
                 <p :class="[textMuted, 'text-sm']">{{ t('Planned Release') }}</p>
-                <p :class="textPrimary">{{ formatDate(project.planned_release) }}</p>
+                <p :class="textPrimary">{{ formatPlannedRelease(project.planned_release) }}</p>
               </div>
               
               <!-- Owner - Editable -->
@@ -664,7 +664,7 @@ const props = defineProps({
 
 const page = usePage()
 const { isDarkText } = useTheme()
-const { t, te } = useTranslation()
+const { t, te, formatDate, formatDateTime, formatPlannedRelease } = useTranslation()
 
 // Classes de texte dynamiques selon le thème
 const textPrimary = computed(() => isDarkText.value ? 'text-gray-900' : 'text-white')
@@ -712,14 +712,6 @@ const can = (permission) => {
   const hasPermission = user?.permissions?.includes?.(permission);
   console.log(hasPermission ? '✅ Permission granted' : '❌ Permission denied');
   return hasPermission;
-}
-
-const formatDate = (date) => {
-  return date ? new Date(date).toLocaleDateString('fr-FR') : '-'
-}
-
-const formatDateTime = (date) => {
-  return date ? new Date(date).toLocaleString('fr-FR') : '-'
 }
 
 const priorityTextClass = (priority) => {

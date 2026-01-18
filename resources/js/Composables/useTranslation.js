@@ -92,6 +92,50 @@ export function useTranslation() {
     }
 
     /**
+     * Format planned_release field which can contain:
+     * - Dates (7/15/2026, 4/15/2026)
+     * - Version codes with dates (CV7.5(0715) where 0715 = July 15, 2025)
+     * - Status text (TBD, deployed, Need PO, etc.)
+     * @param {string} plannedRelease - The planned_release value
+     * @returns {string} - The formatted value
+     */
+    const formatPlannedRelease = (plannedRelease) => {
+        if (!plannedRelease) return ''
+        
+        // Check for version code pattern: CV7.5(0715)
+        const versionMatch = plannedRelease.match(/^(.+)\((\d{4})\)(.*)$/)
+        if (versionMatch) {
+            const [, prefix, dateCode, suffix] = versionMatch
+            const month = parseInt(dateCode.substring(0, 2), 10)
+            const day = parseInt(dateCode.substring(2, 4), 10)
+            
+            if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+                const year = 2025 // Par défaut 2025 pour les codes de version
+                const date = new Date(year, month - 1, day)
+                
+                if (!isNaN(date.getTime())) {
+                    const formattedDate = formatDate(date)
+                    return `${prefix.trim()} (${formattedDate})${suffix}`
+                }
+            }
+        }
+        
+        // Try to parse as a regular date
+        const dateObj = new Date(plannedRelease)
+        if (!isNaN(dateObj.getTime())) {
+            // Check if it looks like a date string
+            if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(plannedRelease) || 
+                /^\d{4}-\d{2}-\d{2}/.test(plannedRelease) ||
+                plannedRelease.includes('T')) {
+                return formatDate(dateObj)
+            }
+        }
+        
+        // Return as-is if it's not a recognizable date format (TBD, deployed, etc.)
+        return plannedRelease
+    }
+
+    /**
      * Format a date with time according to the current locale
      * @param {string|Date} date - The date to format
      * @param {object} options - Intl.DateTimeFormat options
@@ -184,6 +228,7 @@ export function useTranslation() {
         te,
         has,
         formatDate,
+        formatPlannedRelease,
         formatDateTime,
         formatNumber,
         formatCurrency,
