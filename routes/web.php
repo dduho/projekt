@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectPhaseController;
 use App\Http\Controllers\RiskController;
 use App\Http\Controllers\ChangeRequestController;
 use App\Http\Controllers\CategoryController;
@@ -43,6 +44,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Projects
     Route::resource('projects', ProjectController::class);
+    
+    // Project Phases
+    Route::put('/phases/{phase}/status', [ProjectPhaseController::class, 'updateStatus'])->name('phases.update-status');
+    Route::put('/projects/{project}/phases', [ProjectPhaseController::class, 'bulkUpdate'])->name('projects.phases.bulk-update');
 
     // Risks
     Route::get('/risks', [RiskController::class, 'index'])->name('risks.index');

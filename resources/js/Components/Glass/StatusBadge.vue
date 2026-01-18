@@ -3,7 +3,7 @@
         class="rag-badge"
         :class="statusClass"
     >
-        {{ label }}
+        {{ displayLabel }}
     </span>
 </template>
 
@@ -13,13 +13,18 @@ import { computed } from 'vue';
 const props = defineProps({
     status: {
         type: String,
-        required: true,
-        validator: (value) => ['red', 'amber', 'green', 'gray', 'not_started', 'in_progress', 'completed', 'on_hold'].includes(value)
+        default: 'gray'
     },
     label: {
         type: String,
         default: null
     }
+});
+
+// Normaliser le status en minuscule pour la comparaison
+const normalizedStatus = computed(() => {
+    if (!props.status) return 'gray';
+    return props.status.toLowerCase();
 });
 
 const statusClass = computed(() => {
@@ -33,20 +38,22 @@ const statusClass = computed(() => {
         'completed': 'rag-green',
         'on_hold': 'rag-red'
     };
-    return statusMap[props.status] || 'rag-gray';
+    return statusMap[normalizedStatus.value] || 'rag-gray';
 });
 
-const defaultLabel = computed(() => {
+const displayLabel = computed(() => {
+    if (props.label) return props.label;
+    
     const labelMap = {
-        'red': 'RED',
-        'amber': 'AMBER',
-        'green': 'GREEN',
-        'gray': 'GRAY',
+        'red': 'Red',
+        'amber': 'Amber',
+        'green': 'Green',
+        'gray': 'N/A',
         'not_started': 'Not Started',
         'in_progress': 'In Progress',
         'completed': 'Completed',
         'on_hold': 'On Hold'
     };
-    return props.label || labelMap[props.status] || props.status.toUpperCase();
+    return labelMap[normalizedStatus.value] || props.status || 'N/A';
 });
 </script>

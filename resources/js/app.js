@@ -8,6 +8,9 @@ import { createPinia } from 'pinia';
 import VueApexCharts from 'vue3-apexcharts';
 import NotificationToast from './Components/NotificationToast.vue';
 
+// Make route globally available
+window.route = window.route || ((...args) => args.join('/'));
+
 const appName = import.meta.env.VITE_APP_NAME || 'PRISM';
 const pinia = createPinia();
 

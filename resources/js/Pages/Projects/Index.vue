@@ -65,7 +65,7 @@
               <h3 :class="['text-xl font-bold mb-1', isDarkText ? 'text-gray-900 font-bold' : 'text-white font-bold']">{{ project.name }}</h3>
               <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ project.project_code }}</p>
             </div>
-            <StatusBadge :status="project.rag_status" />
+            <StatusBadge :status="project.calculated_rag_status ?? project.rag_status ?? 'gray'" />
           </div>
 
           <!-- Category & Priority -->
@@ -98,9 +98,9 @@
           <div class="mb-4">
             <div class="flex justify-between text-sm mb-2">
               <span :class="[isDarkText ? 'text-gray-700' : 'text-gray-200']">Completion</span>
-              <span :class="['font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ project.completion_percent }}%</span>
+              <span :class="['font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ project.calculated_completion_percent ?? project.completion_percent ?? 0 }}%</span>
             </div>
-            <ProgressBar :progress="project.completion_percent" :status="project.rag_status" />
+            <ProgressBar :progress="project.calculated_completion_percent ?? project.completion_percent ?? 0" :status="project.calculated_rag_status ?? project.rag_status" />
           </div>
 
           <!-- Timeline -->
@@ -176,7 +176,8 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
+import { route } from '@/Composables/useRoute'
 import { useTheme } from '@/Composables/useTheme';
 import AppLayout from '@/Layouts/AppLayout.vue'
 import GlassCard from '@/Components/Glass/GlassCard.vue'
@@ -244,14 +245,15 @@ const resetFilters = () => {
 }
 
 const changePage = (page) => {
-  router.get(route('projects.index', { ...filters.value, page }), {}, {
+  router.get(route('projects.index'), { ...filters.value, page }, {
     preserveState: true,
     preserveScroll: true,
   })
 }
 
 const can = (permission) => {
-  return window.$page?.props?.auth?.user?.permissions?.includes(permission)
+  const user = usePage().props?.auth?.user
+  return user?.permissions?.includes(permission) || user?.roles?.includes('admin')
 }
 
 const formatDate = (date) => {

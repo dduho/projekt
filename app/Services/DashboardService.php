@@ -238,4 +238,277 @@ class DashboardService
         Cache::forget('dashboard.devstatus');
         Cache::forget('dashboard.timeline');
     }
+
+    /**
+     * Get overdue projects (past target date but not deployed)
+     */
+    public function getOverdueProjects(): array
+    {
+        return Project::with(['category', 'owner'])
+            ->whereNotNull('target_date')
+            ->where('target_date', '<', now())
+            ->whereNotIn('dev_status', ['Deployed'])
+            ->orderBy('target_date')
+            ->get()
+            ->map(fn($p) => [
+                'id' => $p->id,
+                'code' => $p->project_code,
+                'name' => $p->name,
+                'target_date' => $p->target_date->format('d/m/Y'),
+                'days_overdue' => now()->startOfDay()->diffInDays($p->target_date->startOfDay()),
+                'rag_status' => $p->calculated_rag_status ?? $p->rag_status,
+                'dev_status' => $p->dev_status,
+                'completion_percent' => $p->calculated_completion_percent ?? $p->completion_percent,
+                'owner' => $p->owner?->name ?? 'Non assigné',
+                'category' => $p->category?->name ?? '-',
+                'category_color' => $p->category?->color ?? '#6366f1',
+            ])
+            ->toArray();
+    }
+
+    /**
+     * Get blocked projects
+     */
+    public function getBlockedProjects(): array
+    {
+        return Project::with(['category', 'owner'])
+            ->whereNotNull('blockers')
+            ->where('blockers', '!=', '')
+            ->whereNotIn('dev_status', ['Deployed'])
+            ->orderByDesc('updated_at')
+            ->get()
+            ->map(fn($p) => [
+                'id' => $p->id,
+                'code' => $p->project_code,
+                'name' => $p->name,
+                'blockers' => $p->blockers,
+                'dev_status' => $p->dev_status,
+                'days_blocked' => $p->updated_at->diffInDays(now()),
+                'owner' => $p->owner?->name ?? 'Non assigné',
+                'category' => $p->category?->name ?? '-',
+            ])
+            ->toArray();
+    }
+
+    /**
+     * Get project health summary with velocity metrics
+     */
+    public function getHealthMetrics(): array
+    {
+        $total = Project::count();
+        $deployed = Project::where('dev_status', 'Deployed')->count();
+        $inProgress = Project::whereIn('dev_status', ['In Development', 'Testing', 'UAT'])->count();
+        $overdue = Project::whereNotNull('target_date')
+            ->where('target_date', '<', now())
+            ->whereNotIn('dev_status', ['Deployed'])
+            ->count();
+        $blocked = Project::whereNotNull('blockers')->whereNotIn('dev_status', ['Deployed'])->count();
+        $atRisk = Project::where('rag_status', 'Red')->count();
+
+        // Calculate average completion
+        $avgCompletion = Project::whereNotIn('dev_status', ['Deployed', 'Not Started'])
+            ->avg('completion_percent') ?? 0;
+
+        // Velocity: projects completed in last 30 days
+        $deployedLast30Days = Project::where('dev_status', 'Deployed')
+            ->where('updated_at', '>=', now()->subDays(30))
+            ->count();
+
+        // Projects started in last 30 days
+        $startedLast30Days = Project::where('created_at', '>=', now()->subDays(30))->count();
+
+        return [
+            'total' => $total,
+            'deployed' => $deployed,
+            'in_progress' => $inProgress,
+            'overdue' => $overdue,
+            'blocked' => $blocked,
+            'at_risk' => $atRisk,
+            'avg_completion' => round($avgCompletion),
+            'velocity' => $deployedLast30Days,
+            'started_last_30' => $startedLast30Days,
+            'health_score' => $this->calculateHealthScore($total, $overdue, $blocked, $atRisk),
+        ];
+    }
+
+    private function calculateHealthScore(int $total, int $overdue, int $blocked, int $atRisk): int
+    {
+        if ($total === 0) return 100;
+        
+        // Deduct points for issues
+        $score = 100;
+        $score -= ($overdue / $total) * 40; // Up to -40 for overdue
+        $score -= ($blocked / $total) * 30; // Up to -30 for blocked
+        $score -= ($atRisk / $total) * 30;  // Up to -30 for at risk
+        
+        return max(0, min(100, round($score)));
+    }
+
+    /**
+     * Get phase completion breakdown
+     */
+    public function getPhaseBreakdown(): array
+    {
+        $phases = ['FRS', 'Development', 'Testing', 'UAT', 'Deployment'];
+        $breakdown = [];
+
+        foreach ($phases as $phase) {
+            $total = \App\Models\ProjectPhase::where('phase', $phase)->count();
+            $completed = \App\Models\ProjectPhase::where('phase', $phase)
+                ->where('status', 'Completed')->count();
+            $inProgress = \App\Models\ProjectPhase::where('phase', $phase)
+                ->where('status', 'In Progress')->count();
+            $blocked = \App\Models\ProjectPhase::where('phase', $phase)
+                ->where('status', 'Blocked')->count();
+
+            $breakdown[] = [
+                'phase' => $phase,
+                'total' => $total,
+                'completed' => $completed,
+                'in_progress' => $inProgress,
+                'blocked' => $blocked,
+                'completion_rate' => $total > 0 ? round(($completed / $total) * 100) : 0,
+            ];
+        }
+
+        return $breakdown;
+    }
+
+    /**
+     * Get recent changelog (phase updates, status changes)
+     */
+    public function getChangelog(int $limit = 20): array
+    {
+        return ActivityLog::with(['user', 'loggable'])
+            ->whereIn('action', ['phase_updated', 'created', 'updated', 'status_changed'])
+            ->latest()
+            ->limit($limit)
+            ->get()
+            ->map(fn($activity) => [
+                'id' => $activity->id,
+                'user' => $activity->user?->name ?? 'Système',
+                'action' => $activity->action,
+                'description' => $this->formatChangelogDescription($activity),
+                'project_id' => $activity->loggable_id,
+                'project_name' => $activity->loggable?->name ?? 'Projet supprimé',
+                'changes' => $activity->changes,
+                'time' => $activity->created_at->diffForHumans(),
+                'date' => $activity->created_at->format('d/m/Y H:i'),
+            ])
+            ->toArray();
+    }
+
+    private function formatChangelogDescription($activity): string
+    {
+        $changes = $activity->changes ?? [];
+        
+        switch ($activity->action) {
+            case 'phase_updated':
+                $phase = $changes['phase'] ?? 'Phase';
+                $old = $changes['old_status'] ?? '?';
+                $new = $changes['new_status'] ?? '?';
+                return "{$phase}: {$old} → {$new}";
+            
+            case 'created':
+                return "Projet créé: " . ($changes['name'] ?? 'Nouveau projet');
+            
+            case 'updated':
+            case 'status_changed':
+                if (isset($changes['dev_status'])) {
+                    return "Statut: " . ($changes['old'] ?? '?') . " → " . ($changes['dev_status'] ?? '?');
+                }
+                return "Projet mis à jour";
+            
+            default:
+                return $activity->action;
+        }
+    }
+
+    /**
+     * Get alerts for dashboard
+     */
+    public function getAlerts(): array
+    {
+        $alerts = [];
+
+        // Overdue projects alert
+        $overdueCount = Project::whereNotNull('target_date')
+            ->where('target_date', '<', now())
+            ->whereNotIn('dev_status', ['Deployed'])
+            ->count();
+        
+        if ($overdueCount > 0) {
+            $alerts[] = [
+                'type' => 'danger',
+                'icon' => 'clock',
+                'title' => 'Projets en retard',
+                'message' => "{$overdueCount} projet(s) ont dépassé leur date cible",
+                'count' => $overdueCount,
+                'action' => 'overdue',
+            ];
+        }
+
+        // Blocked projects alert
+        $blockedCount = Project::whereNotNull('blockers')
+            ->whereNotIn('dev_status', ['Deployed'])
+            ->count();
+        
+        if ($blockedCount > 0) {
+            $alerts[] = [
+                'type' => 'warning',
+                'icon' => 'alert-triangle',
+                'title' => 'Projets bloqués',
+                'message' => "{$blockedCount} projet(s) ont des blocages signalés",
+                'count' => $blockedCount,
+                'action' => 'blocked',
+            ];
+        }
+
+        // Critical risks alert
+        $criticalRisks = Risk::critical()->open()->count();
+        
+        if ($criticalRisks > 0) {
+            $alerts[] = [
+                'type' => 'danger',
+                'icon' => 'flame',
+                'title' => 'Risques critiques',
+                'message' => "{$criticalRisks} risque(s) critique(s) non résolus",
+                'count' => $criticalRisks,
+                'action' => 'risks',
+            ];
+        }
+
+        // Upcoming deadlines (next 7 days)
+        $urgentDeadlines = Project::whereNotNull('target_date')
+            ->whereBetween('target_date', [now(), now()->addDays(7)])
+            ->whereNotIn('dev_status', ['Deployed'])
+            ->count();
+        
+        if ($urgentDeadlines > 0) {
+            $alerts[] = [
+                'type' => 'info',
+                'icon' => 'calendar',
+                'title' => 'Échéances proches',
+                'message' => "{$urgentDeadlines} projet(s) arrivent à échéance dans 7 jours",
+                'count' => $urgentDeadlines,
+                'action' => 'deadlines',
+            ];
+        }
+
+        // Pending change requests
+        $pendingChanges = ChangeRequest::pending()->count();
+        
+        if ($pendingChanges > 0) {
+            $alerts[] = [
+                'type' => 'info',
+                'icon' => 'file-edit',
+                'title' => 'Demandes en attente',
+                'message' => "{$pendingChanges} demande(s) de changement en attente",
+                'count' => $pendingChanges,
+                'action' => 'changes',
+            ];
+        }
+
+        return $alerts;
+    }
 }

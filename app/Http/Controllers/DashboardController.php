@@ -26,6 +26,13 @@ class DashboardController extends Controller
             'criticalProjects' => $this->dashboardService->getCriticalProjects(),
             'upcomingDeadlines' => $this->dashboardService->getUpcomingDeadlines(),
             'recentActivities' => $this->dashboardService->getRecentActivity(),
+            // New PMP features
+            'healthMetrics' => $this->dashboardService->getHealthMetrics(),
+            'overdueProjects' => $this->dashboardService->getOverdueProjects(),
+            'blockedProjects' => $this->dashboardService->getBlockedProjects(),
+            'phaseBreakdown' => $this->dashboardService->getPhaseBreakdown(),
+            'changelog' => $this->dashboardService->getChangelog(),
+            'alerts' => $this->dashboardService->getAlerts(),
         ];
 
         if ($request->wantsJson()) {

@@ -203,6 +203,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
+import { route } from '@/Composables/useRoute'
 import { useTheme } from '@/Composables/useTheme';
 
 const { isDarkText } = useTheme();

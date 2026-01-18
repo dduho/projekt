@@ -3,125 +3,351 @@
         page-title="Dashboard"
         page-description="Vue d'ensemble de vos projets"
     >
-        <!-- KPIs Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <GlassCard 
-                v-for="kpi in kpis" 
-                :key="kpi.label"
-                animated
-                class="delay-100"
+        <!-- Alerts Banner -->
+        <div v-if="alerts?.length" class="mb-6 space-y-3">
+            <div 
+                v-for="alert in alerts" 
+                :key="alert.title"
+                :class="[
+                    'p-4 rounded-xl flex items-center justify-between',
+                    getAlertClass(alert.type)
+                ]"
             >
-                <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <component :is="getAlertIcon(alert.icon)" class="w-5 h-5" />
                     <div>
-                        <p :class="['text-sm mb-1', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ kpi.label }}</p>
-                        <h3 :class="['text-3xl font-bold', isDarkText ? 'text-gray-900' : 'text-white']">{{ kpi.value }}</h3>
-                        <p :class="['text-xs mt-1', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ kpi.subtitle }}</p>
+                        <p class="font-semibold">{{ alert.title }}</p>
+                        <p class="text-sm opacity-80">{{ alert.message }}</p>
                     </div>
-                    <div 
-                        class="w-12 h-12 rounded-xl flex items-center justify-center"
-                        :class="kpi.bgClass"
-                    >
-                        <component :is="kpi.icon" class="w-6 h-6" :class="kpi.iconClass" />
+                </div>
+                <span class="text-2xl font-bold">{{ alert.count }}</span>
+            </div>
+        </div>
+
+        <!-- Health Score & Main KPIs -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+            <!-- Portfolio Health Score -->
+            <GlassCard animated class="lg:col-span-1">
+                <div class="text-center">
+                    <p :class="['text-sm mb-2', textMuted]">Portfolio Health</p>
+                    <div class="relative inline-flex items-center justify-center">
+                        <svg class="w-32 h-32 transform -rotate-90">
+                            <circle 
+                                cx="64" cy="64" r="56" 
+                                stroke-width="8" 
+                                :stroke="isDarkText ? '#e5e7eb' : 'rgba(255,255,255,0.1)'"
+                                fill="none"
+                            />
+                            <circle 
+                                cx="64" cy="64" r="56" 
+                                stroke-width="8" 
+                                :stroke="getHealthColor(healthMetrics?.health_score)"
+                                fill="none"
+                                :stroke-dasharray="352"
+                                :stroke-dashoffset="352 - (352 * (healthMetrics?.health_score || 0) / 100)"
+                                stroke-linecap="round"
+                                class="transition-all duration-1000"
+                            />
+                        </svg>
+                        <span :class="['absolute text-3xl font-bold', textPrimary]">
+                            {{ healthMetrics?.health_score || 0 }}%
+                        </span>
+                    </div>
+                    <p :class="['text-xs mt-2', textMuted]">
+                        {{ getHealthLabel(healthMetrics?.health_score) }}
+                    </p>
+                </div>
+            </GlassCard>
+
+            <!-- Quick Stats Grid -->
+            <div class="lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <GlassCard animated v-for="stat in quickStats" :key="stat.label">
+                    <div class="flex items-center gap-3">
+                        <div :class="['p-2 rounded-lg', stat.bg]">
+                            <component :is="stat.icon" class="w-5 h-5" :class="stat.color" />
+                        </div>
+                        <div>
+                            <p :class="['text-2xl font-bold', textPrimary]">{{ stat.value }}</p>
+                            <p :class="['text-xs', textMuted]">{{ stat.label }}</p>
+                        </div>
+                    </div>
+                </GlassCard>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <!-- Phase Progress Chart -->
+            <GlassCard title="Progression des Phases" animated class="lg:col-span-2">
+                <div class="space-y-4">
+                    <div v-for="phase in phaseBreakdown" :key="phase.phase" class="space-y-1">
+                        <div class="flex justify-between items-center">
+                            <span :class="['text-sm font-medium', textPrimary]">{{ phase.phase }}</span>
+                            <span :class="['text-xs', textMuted]">
+                                {{ phase.completed }}/{{ phase.total }} ({{ phase.completion_rate }}%)
+                            </span>
+                        </div>
+                        <div class="h-3 rounded-full overflow-hidden" :class="isDarkText ? 'bg-gray-200' : 'bg-white/10'">
+                            <div class="h-full flex">
+                                <div 
+                                    class="bg-green-500 transition-all duration-500"
+                                    :style="{ width: `${(phase.completed / Math.max(phase.total, 1)) * 100}%` }"
+                                ></div>
+                                <div 
+                                    class="bg-blue-500 transition-all duration-500"
+                                    :style="{ width: `${(phase.in_progress / Math.max(phase.total, 1)) * 100}%` }"
+                                ></div>
+                                <div 
+                                    class="bg-red-500 transition-all duration-500"
+                                    :style="{ width: `${(phase.blocked / Math.max(phase.total, 1)) * 100}%` }"
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-4 text-xs" :class="textMuted">
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-500 rounded"></span> Completed</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-500 rounded"></span> In Progress</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-500 rounded"></span> Blocked</span>
+                </div>
+            </GlassCard>
+
+            <!-- RAG Distribution -->
+            <GlassCard title="Distribution RAG" animated>
+                <div class="space-y-3">
+                    <div v-for="rag in ragDistribution" :key="rag.name" class="flex items-center gap-3">
+                        <div 
+                            class="w-4 h-4 rounded-full"
+                            :style="{ backgroundColor: rag.color }"
+                        ></div>
+                        <span :class="['flex-1', textPrimary]">{{ rag.name }}</span>
+                        <span :class="['text-xl font-bold', textPrimary]">{{ rag.value }}</span>
+                        <span :class="['text-sm', textMuted]">
+                            {{ getPercentage(rag.value) }}%
+                        </span>
                     </div>
                 </div>
                 
-                <!-- Trend -->
-                <div v-if="kpi.trend" class="mt-4 flex items-center gap-2">
-                    <component 
-                        :is="kpi.trend.value > 0 ? TrendingUp : TrendingDown" 
-                        class="w-4 h-4"
-                        :class="kpi.trend.value > 0 ? 'text-green-400' : 'text-red-400'"
-                    />
-                    <span 
-                        class="text-sm font-medium"
-                        :class="kpi.trend.value > 0 ? 'text-green-400' : 'text-red-400'"
-                    >
-                        {{ Math.abs(kpi.trend.value) }}%
-                    </span>
-                    <span :class="['text-xs', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ kpi.trend.label }}</span>
+                <!-- Mini donut -->
+                <div class="mt-4 flex justify-center">
+                    <svg class="w-24 h-24" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="40" fill="none" stroke-width="15" 
+                            :stroke="isDarkText ? '#e5e7eb' : 'rgba(255,255,255,0.1)'" />
+                        <circle cx="50" cy="50" r="40" fill="none" stroke-width="15"
+                            stroke="#10b981" 
+                            :stroke-dasharray="`${getArcLength('Green')} 251.2`"
+                            stroke-dashoffset="0"
+                            transform="rotate(-90 50 50)" />
+                    </svg>
                 </div>
             </GlassCard>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <!-- RAG Status Distribution -->
-            <GlassCard 
-                title="Statut RAG"
-                animated
-                class="lg:col-span-2 delay-200"
-            >
-                <apexchart
-                    v-if="ragChartOptions"
-                    type="donut"
-                    height="300"
-                    :options="ragChartOptions"
-                    :series="ragChartSeries"
-                />
-            </GlassCard>
-
-            <!-- Critical Projects -->
-            <GlassCard title="Projets Critiques" animated class="delay-300">
-                <div class="space-y-3">
+        <!-- Overdue & Blocked Projects -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Overdue Projects -->
+            <GlassCard animated>
+                <template #header>
+                    <div class="flex items-center gap-2">
+                        <Clock class="w-5 h-5 text-red-500" />
+                        <h3 :class="['font-semibold', textPrimary]">Projets en Retard ({{ overdueProjects?.length || 0 }})</h3>
+                    </div>
+                </template>
+                
+                <div v-if="overdueProjects?.length" class="space-y-3 max-h-80 overflow-y-auto">
                     <div 
-                        v-for="project in criticalProjects" 
+                        v-for="project in overdueProjects" 
                         :key="project.id"
-                        class="p-3 glass-subtle rounded-lg hover:glass-hover cursor-pointer transition-all"
+                        @click="goToProject(project.id)"
+                        :class="[
+                            'p-3 rounded-lg cursor-pointer transition-all',
+                            isDarkText ? 'bg-red-50 hover:bg-red-100 border border-red-200' : 'bg-red-500/10 hover:bg-red-500/20 border border-red-500/30'
+                        ]"
                     >
-                        <div class="flex items-start justify-between mb-2">
-                            <h4 :class="['text-sm font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ project.name }}</h4>
-                            <StatusBadge :status="project.rag_status" />
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p :class="['font-semibold text-sm', textPrimary]">{{ project.name }}</p>
+                                <p :class="['text-xs', textMuted]">{{ project.code }}</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs font-bold bg-red-500 text-white rounded">
+                                -{{ project.days_overdue }}j
+                            </span>
                         </div>
-                        <p :class="['text-xs mb-2', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ project.project_code }}</p>
-                        <ProgressBar 
-                            :value="project.overall_progress"
-                            :max="100"
-                            label="Progression"
-                        />
+                        <div class="flex justify-between items-center">
+                            <span :class="['text-xs', textMuted]">Target: {{ project.target_date }}</span>
+                            <ProgressBar :progress="project.completion_percent" class="w-24" />
+                        </div>
+                    </div>
+                </div>
+                <div v-else class="text-center py-8">
+                    <CheckCircle class="w-12 h-12 text-green-500 mx-auto mb-2" />
+                    <p :class="textMuted">Aucun projet en retard 🎉</p>
+                </div>
+            </GlassCard>
+
+            <!-- Blocked Projects -->
+            <GlassCard animated>
+                <template #header>
+                    <div class="flex items-center gap-2">
+                        <AlertTriangle class="w-5 h-5 text-amber-500" />
+                        <h3 :class="['font-semibold', textPrimary]">Projets Bloqués ({{ blockedProjects?.length || 0 }})</h3>
+                    </div>
+                </template>
+                
+                <div v-if="blockedProjects?.length" class="space-y-3 max-h-80 overflow-y-auto">
+                    <div 
+                        v-for="project in blockedProjects" 
+                        :key="project.id"
+                        @click="goToProject(project.id)"
+                        :class="[
+                            'p-3 rounded-lg cursor-pointer transition-all',
+                            isDarkText ? 'bg-amber-50 hover:bg-amber-100 border border-amber-200' : 'bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30'
+                        ]"
+                    >
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p :class="['font-semibold text-sm', textPrimary]">{{ project.name }}</p>
+                                <p :class="['text-xs', textMuted]">{{ project.code }} • {{ project.owner }}</p>
+                            </div>
+                            <span :class="['text-xs px-2 py-1 rounded', isDarkText ? 'bg-gray-200' : 'bg-white/20']">
+                                {{ project.days_blocked }}j
+                            </span>
+                        </div>
+                        <p :class="['text-xs p-2 rounded', isDarkText ? 'bg-amber-100 text-amber-800' : 'bg-amber-500/20 text-amber-200']">
+                            🚫 {{ project.blockers }}
+                        </p>
+                    </div>
+                </div>
+                <div v-else class="text-center py-8">
+                    <CheckCircle class="w-12 h-12 text-green-500 mx-auto mb-2" />
+                    <p :class="textMuted">Aucun projet bloqué 🎉</p>
+                </div>
+            </GlassCard>
+        </div>
+
+        <!-- Changelog & Upcoming Deadlines -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Changelog -->
+            <GlassCard animated>
+                <template #header>
+                    <div class="flex items-center gap-2">
+                        <FileText class="w-5 h-5 text-prism-400" />
+                        <h3 :class="['font-semibold', textPrimary]">Journal des Modifications</h3>
+                    </div>
+                </template>
+                
+                <div class="space-y-3 max-h-96 overflow-y-auto">
+                    <div 
+                        v-for="entry in changelog" 
+                        :key="entry.id"
+                        :class="[
+                            'p-3 rounded-lg border-l-4',
+                            getChangelogBorderClass(entry.action),
+                            isDarkText ? 'bg-gray-50' : 'bg-white/5'
+                        ]"
+                    >
+                        <div class="flex justify-between items-start mb-1">
+                            <p :class="['text-sm font-medium', textPrimary]">{{ entry.project_name }}</p>
+                            <span :class="['text-xs', textMuted]">{{ entry.time }}</span>
+                        </div>
+                        <p :class="['text-sm', getChangelogTextClass(entry.action)]">
+                            {{ entry.description }}
+                        </p>
+                        <p :class="['text-xs mt-1', textMuted]">par {{ entry.user }}</p>
                     </div>
                     
-                    <div v-if="criticalProjects.length === 0" class="text-center py-8">
-                        <CheckCircle class="w-12 h-12 text-green-400 mx-auto mb-2" />
-                        <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">Aucun projet critique</p>
+                    <div v-if="!changelog?.length" class="text-center py-8">
+                        <FileText :class="['w-12 h-12 mx-auto mb-2', textMuted]" />
+                        <p :class="textMuted">Aucune modification récente</p>
+                    </div>
+                </div>
+            </GlassCard>
+
+            <!-- Upcoming Deadlines -->
+            <GlassCard animated>
+                <template #header>
+                    <div class="flex items-center gap-2">
+                        <Calendar class="w-5 h-5 text-blue-400" />
+                        <h3 :class="['font-semibold', textPrimary]">Échéances à Venir</h3>
+                    </div>
+                </template>
+                
+                <div class="space-y-3 max-h-96 overflow-y-auto">
+                    <div 
+                        v-for="project in upcomingDeadlines" 
+                        :key="project.id"
+                        @click="goToProject(project.id)"
+                        :class="[
+                            'p-3 rounded-lg cursor-pointer transition-all',
+                            project.is_urgent 
+                                ? (isDarkText ? 'bg-orange-50 border border-orange-200' : 'bg-orange-500/10 border border-orange-500/30')
+                                : (isDarkText ? 'bg-gray-50 hover:bg-gray-100' : 'bg-white/5 hover:bg-white/10')
+                        ]"
+                    >
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p :class="['font-semibold text-sm', textPrimary]">{{ project.name }}</p>
+                                <p :class="['text-xs', textMuted]">{{ project.code }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p :class="[
+                                    'text-sm font-bold',
+                                    project.days_remaining <= 3 ? 'text-red-500' : 
+                                    project.days_remaining <= 7 ? 'text-orange-500' : 'text-blue-500'
+                                ]">
+                                    {{ project.days_remaining }}j
+                                </p>
+                                <p :class="['text-xs', textMuted]">{{ project.target_date }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <ProgressBar :progress="project.completion_percent" class="flex-1" />
+                            <StatusBadge :status="project.rag_status" size="sm" />
+                        </div>
+                    </div>
+                    
+                    <div v-if="!upcomingDeadlines?.length" class="text-center py-8">
+                        <Calendar :class="['w-12 h-12 mx-auto mb-2', textMuted]" />
+                        <p :class="textMuted">Pas d'échéances imminentes</p>
                     </div>
                 </div>
             </GlassCard>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Projects by Category -->
-            <GlassCard title="Projets par Catégorie" animated class="delay-100">
-                <apexchart
-                    v-if="categoryChartOptions"
-                    type="bar"
-                    height="300"
-                    :options="categoryChartOptions"
-                    :series="categoryChartSeries"
-                />
-            </GlassCard>
-
-            <!-- Recent Activity -->
-            <GlassCard title="Activité Récente" animated class="delay-200">
-                <div class="space-y-3 max-h-[300px] overflow-y-auto">
-                    <div 
-                        v-for="activity in recentActivities" 
-                        :key="activity.id"
-                        class="flex items-start gap-3 p-3 glass-subtle rounded-lg"
-                    >
-                        <div 
-                            class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                            :class="getActivityIconBg(activity.type)"
-                        >
-                            <component :is="getActivityIcon(activity.type)" class="w-4 h-4" />
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p :class="['text-sm', isDarkText ? 'text-gray-900' : 'text-white']">{{ activity.description }}</p>
-                            <p :class="['text-xs mt-1', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ formatDate(activity.created_at) }}</p>
-                        </div>
+        <!-- Velocity Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <GlassCard animated>
+                <div class="flex items-center gap-4">
+                    <div class="p-3 rounded-xl bg-green-500/20">
+                        <Rocket class="w-8 h-8 text-green-500" />
                     </div>
-                    
-                    <div v-if="recentActivities.length === 0" class="text-center py-8">
-                        <Activity :class="['w-12 h-12 mx-auto mb-2', isDarkText ? 'text-gray-600' : 'text-gray-400']" />
-                        <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">Aucune activité récente</p>
+                    <div>
+                        <p :class="['text-3xl font-bold', textPrimary]">{{ healthMetrics?.velocity || 0 }}</p>
+                        <p :class="['text-sm', textMuted]">Projets déployés (30j)</p>
+                    </div>
+                </div>
+            </GlassCard>
+            
+            <GlassCard animated>
+                <div class="flex items-center gap-4">
+                    <div class="p-3 rounded-xl bg-blue-500/20">
+                        <PlayCircle class="w-8 h-8 text-blue-500" />
+                    </div>
+                    <div>
+                        <p :class="['text-3xl font-bold', textPrimary]">{{ healthMetrics?.started_last_30 || 0 }}</p>
+                        <p :class="['text-sm', textMuted]">Nouveaux projets (30j)</p>
+                    </div>
+                </div>
+            </GlassCard>
+            
+            <GlassCard animated>
+                <div class="flex items-center gap-4">
+                    <div class="p-3 rounded-xl bg-purple-500/20">
+                        <TrendingUp class="w-8 h-8 text-purple-500" />
+                    </div>
+                    <div>
+                        <p :class="['text-3xl font-bold', textPrimary]">{{ healthMetrics?.avg_completion || 0 }}%</p>
+                        <p :class="['text-sm', textMuted]">Completion moyenne</p>
                     </div>
                 </div>
             </GlassCard>
@@ -131,16 +357,11 @@
 
 <script setup>
 import { computed } from 'vue';
+import { router } from '@inertiajs/vue3';
+import { route } from '@/Composables/useRoute';
 import { 
-    FolderKanban, 
-    AlertTriangle, 
-    CheckCircle, 
-    Clock,
-    TrendingUp,
-    TrendingDown,
-    Activity,
-    FileEdit,
-    MessageSquare
+    FolderKanban, AlertTriangle, CheckCircle, Clock, TrendingUp,
+    FileText, Calendar, Rocket, PlayCircle, Flame, AlertCircle
 } from 'lucide-vue-next';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import GlassCard from '@/Components/Glass/GlassCard.vue';
@@ -150,216 +371,108 @@ import { useTheme } from '@/Composables/useTheme';
 
 const { isDarkText } = useTheme();
 
+const textPrimary = computed(() => isDarkText.value ? 'text-gray-900' : 'text-white');
+const textMuted = computed(() => isDarkText.value ? 'text-gray-500' : 'text-slate-400');
+
 const props = defineProps({
-    stats: {
-        type: Object,
-        required: true
-    },
-    criticalProjects: {
-        type: Array,
-        default: () => []
-    },
-    recentActivities: {
-        type: Array,
-        default: () => []
-    }
+    stats: { type: Object, default: () => ({}) },
+    healthMetrics: { type: Object, default: () => ({}) },
+    ragDistribution: { type: Array, default: () => [] },
+    phaseBreakdown: { type: Array, default: () => [] },
+    overdueProjects: { type: Array, default: () => [] },
+    blockedProjects: { type: Array, default: () => [] },
+    upcomingDeadlines: { type: Array, default: () => [] },
+    changelog: { type: Array, default: () => [] },
+    alerts: { type: Array, default: () => [] },
+    criticalProjects: { type: Array, default: () => [] },
+    recentActivities: { type: Array, default: () => [] },
 });
 
-// KPIs
-const kpis = computed(() => [
-    {
-        label: 'Total Projets',
-        value: props.stats.total_projects,
-        subtitle: 'Projets actifs',
-        icon: FolderKanban,
-        bgClass: 'bg-prism-500/20',
-        iconClass: 'text-prism-400',
-        trend: { value: 12, label: 'vs mois dernier' }
+// Quick stats
+const quickStats = computed(() => [
+    { 
+        label: 'Total Projets', 
+        value: props.healthMetrics?.total || 0, 
+        icon: FolderKanban, 
+        bg: 'bg-prism-500/20', 
+        color: 'text-prism-400' 
     },
-    {
-        label: 'Projets GREEN',
-        value: props.stats.green_projects,
-        subtitle: 'En bonne voie',
-        icon: CheckCircle,
-        bgClass: 'bg-green-500/20',
-        iconClass: 'text-green-400',
+    { 
+        label: 'En Cours', 
+        value: props.healthMetrics?.in_progress || 0, 
+        icon: PlayCircle, 
+        bg: 'bg-blue-500/20', 
+        color: 'text-blue-400' 
     },
-    {
-        label: 'Projets AMBER',
-        value: props.stats.amber_projects,
-        subtitle: 'À surveiller',
-        icon: Clock,
-        bgClass: 'bg-amber-500/20',
-        iconClass: 'text-amber-400',
+    { 
+        label: 'Déployés', 
+        value: props.healthMetrics?.deployed || 0, 
+        icon: CheckCircle, 
+        bg: 'bg-green-500/20', 
+        color: 'text-green-400' 
     },
-    {
-        label: 'Projets RED',
-        value: props.stats.red_projects,
-        subtitle: 'Critiques',
-        icon: AlertTriangle,
-        bgClass: 'bg-red-500/20',
-        iconClass: 'text-red-400',
-    }
+    { 
+        label: 'À Risque', 
+        value: props.healthMetrics?.at_risk || 0, 
+        icon: AlertTriangle, 
+        bg: 'bg-red-500/20', 
+        color: 'text-red-400' 
+    },
 ]);
 
-// RAG Chart
-const ragChartSeries = computed(() => {
-    return [
-        props.stats.green_projects || 0,
-        props.stats.amber_projects || 0,
-        props.stats.red_projects || 0,
-    ];
-});
-
-// Couleur du texte pour les graphiques selon le thème
-const chartTextColor = computed(() => isDarkText.value ? '#374151' : '#9ca3af');
-const chartThemeMode = computed(() => isDarkText.value ? 'light' : 'dark');
-
-const ragChartOptions = computed(() => ({
-    chart: {
-        type: 'donut',
-        background: 'transparent',
-        foreColor: chartTextColor.value
-    },
-    labels: ['GREEN', 'AMBER', 'RED'],
-    colors: ['#10b981', '#f59e0b', '#ef4444'],
-    legend: {
-        position: 'bottom',
-        labels: {
-            colors: chartTextColor.value
-        }
-    },
-    dataLabels: {
-        enabled: true,
-        style: {
-            colors: ['#fff']
-        }
-    },
-    plotOptions: {
-        pie: {
-            donut: {
-                size: '70%',
-                labels: {
-                    show: true,
-                    total: {
-                        show: true,
-                        label: 'Total',
-                        color: chartTextColor.value
-                    }
-                }
-            }
-        }
-    },
-    theme: {
-        mode: chartThemeMode.value
-    },
-    noData: {
-        text: 'Aucune donnée disponible',
-        style: {
-            color: chartTextColor.value
-        }
-    }
-}));
-
-// Category Chart
-const categoryChartSeries = computed(() => {
-    if (!props.stats.by_category || props.stats.by_category.length === 0) {
-        return [{
-            name: 'Projets',
-            data: []
-        }];
-    }
-    
-    return [{
-        name: 'Projets',
-        data: props.stats.by_category.map(c => c.count || 0)
-    }];
-});
-
-const categoryChartOptions = computed(() => {
-    const categories = props.stats.by_category?.map(c => c.name || 'Unknown') || [];
-    
-    return {
-        chart: {
-            type: 'bar',
-            background: 'transparent',
-            foreColor: chartTextColor.value,
-            toolbar: {
-                show: false
-            }
-        },
-        xaxis: {
-            categories: categories,
-            labels: {
-                style: {
-                    colors: chartTextColor.value
-                }
-            }
-        },
-        yaxis: {
-            labels: {
-                style: {
-                    colors: chartTextColor.value
-                }
-            }
-        },
-        plotOptions: {
-            bar: {
-                borderRadius: 8,
-                distributed: true
-            }
-        },
-        colors: ['#667eea', '#764ba2', '#f59e0b', '#10b981', '#ef4444'],
-        dataLabels: {
-            enabled: false
-        },
-        legend: {
-            show: false
-        },
-        grid: {
-            borderColor: isDarkText.value ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'
-        },
-        theme: {
-            mode: chartThemeMode.value
-        },
-        noData: {
-            text: 'Aucune donnée disponible',
-            style: {
-                color: chartTextColor.value
-            }
-        }
-    };
-});
-
-// Activity helpers
-const getActivityIcon = (type) => {
-    const icons = {
-        'project_created': FolderKanban,
-        'project_updated': FileEdit,
-        'comment_added': MessageSquare,
-        'phase_updated': Activity,
-        'risk_created': AlertTriangle,
-    };
-    return icons[type] || Activity;
+// Helpers
+const getHealthColor = (score) => {
+    if (score >= 80) return '#10b981';
+    if (score >= 60) return '#f59e0b';
+    return '#ef4444';
 };
 
-const getActivityIconBg = (type) => {
-    const colors = {
-        'project_created': 'bg-prism-500/20 text-prism-400',
-        'project_updated': 'bg-amber-500/20 text-amber-400',
-        'comment_added': 'bg-green-500/20 text-green-400',
-        'phase_updated': 'bg-blue-500/20 text-blue-400',
-        'risk_created': 'bg-red-500/20 text-red-400',
-    };
-    return colors[type] || 'bg-gray-500/20 text-gray-400';
+const getHealthLabel = (score) => {
+    if (score >= 80) return 'Excellent';
+    if (score >= 60) return 'Correct';
+    if (score >= 40) return 'À surveiller';
+    return 'Critique';
 };
 
-const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('fr-FR', {
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+const getPercentage = (value) => {
+    const total = props.ragDistribution?.reduce((sum, r) => sum + r.value, 0) || 1;
+    return Math.round((value / total) * 100);
+};
+
+const getArcLength = (name) => {
+    const item = props.ragDistribution?.find(r => r.name === name);
+    const total = props.ragDistribution?.reduce((sum, r) => sum + r.value, 0) || 1;
+    return ((item?.value || 0) / total) * 251.2;
+};
+
+const getAlertClass = (type) => ({
+    'danger': 'bg-red-500/20 text-red-500 border border-red-500/30',
+    'warning': 'bg-amber-500/20 text-amber-500 border border-amber-500/30',
+    'info': 'bg-blue-500/20 text-blue-500 border border-blue-500/30',
+}[type] || 'bg-gray-500/20 text-gray-500');
+
+const getAlertIcon = (icon) => ({
+    'clock': Clock,
+    'alert-triangle': AlertTriangle,
+    'flame': Flame,
+    'calendar': Calendar,
+    'file-edit': FileText,
+}[icon] || AlertCircle);
+
+const getChangelogBorderClass = (action) => ({
+    'phase_updated': 'border-l-blue-500',
+    'created': 'border-l-green-500',
+    'updated': 'border-l-amber-500',
+    'status_changed': 'border-l-purple-500',
+}[action] || 'border-l-gray-500');
+
+const getChangelogTextClass = (action) => ({
+    'phase_updated': isDarkText.value ? 'text-blue-700' : 'text-blue-300',
+    'created': isDarkText.value ? 'text-green-700' : 'text-green-300',
+    'updated': isDarkText.value ? 'text-amber-700' : 'text-amber-300',
+}[action] || textMuted.value);
+
+const goToProject = (id) => {
+    router.visit(route('projects.show', id));
 };
 </script>

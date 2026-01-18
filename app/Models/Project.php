@@ -39,6 +39,12 @@ class Project extends Model
         'completion_percent' => 'integer',
     ];
 
+    protected $appends = [
+        'calculated_completion_percent',
+        'calculated_rag_status',
+        'health_status',
+    ];
+
     // =====================
     // RELATIONS
     // =====================
@@ -150,6 +156,86 @@ class Project extends Model
     // =====================
     // ACCESSORS
     // =====================
+
+    /**
+     * Calcule le pourcentage de completion basé sur les phases
+     * Deployment ✓ → 100%, UAT ✓ → 85%, Testing ✓ → 60%, Development ✓ → 35%, FRS ✓ → 20%, sinon 10%
+     */
+    public function getCalculatedCompletionPercentAttribute(): int
+    {
+        $phases = $this->phases;
+        
+        if ($phases->isEmpty()) {
+            return 10;
+        }
+
+        // Vérifier chaque phase dans l'ordre inverse (la plus avancée d'abord)
+        $phaseValues = [
+            'Deployment' => 100,
+            'UAT' => 85,
+            'Testing' => 60,
+            'Development' => 35,
+            'FRS' => 20,
+        ];
+
+        foreach ($phaseValues as $phaseName => $value) {
+            $phase = $phases->firstWhere('phase', $phaseName);
+            if ($phase && $phase->status === 'Completed') {
+                return $value;
+            }
+        }
+
+        // Si aucune phase n'est complétée, vérifier si une est en cours
+        foreach ($phaseValues as $phaseName => $value) {
+            $phase = $phases->firstWhere('phase', $phaseName);
+            if ($phase && $phase->status === 'In Progress') {
+                // Retourner la valeur de la phase précédente + un peu
+                return max(10, $value - 10);
+            }
+        }
+
+        return 10;
+    }
+
+    /**
+     * Calcule le RAG Status basé sur le dev_status
+     * Deploy/Configuration Done → Green, Waiting/Not Start → Red, sinon Amber
+     */
+    public function getCalculatedRagStatusAttribute(): string
+    {
+        $devStatus = strtolower($this->dev_status ?? '');
+        $frsStatus = strtolower($this->frs_status ?? '');
+
+        // Green si Deploy ou Configuration Done
+        if (str_contains($devStatus, 'deploy') || str_contains($devStatus, 'configuration done')) {
+            return 'Green';
+        }
+
+        // Red si Waiting ou Not Start
+        if (str_contains($devStatus, 'waiting') || str_contains($frsStatus, 'not start')) {
+            return 'Red';
+        }
+
+        // Sinon Amber
+        return 'Amber';
+    }
+
+    /**
+     * Calcule le Health basé sur le completion %
+     * >= 80% → Green, >= 50% → Amber, sinon Red
+     */
+    public function getHealthStatusAttribute(): string
+    {
+        $completion = $this->calculated_completion_percent;
+
+        if ($completion >= 80) {
+            return 'Green';
+        } elseif ($completion >= 50) {
+            return 'Amber';
+        }
+
+        return 'Red';
+    }
 
     public function getIsBlockedAttribute(): bool
     {

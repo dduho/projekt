@@ -11,6 +11,7 @@ use App\Http\Resources\CommentResource;
 use App\Models\Project;
 use App\Models\Category;
 use App\Models\ActivityLog;
+use App\Models\User;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -33,7 +34,7 @@ class ProjectController extends Controller
             return new ProjectCollection($projects);
         }
 
-        $query = Project::with('category')
+        $query = Project::with(['category', 'owner'])
             ->withCount(['risks', 'changeRequests']);
 
         if ($request->filled('search')) {
@@ -47,8 +48,12 @@ class ProjectController extends Controller
             $query->where('rag_status', $request->rag_status);
         }
 
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
+        if ($request->filled('dev_status')) {
+            $query->where('dev_status', $request->dev_status);
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
         }
 
         $projects = $query->orderBy('created_at', 'desc')->paginate(12);
@@ -57,7 +62,7 @@ class ProjectController extends Controller
         return Inertia::render('Projects/Index', [
             'projects' => $projects,
             'categories' => $categories,
-            'filters' => $request->only(['search', 'rag_status', 'category_id'])
+            'filters' => $request->only(['search', 'rag_status', 'dev_status', 'category'])
         ]);
     }
 
