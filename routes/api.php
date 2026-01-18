@@ -11,6 +11,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ChecklistItemController;
+use App\Http\Controllers\AttachmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -102,4 +104,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('api.notifications.read-all');
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('api.notifications.destroy');
     Route::delete('/notifications', [NotificationController::class, 'destroyAll'])->name('api.notifications.destroy-all');
+
+    // PHASE 1 - Checklist Items & Attachments
+    Route::post('/projects/{project}/checklist-items', [ChecklistItemController::class, 'store'])->name('api.checklist-items.store');
+    Route::patch('/checklist-items/{item}', [ChecklistItemController::class, 'update'])->name('api.checklist-items.update');
+    Route::delete('/checklist-items/{item}', [ChecklistItemController::class, 'destroy'])->name('api.checklist-items.destroy');
+    Route::post('/projects/{project}/checklist-items/reorder', [ChecklistItemController::class, 'reorder'])->name('api.checklist-items.reorder');
+
+    Route::post('/projects/{project}/attachments', [AttachmentController::class, 'store'])->name('api.attachments.store');
+    Route::get('/attachments/{attachment}/download', [AttachmentController::class, 'download'])->name('api.attachments.download');
+    Route::delete('/attachments/{attachment}', [AttachmentController::class, 'destroy'])->name('api.attachments.destroy');
 });

@@ -33,6 +33,9 @@ class DashboardController extends Controller
             'phaseBreakdown' => $this->dashboardService->getPhaseBreakdown(),
             'changelog' => $this->dashboardService->getChangelog(),
             'alerts' => $this->dashboardService->getAlerts(),
+            'allProjects' => \App\Models\Project::with('category')
+                ->select('id', 'name', 'project_code', 'dev_status', 'rag_status', 'completion_percent', 'submission_date', 'target_date', 'category_id')
+                ->get(),
         ];
 
         if ($request->wantsJson()) {

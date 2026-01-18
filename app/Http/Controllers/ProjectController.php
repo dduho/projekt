@@ -195,7 +195,9 @@ class ProjectController extends Controller
             'risks' => fn($q) => $q->orderByDesc('risk_score'),
             'changeRequests' => fn($q) => $q->orderBy('created_at', 'desc'),
             'activities' => fn($q) => $q->with('user')->orderBy('created_at', 'desc')->limit(10),
-            'comments' => fn($q) => $q->with(['user', 'replies.user'])->whereNull('parent_id')->orderBy('created_at', 'desc')
+            'comments' => fn($q) => $q->with(['user', 'replies.user'])->whereNull('parent_id')->orderBy('created_at', 'desc'),
+            'checklistItems' => fn($q) => $q->orderBy('order'),
+            'attachments' => fn($q) => $q->with('creator')->orderBy('created_at', 'desc'),
         ]);
 
         // Auto-calculate ML risk analysis

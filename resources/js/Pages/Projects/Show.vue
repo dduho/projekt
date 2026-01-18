@@ -115,47 +115,47 @@
         <!-- Sidebar -->
         <div class="space-y-4">
           <GlassCard>
-            <h3 :class="['text-lg font-semibold mb-4', textPrimary]">{{ t('Project Details') }}</h3>
-            <div class="space-y-3">
+            <h3 :class="['text-xl font-bold mb-6', textPrimary]">{{ t('Project Details') }}</h3>
+            <div class="space-y-4">
               <div>
-                <p :class="[textMuted, 'text-sm']">{{ t('Category') }}</p>
-                <div class="flex items-center gap-2 mt-1">
+                <p :class="[textMuted, 'text-xs uppercase tracking-wide font-semibold mb-1.5']">{{ t('Category') }}</p>
+                <div class="flex items-center gap-2">
                   <div
-                    class="w-3 h-3 rounded-full"
+                    class="w-3 h-3 rounded-full flex-shrink-0"
                     :style="{ backgroundColor: project.category?.color || '#6366f1' }"
                   ></div>
-                  <p :class="textPrimary">{{ project.category?.name || '-' }}</p>
+                  <p :class="[textPrimary, 'text-sm font-medium']">{{ project.category?.name || '-' }}</p>
                 </div>
               </div>
               <div v-if="project.business_area">
-                <p :class="[textMuted, 'text-sm']">{{ t('Business Area') }}</p>
-                <p :class="textPrimary">{{ project.business_area }}</p>
+                <p :class="[textMuted, 'text-xs uppercase tracking-wide font-semibold mb-1.5']">{{ t('Business Area') }}</p>
+                <p :class="[textPrimary, 'text-sm font-medium']">{{ project.business_area }}</p>
               </div>
               <div>
-                <p :class="[textMuted, 'text-sm']">{{ t('Dev Status') }}</p>
-                <p :class="textPrimary">{{ te('dev_status', project.dev_status) || '-' }}</p>
+                <p :class="[textMuted, 'text-xs uppercase tracking-wide font-semibold mb-1.5']">{{ t('Dev Status') }}</p>
+                <p :class="[textPrimary, 'text-sm font-medium']">{{ te('dev_status', project.dev_status) || '-' }}</p>
               </div>
               <div>
-                <p :class="[textMuted, 'text-sm']">{{ t('Target Date') }}</p>
-                <p :class="textPrimary">{{ formatDate(project.target_date) }}</p>
+                <p :class="[textMuted, 'text-xs uppercase tracking-wide font-semibold mb-1.5']">{{ t('Target Date') }}</p>
+                <p :class="[textPrimary, 'text-sm font-medium']">{{ formatDate(project.target_date) }}</p>
               </div>
               <div v-if="project.submission_date">
-                <p :class="[textMuted, 'text-sm']">{{ t('Submission Date') }}</p>
-                <p :class="textPrimary">{{ formatDate(project.submission_date) }}</p>
+                <p :class="[textMuted, 'text-xs uppercase tracking-wide font-semibold mb-1.5']">{{ t('Submission Date') }}</p>
+                <p :class="[textPrimary, 'text-sm font-medium']">{{ formatDate(project.submission_date) }}</p>
               </div>
               <div v-if="project.planned_release">
-                <p :class="[textMuted, 'text-sm']">{{ t('Planned Release') }}</p>
-                <p :class="textPrimary">{{ formatPlannedRelease(project.planned_release) }}</p>
+                <p :class="[textMuted, 'text-xs uppercase tracking-wide font-semibold mb-1.5']">{{ t('Planned Release') }}</p>
+                <p :class="[textPrimary, 'text-sm font-medium']">{{ formatPlannedRelease(project.planned_release) }}</p>
               </div>
               
               <!-- Owner - Editable -->
               <div>
-                <div class="flex items-center justify-between">
-                  <p :class="[textMuted, 'text-sm']">{{ t('Owner') }}</p>
+                <div class="flex items-center justify-between mb-1.5">
+                  <p :class="[textMuted, 'text-xs uppercase tracking-wide font-semibold']">{{ t('Owner') }}</p>
                   <button 
                     v-if="can('edit projects') && !editingOwner" 
                     @click="editingOwner = true"
-                    :class="['text-xs text-prism-400 hover:text-prism-300']"
+                    :class="['text-xs font-medium text-prism-500 hover:text-prism-600 transition-colors']"
                   >
                     {{ t('Edit') }}
                   </button>
@@ -175,30 +175,30 @@
                     <GlassButton size="sm" variant="ghost" @click="cancelOwnerEdit">{{ t('Cancel') }}</GlassButton>
                   </div>
                 </div>
-                <div v-else class="flex items-center gap-2 mt-1">
+                <div v-else class="flex items-center gap-2">
                   <User class="w-4 h-4" :class="textMuted" />
-                  <p :class="textPrimary">{{ project.owner || t('Unassigned') }}</p>
+                  <p :class="[textPrimary, 'text-sm font-medium']">{{ project.owner || t('Unassigned') }}</p>
                 </div>
               </div>
 
               <div v-if="project.current_progress">
-                <p :class="[textMuted, 'text-sm']">{{ t('Current Progress') }}</p>
-                <p :class="textPrimary">{{ project.current_progress }}</p>
+                <p :class="[textMuted, 'text-xs uppercase tracking-wide font-semibold mb-1.5']">{{ t('Current Progress') }}</p>
+                <p :class="[textPrimary, 'text-sm font-medium']">{{ project.current_progress }}</p>
               </div>
             </div>
           </GlassCard>
 
           <!-- Blockers - Editable -->
           <GlassCard>
-              <div class="flex items-center justify-between mb-3">
-                <h3 :class="['text-lg font-semibold flex items-center gap-2', textPrimary]">
-                  <AlertCircle class="w-5 h-5 text-red-400" />
+              <div class="flex items-center justify-between mb-4">
+                <h3 :class="['text-xl font-bold flex items-center gap-2', textPrimary]">
+                  <AlertCircle class="w-5 h-5 text-red-500" />
                   {{ t('Blockers') }}
                 </h3>
                 <button 
                   v-if="can('edit projects') && !editingBlockers" 
                   @click="editingBlockers = true"
-                  :class="['text-xs text-prism-400 hover:text-prism-300']"
+                  :class="['text-xs font-medium text-prism-500 hover:text-prism-600 transition-colors']"
                 >
                   {{ t('Edit') }}
                 </button>
@@ -220,7 +220,7 @@
               </div>
             </div>
             <div v-else>
-              <p v-if="project.blockers" :class="[textSecondary, 'text-sm']">{{ project.blockers }}</p>
+              <p v-if="project.blockers" :class="[textSecondary, 'text-sm leading-relaxed']">{{ project.blockers }}</p>
               <p v-else :class="[textMuted, 'text-sm italic']">{{ t('No blockers') }}</p>
             </div>
           </GlassCard>
@@ -229,8 +229,8 @@
           <GlassCard>
             <div class="flex items-center justify-between">
               <div>
-                <h3 :class="['text-lg font-semibold flex items-center gap-2', textPrimary]">
-                  <AlertCircle class="w-5 h-5 text-orange-400" />
+                <h3 :class="['text-xl font-bold flex items-center gap-2', textPrimary]">
+                  <AlertCircle class="w-5 h-5 text-orange-500" />
                   {{ t('Need PO') }}
                 </h3>
               </div>
@@ -259,16 +259,16 @@
         <div class="lg:col-span-2 space-y-6">
           <!-- Tabs -->
           <GlassCard>
-            <div :class="['flex border-b', borderColor]">
+            <div :class="['flex flex-wrap gap-1 border-b', borderColor]">
               <button
                 v-for="tab in tabs"
                 :key="tab.id"
                 @click="activeTab = tab.id"
                 :class="[
-                  'px-6 py-3 font-medium transition-colors',
+                  'px-4 py-3 text-sm font-semibold transition-all rounded-t-lg',
                   activeTab === tab.id
-                    ? (isDarkText ? 'text-prism-600 border-b-2 border-prism-500' : 'text-white border-b-2 border-prism-500')
-                    : (isDarkText ? 'text-gray-500 hover:text-gray-900' : 'text-slate-400 hover:text-white')
+                    ? (isDarkText ? 'text-prism-600 bg-prism-50 border-b-2 border-prism-500' : 'text-white bg-white/10 border-b-2 border-prism-500')
+                    : (isDarkText ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-50' : 'text-slate-400 hover:text-white hover:bg-white/5')
                 ]"
               >
                 {{ tab.label }}
@@ -375,19 +375,32 @@
                 </div>
               </div>
 
+              <!-- Timeline Tab -->
+              <div v-if="activeTab === 'timeline'">
+                <GanttChart :phases="project.phases || []" />
+              </div>
+
+              <!-- Checklist Tab -->
+              <div v-if="activeTab === 'checklist'">
+                <ChecklistWidget
+                  :project-id="project.id"
+                  :initial-items="project.checklist_items || []"
+                />
+              </div>
+
+              <!-- Attachments Tab -->
+              <div v-if="activeTab === 'attachments'">
+                <FileUpload
+                  :project-id="project.id"
+                  :initial-attachments="project.attachments || []"
+                />
+              </div>
+
               <!-- Risks Tab -->
               <div v-if="activeTab === 'risks'">
-                <div class="flex justify-between items-center mb-4">
+                <div class="mb-4">
                   <h3 :class="['text-lg font-semibold', textPrimary]">{{ t('Risks') }}</h3>
-                  <GlassButton
-                    variant="primary"
-                    size="sm"
-                    @click="createRisk"
-                    v-if="can('create risks')"
-                  >
-                    <Plus class="w-4 h-4 mr-2" />
-                    {{ t('Add Risk') }}
-                  </GlassButton>
+                  <p :class="['text-sm mt-1', textMuted]">{{ t('Automatically detected risks') }}</p>
                 </div>
                 <div v-if="project.risks?.length" class="space-y-3">
                   <div
@@ -411,49 +424,6 @@
                 </div>
                 <div v-else :class="['text-center py-8', textMuted]">
                   {{ t('No risks recorded') }}
-                </div>
-              </div>
-
-              <!-- Changes Tab -->
-              <div v-if="activeTab === 'changes'">
-                <div class="flex justify-between items-center mb-4">
-                  <h3 :class="['text-lg font-semibold', textPrimary]">{{ t('Change Requests') }}</h3>
-                  <GlassButton
-                    variant="primary"
-                    size="sm"
-                    @click="createChange"
-                    v-if="can('create change-requests')"
-                  >
-                    <Plus class="w-4 h-4 mr-2" />
-                    {{ t('Add Change') }}
-                  </GlassButton>
-                </div>
-                <div v-if="project.changes?.length" class="space-y-3">
-                  <div
-                    v-for="change in project.changes"
-                    :key="change.id"
-                    :class="['p-4 rounded-lg cursor-pointer transition', isDarkText ? 'bg-gray-100 hover:bg-gray-200' : 'glass hover:bg-white/10']"
-                    @click="viewChange(change.id)"
-                  >
-                    <div class="flex justify-between items-start">
-                      <div class="flex-1">
-                        <div class="flex items-center gap-2 mb-2">
-                          <span class="text-xs px-2 py-1 rounded bg-prism-500/20 text-prism-600">
-                            {{ change.change_type }}
-                          </span>
-                          <span :class="['text-xs', textMuted]">{{ change.change_code }}</span>
-                        </div>
-                        <p :class="['text-sm mb-2', textSecondary]">{{ change.description }}</p>
-                        <p :class="['text-xs', textMuted]">
-                          {{ t('Requested by') }} {{ change.requested_by?.name }} {{ t('on') }} {{ formatDate(change.requested_at) }}
-                        </p>
-                      </div>
-                      <StatusBadge :status="changeStatusToRag(change.status)" size="sm" />
-                    </div>
-                  </div>
-                </div>
-                <div v-else :class="['text-center py-8', textMuted]">
-                  {{ t('No change requests') }}
                 </div>
               </div>
 
@@ -597,16 +567,26 @@
               <!-- Activities Tab -->
               <div v-if="activeTab === 'activities'">
                 <h3 :class="['text-lg font-semibold mb-4', textPrimary]">{{ t('Recent Activities') }}</h3>
-                <div v-if="project.activities?.length" class="space-y-3">
+                <div v-if="project.activities?.length" class="space-y-2">
                   <div
                     v-for="activity in project.activities"
                     :key="activity.id"
-                    :class="['flex gap-3 pb-3 border-b last:border-0', borderColor]"
+                    :class="['flex gap-3 p-3 rounded-lg transition-colors', 'hover:bg-gray-50 dark:hover:bg-gray-800/50']"
                   >
-                    <div class="w-2 h-2 rounded-full bg-prism-400 mt-2"></div>
-                    <div class="flex-1">
-                      <p :class="[textPrimary, 'text-sm']">{{ activity.description }}</p>
-                      <p :class="['text-xs mt-1', textMuted]">{{ formatDateTime(activity.created_at) }} {{ t('by') }} {{ activity.user?.name }}</p>
+                    <div :class="['flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center', getActivityIconClass(activity)]">
+                      <component :is="getActivityIcon(activity)" class="w-4 h-4" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-start justify-between gap-2">
+                        <p :class="[textPrimary, 'text-sm font-medium']">
+                          <span class="font-semibold">{{ activity.user?.name }}</span>
+                          {{ getActivityAction(activity) }}
+                        </p>
+                        <span :class="['text-xs flex-shrink-0', textMuted]">{{ formatRelativeTime(activity.created_at) }}</span>
+                      </div>
+                      <p v-if="getActivityTarget(activity)" :class="['text-xs mt-0.5', textMuted]">
+                        {{ getActivityTarget(activity) }}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -649,10 +629,14 @@ import GlassButton from '@/Components/Glass/GlassButton.vue'
 import GlassModal from '@/Components/Glass/GlassModal.vue'
 import StatusBadge from '@/Components/Glass/StatusBadge.vue'
 import ProgressBar from '@/Components/Glass/ProgressBar.vue'
+import ChecklistWidget from '@/Components/ChecklistWidget.vue'
+import FileUpload from '@/Components/FileUpload.vue'
+import GanttChart from '@/Components/GanttChart.vue'
 import {
   ArrowLeft, Edit, Trash2, TrendingUp, Flag,
   AlertTriangle, FileText, AlertCircle, Plus, Check,
-  MessageSquare, Send, X, User
+  MessageSquare, Send, X, User, CheckCircle, XCircle,
+  PlayCircle, PauseCircle, RefreshCw, GitBranch
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -686,8 +670,10 @@ const replyText = ref('')
 
 const tabs = computed(() => [
   { id: 'overview', label: t('Overview') },
+  { id: 'timeline', label: t('Timeline') },
+  { id: 'checklist', label: t('Checklist') },
+  { id: 'attachments', label: t('Attachments') },
   { id: 'risks', label: t('Risks') },
-  { id: 'changes', label: t('Changes') },
   { id: 'comments', label: t('Comments') },
   { id: 'activities', label: t('Activities') },
 ])
@@ -962,4 +948,65 @@ const analyzeRisks = () => {
     })
   }
 }
+
+// Activity helpers
+const getActivityIcon = (activity) => {
+  const desc = activity.description?.toLowerCase() || ''
+  if (desc.includes('created') || desc.includes('créé')) return Plus
+  if (desc.includes('updated') || desc.includes('modifié') || desc.includes('mis à jour')) return Edit
+  if (desc.includes('deleted') || desc.includes('supprimé')) return Trash2
+  if (desc.includes('status') || desc.includes('statut')) return RefreshCw
+  if (desc.includes('completed') || desc.includes('terminé') || desc.includes('completed')) return CheckCircle
+  if (desc.includes('comment') || desc.includes('commentaire')) return MessageSquare
+  if (desc.includes('risk') || desc.includes('risque')) return AlertTriangle
+  if (desc.includes('phase')) return GitBranch
+  return FileText
+}
+
+const getActivityIconClass = (activity) => {
+  const desc = activity.description?.toLowerCase() || ''
+  if (desc.includes('created') || desc.includes('créé')) return 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
+  if (desc.includes('deleted') || desc.includes('supprimé')) return 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
+  if (desc.includes('completed') || desc.includes('terminé')) return 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+  if (desc.includes('risk') || desc.includes('risque')) return 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+  return 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+}
+
+const getActivityAction = (activity) => {
+  const desc = activity.description || ''
+  // Extract action from description (e.g., "Project created" => "a créé le projet")
+  if (desc.includes('created')) return t('created')
+  if (desc.includes('updated')) return t('updated')
+  if (desc.includes('deleted')) return t('deleted')
+  if (desc.includes('status changed')) return t('changed status')
+  if (desc.includes('commented')) return t('commented on')
+  return desc
+}
+
+const getActivityTarget = (activity) => {
+  const desc = activity.description || ''
+  // Extract target from description if present
+  if (desc.includes(':')) {
+    const parts = desc.split(':')
+    return parts.length > 1 ? parts[1].trim() : null
+  }
+  return null
+}
+
+const formatRelativeTime = (date) => {
+  if (!date) return ''
+  const now = new Date()
+  const activityDate = new Date(date)
+  const diffMs = now - activityDate
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays = Math.floor(diffMs / 86400000)
+
+  if (diffMins < 1) return t('Just now')
+  if (diffMins < 60) return t('minutes ago', { count: diffMins })
+  if (diffHours < 24) return t('hours ago', { count: diffHours })
+  if (diffDays < 7) return t('days ago', { count: diffDays })
+  return formatDate(date)
+}
+
 </script>

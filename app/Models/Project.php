@@ -360,4 +360,24 @@ class Project extends Model
         $service = app(\App\Services\RiskScoringService::class);
         return $service->analyzeProject($this);
     }
+
+    // =====================
+    // PHASE 1 - RELATIONS
+    // =====================
+
+    /**
+     * Get the checklist items for this project.
+     */
+    public function checklistItems(): HasMany
+    {
+        return $this->hasMany(ChecklistItem::class);
+    }
+
+    /**
+     * Get the attachments for this project.
+     */
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(Attachment::class);
+    }
 }

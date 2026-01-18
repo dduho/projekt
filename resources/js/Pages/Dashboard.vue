@@ -238,6 +238,13 @@
             </GlassCard>
         </div>
 
+        <!-- Portfolio Timeline -->
+        <div class="mb-6">
+            <GlassCard animated>
+                <PortfolioGantt :projects="allProjects" />
+            </GlassCard>
+        </div>
+
         <!-- Changelog & Upcoming Deadlines -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <!-- Changelog -->
@@ -380,6 +387,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import GlassCard from '@/Components/Glass/GlassCard.vue';
 import StatusBadge from '@/Components/Glass/StatusBadge.vue';
 import ProgressBar from '@/Components/Glass/ProgressBar.vue';
+import PortfolioGantt from '@/Components/PortfolioGantt.vue';
 import { useTheme } from '@/Composables/useTheme';
 import { useTranslation } from '@/Composables/useTranslation';
 
@@ -401,6 +409,7 @@ const props = defineProps({
     alerts: { type: Array, default: () => [] },
     criticalProjects: { type: Array, default: () => [] },
     recentActivities: { type: Array, default: () => [] },
+    allProjects: { type: Array, default: () => [] },
 });
 
 // Quick stats

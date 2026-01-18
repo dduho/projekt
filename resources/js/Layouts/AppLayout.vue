@@ -338,7 +338,6 @@ const navigation = computed(() => [
     { name: t('Dashboard'), href: '/dashboard', icon: LayoutDashboard },
     { name: t('Projects'), href: '/projects', icon: FolderKanban },
     { name: t('Risks'), href: '/risks', icon: AlertTriangle },
-    { name: t('Changes'), href: '/change-requests', icon: FileEdit },
     { name: t('Import Excel'), href: '/import', icon: Upload },
     { name: t('Categories'), href: '/categories', icon: Tag },
     { name: t('Users'), href: '/users', icon: Users },
