@@ -178,7 +178,7 @@ class DashboardService
                 'critical_risks' => $p->risks_count,
                 'blockers' => $p->blockers,
                 'completion_percent' => $p->completion_percent,
-                'target_date' => $p->target_date?->format('d/m/Y'),
+                'target_date' => $p->target_date?->toDateString(),
             ])
             ->toArray();
     }
@@ -195,7 +195,7 @@ class DashboardService
                 'id' => $p->id,
                 'code' => $p->project_code,
                 'name' => $p->name,
-                'target_date' => $p->target_date->format('d/m/Y'),
+                'target_date' => $p->target_date->toDateString(),
                 'days_remaining' => abs(now()->diffInDays($p->target_date)),
                 'rag_status' => $p->rag_status,
                 'dev_status' => $p->dev_status,
@@ -254,7 +254,7 @@ class DashboardService
                 'id' => $p->id,
                 'code' => $p->project_code,
                 'name' => $p->name,
-                'target_date' => $p->target_date->format('d/m/Y'),
+                'target_date' => $p->target_date->toDateString(),
                 'days_overdue' => abs($p->target_date->diffInDays(now())),
                 'rag_status' => $p->calculated_rag_status ?? $p->rag_status,
                 'dev_status' => $p->dev_status,
@@ -283,7 +283,7 @@ class DashboardService
                 'name' => $p->name,
                 'blockers' => $p->blockers,
                 'dev_status' => $p->dev_status,
-                'target_date' => $p->target_date?->format('d/m/Y'),
+                'target_date' => $p->target_date?->toDateString(),
                 'days_until_deadline' => $p->target_date ? (int) ($p->target_date->diffInDays(now(), false) * -1) : null,
                 'owner' => $p->owner?->name ?? 'Non assigné',
                 'category' => $p->category?->name ?? '-',

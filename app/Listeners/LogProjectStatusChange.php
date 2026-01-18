@@ -6,6 +6,7 @@ use App\Events\ProjectStatusChanged;
 use App\Models\ActivityLog;
 use App\Models\User;
 use App\Notifications\ProjectStatusChangedNotification;
+use Illuminate\Support\Facades\Auth;
 
 class LogProjectStatusChange
 {
@@ -16,7 +17,7 @@ class LogProjectStatusChange
     {
         // Log the activity
         ActivityLog::create([
-            'user_id' => auth()->user()?->id,
+            'user_id' => Auth::user()?->id,
             'loggable_type' => 'App\Models\Project',
             'loggable_id' => $event->project->id,
             'action' => 'status_changed',
@@ -32,7 +33,7 @@ class LogProjectStatusChange
 
         foreach ($usersToNotify as $user) {
             // Don't notify the user who made the change
-            if ($user->id !== auth()->user()?->id) {
+            if ($user->id !== Auth::user()?->id) {
                 $user->notify(new ProjectStatusChangedNotification(
                     $event->project,
                     $event->oldStatus,

@@ -321,7 +321,6 @@
     "Describe any blockers or issues": "Décrire tout blocage ou problème",
     "Save Changes": "Enregistrer les modifications",
     "e.g., Integration phase completed": "ex: Phase d'intégration terminée",
-    "FRS Status": "Statut FRS",
     "Development Status": "Statut Dev",
 
     "Phase": "Phase",
@@ -362,5 +361,37 @@
     "alerts.upcoming_deadlines": "Échéances proches",
     "alerts.upcoming_deadlines_message": ":count projet(s) arrivent à échéance dans 7 jours",
     "alerts.pending_changes": "Demandes en attente",
-    "alerts.pending_changes_message": ":count demande(s) de changement en attente"
+    "alerts.pending_changes_message": ":count demande(s) de changement en attente",
+    "Project Information": "Informations du projet"
+    , "View Risks": "Voir les risques"
+    , "View Changes": "Voir les changements"
+    , "Owner name placeholder": "Nom du responsable..."
+    , "Unassigned": "Non assigné"
+    , "Describe blockers": "Décrivez les blocants..."
+    , "No blockers": "Aucun blocant"
+    , "No description provided": "Pas de description fournie"
+    , "Phases": "Phases"
+    , "completed": "terminées"
+    , "Started": "Commencée"
+    , "No phases defined": "Aucune phase définie"
+    , "Add Risk": "Ajouter un risque"
+    , "Add Change": "Ajouter un changement"
+    , "Requested by": "Demandé par"
+    , "on": "le"
+    , "Score": "Score"
+    , "No risks recorded": "Aucun risque enregistré"
+    , "No change requests": "Aucune demande de changement"
+    , "Add a comment": "Ajouter un commentaire..."
+    , "Reply": "Répondre"
+    , "Your reply": "Votre réponse..."
+    , "No comments yet": "Aucun commentaire"
+    , "Be the first to comment": "Soyez le premier à commenter !"
+    , "Recent Activities": "Activités récentes"
+    , "No activities yet": "Aucune activité pour le moment"
+    , "Delete project": "Supprimer le projet"
+    , "Delete project confirmation": "Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible."
+    , "Confirm delete comment": "Supprimer ce commentaire ?"
+    , "Run ML risk analysis?": "Lancer l'analyse automatique des risques via ML ?"
+    , "ML analysis finished, check Risks tab": "Analyse ML terminée ! Consultez l'onglet Risques."
+    , "ML Score": "Score ML"
 }

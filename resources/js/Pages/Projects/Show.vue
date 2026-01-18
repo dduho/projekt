@@ -1,5 +1,5 @@
 <template>
-  <AppLayout page-title="Détails Projet" page-description="Informations du projet">
+  <AppLayout :page-title="t('Project Details')" :page-description="t('Project Information')">
     <div class="max-w-7xl mx-auto space-y-6">
       <!-- Header -->
       <div class="flex items-center justify-between">
@@ -73,7 +73,7 @@
                     'text-xs px-2 py-0.5 rounded-full font-bold',
                     riskLevelClass(project.ml_risk_analysis.level)
                   ]"
-                  :title="`Score ML: ${(project.ml_risk_analysis.score * 100).toFixed(0)}%`"
+                  :title="`${t('ML Score')}: ${(project.ml_risk_analysis.score * 100).toFixed(0)}%`"
                 >
                   {{ project.ml_risk_analysis.level }}
                 </span>
@@ -164,20 +164,20 @@
                   <input 
                     v-model="ownerText"
                     type="text"
-                    placeholder="Nom du responsable..."
+                    :placeholder="t('Owner name placeholder')"
                     :class="[
                       'w-full px-3 py-2 rounded-lg text-sm',
                       isDarkText ? 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400' : 'bg-white/10 border border-white/20 text-white placeholder-gray-400'
                     ]"
                   />
                   <div class="flex gap-2">
-                    <GlassButton size="sm" @click="updateOwner">Sauvegarder</GlassButton>
-                    <GlassButton size="sm" variant="ghost" @click="cancelOwnerEdit">Annuler</GlassButton>
+                    <GlassButton size="sm" @click="updateOwner">{{ t('Save') }}</GlassButton>
+                    <GlassButton size="sm" variant="ghost" @click="cancelOwnerEdit">{{ t('Cancel') }}</GlassButton>
                   </div>
                 </div>
                 <div v-else class="flex items-center gap-2 mt-1">
                   <User class="w-4 h-4" :class="textMuted" />
-                  <p :class="textPrimary">{{ project.owner || 'Non assigné' }}</p>
+                  <p :class="textPrimary">{{ project.owner || t('Unassigned') }}</p>
                 </div>
               </div>
 
@@ -190,38 +190,38 @@
 
           <!-- Blockers - Editable -->
           <GlassCard>
-            <div class="flex items-center justify-between mb-3">
-              <h3 :class="['text-lg font-semibold flex items-center gap-2', textPrimary]">
-                <AlertCircle class="w-5 h-5 text-red-400" />
-                {{ t('Blockers') }}
-              </h3>
-              <button 
-                v-if="can('edit projects') && !editingBlockers" 
-                @click="editingBlockers = true"
-                :class="['text-xs text-prism-400 hover:text-prism-300']"
-              >
-                Modifier
-              </button>
-            </div>
+              <div class="flex items-center justify-between mb-3">
+                <h3 :class="['text-lg font-semibold flex items-center gap-2', textPrimary]">
+                  <AlertCircle class="w-5 h-5 text-red-400" />
+                  {{ t('Blockers') }}
+                </h3>
+                <button 
+                  v-if="can('edit projects') && !editingBlockers" 
+                  @click="editingBlockers = true"
+                  :class="['text-xs text-prism-400 hover:text-prism-300']"
+                >
+                  {{ t('Edit') }}
+                </button>
+              </div>
             
             <div v-if="editingBlockers && can('edit projects')" class="space-y-2">
               <textarea 
                 v-model="blockersText"
                 rows="3"
-                placeholder="Décrivez les blocants..."
+                :placeholder="t('Describe blockers')"
                 :class="[
                   'w-full px-3 py-2 rounded-lg text-sm resize-none',
                   isDarkText ? 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400' : 'bg-white/10 border border-white/20 text-white placeholder-gray-400'
                 ]"
               ></textarea>
               <div class="flex gap-2">
-                <GlassButton size="sm" @click="updateBlockers">Sauvegarder</GlassButton>
-                <GlassButton size="sm" variant="ghost" @click="cancelBlockersEdit">Annuler</GlassButton>
+                <GlassButton size="sm" @click="updateBlockers">{{ t('Save') }}</GlassButton>
+                <GlassButton size="sm" variant="ghost" @click="cancelBlockersEdit">{{ t('Cancel') }}</GlassButton>
               </div>
             </div>
             <div v-else>
               <p v-if="project.blockers" :class="[textSecondary, 'text-sm']">{{ project.blockers }}</p>
-              <p v-else :class="[textMuted, 'text-sm italic']">Aucun blocant</p>
+              <p v-else :class="[textMuted, 'text-sm italic']">{{ t('No blockers') }}</p>
             </div>
           </GlassCard>
 
@@ -231,7 +231,7 @@
               <div>
                 <h3 :class="['text-lg font-semibold flex items-center gap-2', textPrimary]">
                   <AlertCircle class="w-5 h-5 text-orange-400" />
-                  Need PO
+                  {{ t('Need PO') }}
                 </h3>
               </div>
               <label v-if="can('edit projects')" class="relative inline-flex items-center cursor-pointer">
@@ -245,10 +245,10 @@
               </label>
               <div v-else>
                 <span v-if="project.need_po" class="px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800 border border-orange-300">
-                  Oui
+                  {{ t('Yes') }}
                 </span>
                 <span v-else class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-300">
-                  Non
+                  {{ t('No') }}
                 </span>
               </div>
             </div>
@@ -278,13 +278,13 @@
             <div class="mt-6">
               <!-- Overview Tab -->
               <div v-if="activeTab === 'overview'">
-                <h3 :class="['text-lg font-semibold mb-3', textPrimary]">Description</h3>
-                <p :class="[textSecondary, 'mb-6']">{{ project.description || 'No description provided' }}</p>
+                <h3 :class="['text-lg font-semibold mb-3', textPrimary]">{{ t('Description') }}</h3>
+                <p :class="[textSecondary, 'mb-6']">{{ project.description || t('No description provided') }}</p>
 
                 <div class="flex justify-between items-center mb-3">
-                  <h3 :class="['text-lg font-semibold', textPrimary]">Phases</h3>
-                  <div v-if="can('edit projects')" class="flex items-center gap-2">
-                    <span :class="['text-sm', textMuted]">{{ completedPhasesCount }}/{{ project.phases?.length || 0 }} completed</span>
+                  <h3 :class="['text-lg font-semibold', textPrimary]">{{ t('Phases') }}</h3>
+                    <div v-if="can('edit projects')" class="flex items-center gap-2">
+                    <span :class="['text-sm', textMuted]">{{ completedPhasesCount }}/{{ project.phases?.length || 0 }} {{ t('completed') }}</span>
                   </div>
                 </div>
                 
@@ -312,8 +312,8 @@
                         <div>
                           <h4 :class="['font-semibold', textPrimary]">{{ phase.phase }}</h4>
                           <div :class="['text-xs', textMuted]" v-if="phase.started_at || phase.completed_at">
-                            <span v-if="phase.started_at">Started: {{ formatDate(phase.started_at) }}</span>
-                            <span v-if="phase.completed_at"> • Completed: {{ formatDate(phase.completed_at) }}</span>
+                            <span v-if="phase.started_at">{{ t('Started') }}: {{ formatDate(phase.started_at) }}</span>
+                            <span v-if="phase.completed_at"> • {{ t('Completed') }}: {{ formatDate(phase.completed_at) }}</span>
                           </div>
                           <p :class="['text-sm mt-1', textMuted]" v-if="phase.remarks">{{ phase.remarks }}</p>
                         </div>
@@ -329,10 +329,10 @@
                             getPhaseSelectClass(phase.status)
                           ]"
                         >
-                          <option value="Pending">⏳ Pending</option>
-                          <option value="In Progress">🔄 In Progress</option>
-                          <option value="Completed">✅ Completed</option>
-                          <option value="Blocked">🚫 Blocked</option>
+                          <option value="Pending">⏳ {{ t('Pending') }}</option>
+                          <option value="In Progress">🔄 {{ t('In Progress') }}</option>
+                          <option value="Completed">✅ {{ t('Completed') }}</option>
+                          <option value="Blocked">🚫 {{ t('Blocked') }}</option>
                         </select>
                       </div>
                       <StatusBadge v-else :status="phaseStatusToRag(phase.status)" size="sm" />
@@ -348,13 +348,13 @@
                   </div>
                 </div>
                 <div v-else :class="['text-center py-8', textMuted]">
-                  No phases defined
+                  {{ t('No phases defined') }}
                 </div>
 
                 <!-- Priority Section -->
                 <div class="mt-6 pt-6" :class="[borderColor, 'border-t']">
                   <div class="flex justify-between items-center">
-                    <h3 :class="['text-lg font-semibold', textPrimary]">Priority</h3>
+                    <h3 :class="['text-lg font-semibold', textPrimary]">{{ t('Priority') }}</h3>
                     <div v-if="can('edit projects')" class="flex gap-2">
                       <button
                         v-for="priority in ['Low', 'Medium', 'High']"
@@ -378,7 +378,7 @@
               <!-- Risks Tab -->
               <div v-if="activeTab === 'risks'">
                 <div class="flex justify-between items-center mb-4">
-                  <h3 :class="['text-lg font-semibold', textPrimary]">Risks</h3>
+                  <h3 :class="['text-lg font-semibold', textPrimary]">{{ t('Risks') }}</h3>
                   <GlassButton
                     variant="primary"
                     size="sm"
@@ -386,7 +386,7 @@
                     v-if="can('create risks')"
                   >
                     <Plus class="w-4 h-4 mr-2" />
-                    Add Risk
+                    {{ t('Add Risk') }}
                   </GlassButton>
                 </div>
                 <div v-if="project.risks?.length" class="space-y-3">
@@ -400,9 +400,9 @@
                       <div class="flex-1">
                         <p :class="['text-sm mb-2', textSecondary]">{{ risk.description }}</p>
                         <div class="flex gap-3 text-sm">
-                          <span :class="textMuted">Impact: {{ risk.impact }}</span>
-                          <span :class="textMuted">Probability: {{ risk.probability }}</span>
-                          <span :class="riskScoreClass(risk.risk_score)">Score: {{ risk.risk_score }}</span>
+                          <span :class="textMuted">{{ t('Impact') }}: {{ risk.impact }}</span>
+                          <span :class="textMuted">{{ t('Probability') }}: {{ risk.probability }}</span>
+                          <span :class="riskScoreClass(risk.risk_score)">{{ t('Score') }}: {{ risk.risk_score }}</span>
                         </div>
                       </div>
                       <StatusBadge :status="riskStatusToRag(risk.status)" size="sm" />
@@ -410,14 +410,14 @@
                   </div>
                 </div>
                 <div v-else :class="['text-center py-8', textMuted]">
-                  No risks recorded
+                  {{ t('No risks recorded') }}
                 </div>
               </div>
 
               <!-- Changes Tab -->
               <div v-if="activeTab === 'changes'">
                 <div class="flex justify-between items-center mb-4">
-                  <h3 :class="['text-lg font-semibold', textPrimary]">Change Requests</h3>
+                  <h3 :class="['text-lg font-semibold', textPrimary]">{{ t('Change Requests') }}</h3>
                   <GlassButton
                     variant="primary"
                     size="sm"
@@ -425,7 +425,7 @@
                     v-if="can('create change-requests')"
                   >
                     <Plus class="w-4 h-4 mr-2" />
-                    Add Change
+                    {{ t('Add Change') }}
                   </GlassButton>
                 </div>
                 <div v-if="project.changes?.length" class="space-y-3">
@@ -445,7 +445,7 @@
                         </div>
                         <p :class="['text-sm mb-2', textSecondary]">{{ change.description }}</p>
                         <p :class="['text-xs', textMuted]">
-                          Requested by {{ change.requested_by?.name }} on {{ formatDate(change.requested_at) }}
+                          {{ t('Requested by') }} {{ change.requested_by?.name }} {{ t('on') }} {{ formatDate(change.requested_at) }}
                         </p>
                       </div>
                       <StatusBadge :status="changeStatusToRag(change.status)" size="sm" />
@@ -453,7 +453,7 @@
                   </div>
                 </div>
                 <div v-else :class="['text-center py-8', textMuted]">
-                  No change requests
+                  {{ t('No change requests') }}
                 </div>
               </div>
 
@@ -461,7 +461,7 @@
               <div v-if="activeTab === 'comments'">
                 <h3 :class="['text-lg font-semibold mb-4 flex items-center gap-2', textPrimary]">
                   <MessageSquare class="w-5 h-5" />
-                  Comments ({{ project.comments?.length || 0 }})
+                  {{ t('Comments') }} ({{ project.comments?.length || 0 }})
                 </h3>
                 
                 <!-- New Comment Form -->
@@ -477,7 +477,7 @@
                       <textarea 
                         v-model="newComment"
                         rows="3"
-                        placeholder="Ajouter un commentaire..."
+                        :placeholder="t('Add a comment')"
                         :class="[
                           'w-full px-3 py-2 rounded-lg text-sm resize-none',
                           isDarkText ? 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400' : 'bg-white/10 border border-white/20 text-white placeholder-gray-400'
@@ -490,7 +490,7 @@
                           :disabled="!newComment.trim()"
                         >
                           <Send class="w-4 h-4 mr-1" />
-                          Envoyer
+                          {{ t('Send') }}
                         </GlassButton>
                       </div>
                     </div>
@@ -523,14 +523,14 @@
                             @click="replyingTo = replyingTo === comment.id ? null : comment.id"
                             :class="['text-xs text-prism-400 hover:text-prism-300']"
                           >
-                            Répondre
+                            {{ t('Reply') }}
                           </button>
                           <button 
                             v-if="comment.user_id === currentUserId || can('delete projects')"
                             @click="deleteComment(comment.id)"
                             class="text-xs text-red-400 hover:text-red-300"
                           >
-                            Supprimer
+                            {{ t('Delete') }}
                           </button>
                         </div>
 
@@ -539,7 +539,7 @@
                           <input 
                             v-model="replyText"
                             type="text"
-                            placeholder="Votre réponse..."
+                            :placeholder="t('Your reply')"
                             :class="[
                               'flex-1 px-3 py-2 rounded-lg text-sm',
                               isDarkText ? 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400' : 'bg-white/10 border border-white/20 text-white placeholder-gray-400'
@@ -580,7 +580,7 @@
                             @click="deleteComment(reply.id)"
                             class="text-xs text-red-400 hover:text-red-300 mt-1"
                           >
-                            Supprimer
+                            {{ t('Delete') }}
                           </button>
                         </div>
                       </div>
@@ -589,14 +589,14 @@
                 </div>
                 <div v-else :class="['text-center py-8', textMuted]">
                   <MessageSquare class="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>Aucun commentaire</p>
-                  <p class="text-sm mt-1">Soyez le premier à commenter !</p>
+                  <p>{{ t('No comments yet') }}</p>
+                  <p class="text-sm mt-1">{{ t('Be the first to comment') }}</p>
                 </div>
               </div>
 
               <!-- Activities Tab -->
               <div v-if="activeTab === 'activities'">
-                <h3 :class="['text-lg font-semibold mb-4', textPrimary]">Recent Activities</h3>
+                <h3 :class="['text-lg font-semibold mb-4', textPrimary]">{{ t('Recent Activities') }}</h3>
                 <div v-if="project.activities?.length" class="space-y-3">
                   <div
                     v-for="activity in project.activities"
@@ -606,12 +606,12 @@
                     <div class="w-2 h-2 rounded-full bg-prism-400 mt-2"></div>
                     <div class="flex-1">
                       <p :class="[textPrimary, 'text-sm']">{{ activity.description }}</p>
-                      <p :class="['text-xs mt-1', textMuted]">{{ formatDateTime(activity.created_at) }} by {{ activity.user?.name }}</p>
+                      <p :class="['text-xs mt-1', textMuted]">{{ formatDateTime(activity.created_at) }} {{ t('by') }} {{ activity.user?.name }}</p>
                     </div>
                   </div>
                 </div>
                 <div v-else :class="['text-center py-8', textMuted]">
-                  No activities yet
+                  {{ t('No activities yet') }}
                 </div>
               </div>
             </div>
@@ -621,16 +621,16 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <GlassModal v-model="showDeleteModal" title="Delete Project">
+    <GlassModal v-model="showDeleteModal" :title="t('Delete project')">
       <p :class="[textSecondary, 'mb-6']">
-        Are you sure you want to delete this project? This action cannot be undone.
+        {{ t('Delete project confirmation') }}
       </p>
       <div class="flex justify-end gap-3">
         <GlassButton variant="secondary" @click="showDeleteModal = false">
-          Cancel
+          {{ t('Cancel') }}
         </GlassButton>
         <GlassButton variant="danger" @click="deleteProject">
-          Delete Project
+          {{ t('Delete project') }}
         </GlassButton>
       </div>
     </GlassModal>
@@ -943,7 +943,7 @@ const submitReply = (parentId) => {
 }
 
 const deleteComment = (commentId) => {
-  if (confirm('Supprimer ce commentaire ?')) {
+  if (confirm(t('Confirm delete comment'))) {
     router.delete(route('comments.destroy', commentId), {
       preserveScroll: true,
     })
@@ -953,11 +953,11 @@ const deleteComment = (commentId) => {
 const currentUserId = computed(() => page.props.auth?.user?.id)
 
 const analyzeRisks = () => {
-  if (confirm('Lancer l\'analyse automatique des risques via ML ?')) {
+  if (confirm(t('Run ML risk analysis?'))) {
     router.post(route('projects.analyze-risks', props.project), {}, {
       preserveScroll: true,
       onSuccess: () => {
-        alert('Analyse ML terminée ! Consultez l\'onglet Risks.')
+        alert(t('ML analysis finished, check Risks tab'))
       }
     })
   }
