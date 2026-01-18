@@ -1,9 +1,9 @@
 <template>
     <div class="glass-card">
         <!-- Header with Search and Actions -->
-        <div class="card-header">
+        <div :class="['card-header', isDarkText ? 'border-gray-200' : 'border-white/10']">
             <div class="flex-1">
-                <h3 v-if="title" class="card-title">{{ title }}</h3>
+                <h3 v-if="title" :class="['card-title', isDarkText ? 'text-gray-900' : 'text-white']">{{ title }}</h3>
             </div>
             
             <div class="flex items-center gap-4">
@@ -13,9 +13,9 @@
                         v-model="searchQuery"
                         type="text"
                         placeholder="Rechercher..."
-                        class="input-glass w-64 pl-10"
+                        :class="['input-glass w-64 pl-10', isDarkText ? 'text-gray-900 placeholder-gray-500' : 'text-white placeholder-gray-400']"
                     />
-                    <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Search :class="['absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4', isDarkText ? 'text-gray-500' : 'text-gray-400']" />
                 </div>
                 
                 <!-- Slot for custom actions -->
@@ -24,7 +24,7 @@
         </div>
 
         <!-- Filters (optional) -->
-        <div v-if="$slots.filters" class="mb-6 pb-4 border-b border-white/10">
+        <div v-if="$slots.filters" :class="['mb-6 pb-4 border-b', isDarkText ? 'border-gray-200' : 'border-white/10']">
             <slot name="filters" />
         </div>
 
@@ -36,7 +36,7 @@
                         <th
                             v-for="column in columns"
                             :key="column.key"
-                            :class="column.headerClass"
+                            :class="[column.headerClass, isDarkText ? 'text-gray-700 border-gray-200' : 'text-gray-300 border-white/10']"
                             @click="column.sortable ? handleSort(column.key) : null"
                             class="cursor-pointer"
                         >
@@ -49,7 +49,7 @@
                                 />
                             </div>
                         </th>
-                        <th v-if="$slots.actions" class="text-right">Actions</th>
+                        <th v-if="$slots.actions" :class="['text-right', isDarkText ? 'text-gray-700' : 'text-gray-300']">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -60,11 +60,20 @@
                     </tr>
                     <tr v-else-if="paginatedData.length === 0">
                         <td :colspan="columns.length + ($slots.actions ? 1 : 0)" class="text-center py-8">
-                            <p class="text-gray-400">{{ emptyMessage }}</p>
+                            <p :class="isDarkText ? 'text-gray-600' : 'text-gray-400'">{{ emptyMessage }}</p>
                         </td>
                     </tr>
-                    <tr v-else v-for="(row, index) in paginatedData" :key="row[rowKey] || index">
-                        <td v-for="column in columns" :key="column.key" :class="column.cellClass">
+                    <tr 
+                        v-else 
+                        v-for="(row, index) in paginatedData" 
+                        :key="row[rowKey] || index"
+                        :class="isDarkText ? 'border-gray-100 hover:bg-gray-50' : 'border-white/5 hover:bg-white/5'"
+                    >
+                        <td 
+                            v-for="column in columns" 
+                            :key="column.key" 
+                            :class="[column.cellClass, isDarkText ? 'text-gray-800' : 'text-gray-200']"
+                        >
                             <slot :name="`cell-${column.key}`" :row="row" :value="row[column.key]">
                                 {{ formatCell(row[column.key], column) }}
                             </slot>
@@ -78,8 +87,8 @@
         </div>
 
         <!-- Pagination -->
-        <div v-if="paginate && !loading && totalPages > 1" class="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
-            <div class="text-sm text-gray-400">
+        <div v-if="paginate && !loading && totalPages > 1" :class="['flex items-center justify-between mt-6 pt-4 border-t', isDarkText ? 'border-gray-200' : 'border-white/10']">
+            <div :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">
                 Affichage {{ (currentPage - 1) * perPage + 1 }} à {{ Math.min(currentPage * perPage, filteredData.length) }} sur {{ filteredData.length }} résultats
             </div>
             
@@ -117,6 +126,9 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { Search, ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { useTheme } from '@/Composables/useTheme';
+
+const { isDarkText } = useTheme();
 
 const props = defineProps({
     title: {

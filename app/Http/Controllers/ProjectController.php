@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ProjectCreated;
+use App\Events\ProjectStatusChanged;
 use App\Http\Requests\ProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\ProjectCollection;
@@ -128,6 +130,9 @@ class ProjectController extends Controller
             'action' => 'created',
             'changes' => ['name' => $project->name],
         ]);
+
+        // Dispatch event
+        event(new ProjectCreated($project, Auth::user()));
 
         return redirect()->route('projects.show', $project)
             ->with('success', 'Projet cree avec succes!');
@@ -333,7 +338,7 @@ class ProjectController extends Controller
         ]);
 
         $comment = $project->comments()->create([
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'content' => $request->content,
             'parent_id' => $request->parent_id,
         ]);

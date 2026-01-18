@@ -1,5 +1,5 @@
 <template>
-  <AppLayout title="Notifications" pageTitle="Notifications" pageDescription="Historique de toutes vos notifications">
+  <AppLayout page-title="Notifications" page-description="Historique de vos notifications">
     <div class="max-w-4xl mx-auto">
       <!-- Header Actions -->
       <div class="flex items-center justify-between mb-6">

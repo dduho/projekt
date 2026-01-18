@@ -18,12 +18,15 @@
         />
         
         <p v-if="error" class="mt-2 text-sm text-red-400">{{ error }}</p>
-        <p v-else-if="hint" class="mt-2 text-sm text-gray-400">{{ hint }}</p>
+        <p v-else-if="hint" :class="['mt-2 text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ hint }}</p>
     </div>
 </template>
 
 <script setup>
 import { computed } from 'vue';
+import { useTheme } from '@/Composables/useTheme';
+
+const { isDarkText } = useTheme();
 
 const props = defineProps({
     modelValue: {

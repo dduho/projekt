@@ -15,7 +15,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Inter', ...defaultTheme.fontFamily.sans],
+                sans: ['Lexend', ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 prism: {
@@ -48,6 +48,8 @@ export default {
             backgroundImage: {
                 'gradient-prism': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 'gradient-prism-r': 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                'gradient-orange-blue': 'linear-gradient(135deg, #ffa07a 0%, #87ceeb 100%)',
+                'gradient-orange-blue-animated': 'linear-gradient(-45deg, #ffa07a, #ffb366, #87ceeb, #6eb5d4)',
             },
             boxShadow: {
                 'glass': '0 8px 32px 0 rgba(102, 126, 234, 0.15)',

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChangeRequestApproved;
 use App\Http\Requests\ChangeRequestRequest;
 use App\Http\Resources\ChangeRequestResource;
 use App\Models\ChangeRequest;

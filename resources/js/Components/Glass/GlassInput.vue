@@ -1,13 +1,13 @@
 <template>
     <div class="w-full">
-        <label v-if="label" :for="inputId" class="label-glass">
+        <label v-if="label" :for="inputId" :class="['label-glass', isDarkText ? 'text-gray-700' : 'text-gray-300']">
             {{ label }}
             <span v-if="required" class="text-red-400 ml-1">*</span>
         </label>
         
         <div class="relative">
             <div v-if="icon" class="absolute left-3 top-1/2 transform -translate-y-1/2">
-                <component :is="icon" class="w-5 h-5 text-gray-400" />
+                <component :is="icon" :class="['w-5 h-5', isDarkText ? 'text-gray-600' : 'text-gray-400']" />
             </div>
             
             <input
@@ -29,12 +29,15 @@
         </div>
         
         <p v-if="error" class="mt-2 text-sm text-red-400">{{ error }}</p>
-        <p v-else-if="hint" class="mt-2 text-sm text-gray-400">{{ hint }}</p>
+        <p v-else-if="hint" :class="['mt-2 text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ hint }}</p>
     </div>
 </template>
 
 <script setup>
 import { computed } from 'vue';
+import { useTheme } from '@/Composables/useTheme';
+
+const { isDarkText } = useTheme();
 
 const props = defineProps({
     modelValue: {
@@ -81,6 +84,9 @@ const inputId = computed(() => `input-${Math.random().toString(36).substr(2, 9)}
 
 const inputClasses = computed(() => {
     const classes = ['input-glass'];
+    
+    // Couleur de texte dynamique
+    classes.push(isDarkText.value ? 'text-gray-900 placeholder-gray-500' : 'text-white placeholder-gray-400');
     
     if (props.icon) {
         classes.push('pl-10');

@@ -1,13 +1,13 @@
 <template>
     <div class="w-full">
-        <label v-if="label" :for="selectId" class="label-glass">
+        <label v-if="label" :for="selectId" :class="['label-glass', isDarkText ? 'text-gray-700' : 'text-gray-300']">
             {{ label }}
             <span v-if="required" class="text-red-400 ml-1">*</span>
         </label>
         
         <div class="relative">
             <div v-if="icon" class="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <component :is="icon" class="w-5 h-5 text-gray-400" />
+                <component :is="icon" :class="['w-5 h-5', isDarkText ? 'text-gray-600' : 'text-gray-400']" />
             </div>
             
             <select
@@ -29,18 +29,21 @@
             </select>
             
             <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <ChevronDown class="w-5 h-5 text-gray-400" />
+                <ChevronDown :class="['w-5 h-5', isDarkText ? 'text-gray-600' : 'text-gray-400']" />
             </div>
         </div>
         
         <p v-if="error" class="mt-2 text-sm text-red-400">{{ error }}</p>
-        <p v-else-if="hint" class="mt-2 text-sm text-gray-400">{{ hint }}</p>
+        <p v-else-if="hint" :class="['mt-2 text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ hint }}</p>
     </div>
 </template>
 
 <script setup>
 import { computed } from 'vue';
 import { ChevronDown } from 'lucide-vue-next';
+import { useTheme } from '@/Composables/useTheme';
+
+const { isDarkText } = useTheme();
 
 const props = defineProps({
     modelValue: {
@@ -95,6 +98,9 @@ const selectId = computed(() => `select-${Math.random().toString(36).substr(2, 9
 
 const selectClasses = computed(() => {
     const classes = ['input-glass appearance-none pr-10'];
+    
+    // Couleur de texte dynamique
+    classes.push(isDarkText.value ? 'text-gray-900' : 'text-white');
     
     if (props.icon) {
         classes.push('pl-10');

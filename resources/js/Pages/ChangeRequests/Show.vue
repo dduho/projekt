@@ -1,5 +1,5 @@
 <template>
-  <AppLayout>
+  <AppLayout page-title="Détails Demande" page-description="Informations de la demande">
     <div class="max-w-5xl mx-auto space-y-6">
       <!-- Header -->
       <div class="flex items-center justify-between">

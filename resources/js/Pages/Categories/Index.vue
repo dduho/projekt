@@ -1,11 +1,11 @@
 <template>
-  <AppLayout>
+  <AppLayout page-title="Categories" page-description="Gestion des catégories">
     <div class="space-y-6">
       <!-- Header -->
       <div class="flex justify-between items-center">
         <div>
-          <h1 class="text-3xl font-bold text-white mb-2">Categories</h1>
-          <p class="text-slate-300">Manage project categories and their colors</p>
+          <h1 :class="['text-3xl font-bold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">Categories</h1>
+          <p :class="isDarkText ? 'text-gray-600' : 'text-slate-300'">Manage project categories and their colors</p>
         </div>
         <GlassButton 
           variant="primary" 
@@ -30,8 +30,8 @@
                 :style="{ backgroundColor: category.color }"
               ></div>
               <div>
-                <h3 class="text-lg font-semibold text-white">{{ category.name }}</h3>
-                <p class="text-sm text-slate-400">{{ category.projects_count || 0 }} projects</p>
+                <h3 :class="['text-lg font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ category.name }}</h3>
+                <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-slate-400']">{{ category.projects_count || 0 }} projects</p>
               </div>
             </div>
             <div class="flex gap-1">
@@ -51,16 +51,16 @@
               </GlassButton>
             </div>
           </div>
-          <p class="text-sm text-slate-300">{{ category.description }}</p>
+          <p :class="['text-sm', isDarkText ? 'text-gray-700' : 'text-slate-300']">{{ category.description }}</p>
         </GlassCard>
       </div>
 
       <!-- Empty State -->
       <div v-if="categories.length === 0" class="text-center py-12">
         <GlassCard class="max-w-md mx-auto p-8">
-          <Tag class="w-16 h-16 mx-auto text-slate-400 mb-4" />
-          <h3 class="text-xl font-semibold text-white mb-2">No categories yet</h3>
-          <p class="text-slate-300 mb-6">Start by creating your first category</p>
+          <Tag :class="['w-16 h-16 mx-auto mb-4', isDarkText ? 'text-gray-400' : 'text-slate-400']" />
+          <h3 :class="['text-xl font-semibold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">No categories yet</h3>
+          <p :class="['mb-6', isDarkText ? 'text-gray-600' : 'text-slate-300']">Start by creating your first category</p>
           <GlassButton 
             variant="primary" 
             @click="showModal = true; editingCategory = null; resetForm()"
@@ -74,7 +74,8 @@
 
     <!-- Create/Edit Modal -->
     <GlassModal 
-      v-model="showModal" 
+      :show="showModal"
+      @close="showModal = false"
       :title="editingCategory ? 'Edit Category' : 'Create Category'"
     >
       <form @submit.prevent="submit">
@@ -92,18 +93,18 @@
             label="Description"
             placeholder="Category description"
             :error="form.errors.description"
-            rows="3"
+            :rows="3"
           />
 
           <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">
+            <label :class="['block text-sm font-medium mb-2', isDarkText ? 'text-gray-700' : 'text-slate-300']">
               Color
             </label>
             <div class="flex gap-3 items-center">
               <input
                 type="color"
                 v-model="form.color"
-                class="w-16 h-10 rounded-lg cursor-pointer bg-transparent border-2 border-white/20"
+                :class="['w-16 h-10 rounded-lg cursor-pointer bg-transparent border-2', isDarkText ? 'border-gray-300' : 'border-white/20']"
               />
               <GlassInput
                 v-model="form.color"
@@ -112,7 +113,7 @@
                 class="flex-1"
               />
             </div>
-            <p class="text-xs text-slate-400 mt-1">
+            <p :class="['text-xs mt-1', isDarkText ? 'text-gray-600' : 'text-slate-400']">
               Preview: <span :style="{ color: form.color }">■ {{ form.color }}</span>
             </p>
           </div>
@@ -141,8 +142,8 @@
     </GlassModal>
 
     <!-- Delete Confirmation -->
-    <GlassModal v-model="showDeleteModal" title="Delete Category">
-      <p class="text-slate-300 mb-6">
+    <GlassModal :show="showDeleteModal" @close="showDeleteModal = false" title="Delete Category">
+      <p :class="['mb-6', isDarkText ? 'text-gray-700' : 'text-slate-300']">
         Are you sure you want to delete "{{ deletingCategory?.name }}"? 
         {{ deletingCategory?.projects_count > 0 ? `This category has ${deletingCategory.projects_count} project(s).` : '' }}
       </p>
@@ -168,6 +169,9 @@ import GlassInput from '@/Components/Glass/GlassInput.vue'
 import GlassTextarea from '@/Components/Glass/GlassTextarea.vue'
 import GlassModal from '@/Components/Glass/GlassModal.vue'
 import { Plus, Edit, Trash2, Tag, Save, Loader2 } from 'lucide-vue-next'
+import { useTheme } from '@/Composables/useTheme'
+
+const { isDarkText } = useTheme()
 
 const props = defineProps({
   categories: Array,

@@ -1,6 +1,9 @@
 <template>
-    <div class="min-h-screen flex items-center justify-center p-6">
-        <div class="w-full max-w-md">
+    <div class="min-h-screen flex items-center justify-center p-6 relative">
+        <!-- Background animé avec pictogrammes -->
+        <BackgroundIcons />
+        
+        <div class="w-full max-w-md relative z-10">
             <!-- Logo -->
             <div class="text-center mb-8 animate-fade-in">
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-prism rounded-2xl shadow-glass-lg mb-4">
@@ -26,6 +29,7 @@
 <script setup>
 import { computed } from 'vue';
 import { Zap } from 'lucide-vue-next';
+import BackgroundIcons from '@/Components/BackgroundIcons.vue';
 
 const currentYear = computed(() => new Date().getFullYear());
 </script>

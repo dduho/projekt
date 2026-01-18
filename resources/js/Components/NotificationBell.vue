@@ -2,7 +2,12 @@
   <div class="relative">
     <button
       @click="toggleDropdown"
-      class="relative p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+      :class="[
+        'relative p-2 rounded-lg transition-colors',
+        isDarkText 
+          ? 'text-gray-600 hover:text-gray-900 hover:bg-white/30' 
+          : 'text-white/70 hover:text-white hover:bg-white/10'
+      ]"
     >
       <Bell class="w-5 h-5" />
       <span
@@ -24,11 +29,16 @@
     >
       <div
         v-if="isOpen"
-        class="absolute right-0 mt-2 w-80 bg-slate-800/95 backdrop-blur-xl border border-white/20 rounded-xl shadow-xl overflow-hidden z-50"
+        :class="[
+          'absolute right-0 mt-2 w-80 backdrop-blur-xl rounded-xl shadow-xl overflow-hidden z-50',
+          isDarkText 
+            ? 'bg-white/90 border border-gray-200' 
+            : 'bg-slate-800/95 border border-white/20'
+        ]"
       >
         <!-- Header -->
-        <div class="flex items-center justify-between px-4 py-3 border-b border-white/10">
-          <h3 class="text-white font-semibold">Notifications</h3>
+        <div :class="['flex items-center justify-between px-4 py-3 border-b', isDarkText ? 'border-gray-200' : 'border-white/10']">
+          <h3 :class="['font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">Notifications</h3>
           <button
             v-if="unreadCount > 0"
             @click="markAllAsRead"
@@ -41,20 +51,23 @@
         <!-- Notifications List -->
         <div class="max-h-96 overflow-y-auto">
           <div v-if="loading" class="p-4 text-center">
-            <div class="animate-spin w-6 h-6 border-2 border-white/30 border-t-white rounded-full mx-auto"></div>
+            <div :class="['animate-spin w-6 h-6 border-2 rounded-full mx-auto', isDarkText ? 'border-gray-300 border-t-gray-600' : 'border-white/30 border-t-white']"></div>
           </div>
 
           <div v-else-if="notifications.length === 0" class="p-8 text-center">
-            <BellOff class="w-12 h-12 text-white/30 mx-auto mb-3" />
-            <p class="text-white/50 text-sm">Aucune notification</p>
+            <BellOff :class="['w-12 h-12 mx-auto mb-3', isDarkText ? 'text-gray-400' : 'text-white/30']" />
+            <p :class="['text-sm', isDarkText ? 'text-gray-500' : 'text-white/50']">Aucune notification</p>
           </div>
 
           <div v-else>
             <div
               v-for="notification in notifications"
               :key="notification.id"
-              class="px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
-              :class="{ 'bg-primary-500/10': !notification.read_at }"
+              :class="[
+                'px-4 py-3 border-b transition-colors cursor-pointer',
+                isDarkText ? 'border-gray-100 hover:bg-gray-100' : 'border-white/5 hover:bg-white/5',
+                !notification.read_at ? 'bg-primary-500/10' : ''
+              ]"
               @click="handleNotificationClick(notification)"
             >
               <div class="flex items-start gap-3">
@@ -65,17 +78,17 @@
                   <component :is="getIcon(notification.data.type)" class="w-4 h-4 text-white" />
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm text-white" :class="{ 'font-medium': !notification.read_at }">
+                  <p :class="['text-sm', isDarkText ? 'text-gray-900' : 'text-white', { 'font-medium': !notification.read_at }]">
                     {{ notification.data.message }}
                   </p>
-                  <p class="text-xs text-white/50 mt-1">
+                  <p :class="['text-xs mt-1', isDarkText ? 'text-gray-500' : 'text-white/50']">
                     {{ formatTime(notification.created_at) }}
                   </p>
                 </div>
                 <button
                   v-if="!notification.read_at"
                   @click.stop="markAsRead(notification.id)"
-                  class="text-white/40 hover:text-white/70"
+                  :class="isDarkText ? 'text-gray-400 hover:text-gray-700' : 'text-white/40 hover:text-white/70'"
                 >
                   <Check class="w-4 h-4" />
                 </button>
@@ -85,7 +98,7 @@
         </div>
 
         <!-- Footer -->
-        <div class="px-4 py-3 border-t border-white/10">
+        <div :class="['px-4 py-3 border-t', isDarkText ? 'border-gray-200' : 'border-white/10']">
           <a
             href="/notifications"
             class="text-sm text-primary-400 hover:text-primary-300 flex items-center justify-center gap-1"
@@ -112,6 +125,9 @@ import {
   Info,
 } from 'lucide-vue-next';
 import axios from 'axios';
+import { useTheme } from '@/Composables/useTheme';
+
+const { isDarkText } = useTheme();
 
 const isOpen = ref(false);
 const loading = ref(false);

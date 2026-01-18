@@ -13,9 +13,9 @@
             >
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-gray-400 mb-1">{{ kpi.label }}</p>
-                        <h3 class="text-3xl font-bold text-white">{{ kpi.value }}</h3>
-                        <p class="text-xs text-gray-400 mt-1">{{ kpi.subtitle }}</p>
+                        <p :class="['text-sm mb-1', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ kpi.label }}</p>
+                        <h3 :class="['text-3xl font-bold', isDarkText ? 'text-gray-900' : 'text-white']">{{ kpi.value }}</h3>
+                        <p :class="['text-xs mt-1', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ kpi.subtitle }}</p>
                     </div>
                     <div 
                         class="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -38,7 +38,7 @@
                     >
                         {{ Math.abs(kpi.trend.value) }}%
                     </span>
-                    <span class="text-xs text-gray-400">{{ kpi.trend.label }}</span>
+                    <span :class="['text-xs', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ kpi.trend.label }}</span>
                 </div>
             </GlassCard>
         </div>
@@ -68,10 +68,10 @@
                         class="p-3 glass-subtle rounded-lg hover:glass-hover cursor-pointer transition-all"
                     >
                         <div class="flex items-start justify-between mb-2">
-                            <h4 class="text-sm font-semibold text-white">{{ project.name }}</h4>
+                            <h4 :class="['text-sm font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ project.name }}</h4>
                             <StatusBadge :status="project.rag_status" />
                         </div>
-                        <p class="text-xs text-gray-400 mb-2">{{ project.project_code }}</p>
+                        <p :class="['text-xs mb-2', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ project.project_code }}</p>
                         <ProgressBar 
                             :value="project.overall_progress"
                             :max="100"
@@ -81,7 +81,7 @@
                     
                     <div v-if="criticalProjects.length === 0" class="text-center py-8">
                         <CheckCircle class="w-12 h-12 text-green-400 mx-auto mb-2" />
-                        <p class="text-sm text-gray-400">Aucun projet critique</p>
+                        <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">Aucun projet critique</p>
                     </div>
                 </div>
             </GlassCard>
@@ -114,14 +114,14 @@
                             <component :is="getActivityIcon(activity.type)" class="w-4 h-4" />
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm text-white">{{ activity.description }}</p>
-                            <p class="text-xs text-gray-400 mt-1">{{ formatDate(activity.created_at) }}</p>
+                            <p :class="['text-sm', isDarkText ? 'text-gray-900' : 'text-white']">{{ activity.description }}</p>
+                            <p :class="['text-xs mt-1', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ formatDate(activity.created_at) }}</p>
                         </div>
                     </div>
                     
                     <div v-if="recentActivities.length === 0" class="text-center py-8">
-                        <Activity class="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                        <p class="text-sm text-gray-400">Aucune activité récente</p>
+                        <Activity :class="['w-12 h-12 mx-auto mb-2', isDarkText ? 'text-gray-600' : 'text-gray-400']" />
+                        <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">Aucune activité récente</p>
                     </div>
                 </div>
             </GlassCard>
@@ -146,6 +146,9 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import GlassCard from '@/Components/Glass/GlassCard.vue';
 import StatusBadge from '@/Components/Glass/StatusBadge.vue';
 import ProgressBar from '@/Components/Glass/ProgressBar.vue';
+import { useTheme } from '@/Composables/useTheme';
+
+const { isDarkText } = useTheme();
 
 const props = defineProps({
     stats: {
@@ -200,24 +203,30 @@ const kpis = computed(() => [
 ]);
 
 // RAG Chart
-const ragChartSeries = computed(() => [
-    props.stats.green_projects,
-    props.stats.amber_projects,
-    props.stats.red_projects,
-]);
+const ragChartSeries = computed(() => {
+    return [
+        props.stats.green_projects || 0,
+        props.stats.amber_projects || 0,
+        props.stats.red_projects || 0,
+    ];
+});
+
+// Couleur du texte pour les graphiques selon le thème
+const chartTextColor = computed(() => isDarkText.value ? '#374151' : '#9ca3af');
+const chartThemeMode = computed(() => isDarkText.value ? 'light' : 'dark');
 
 const ragChartOptions = computed(() => ({
     chart: {
         type: 'donut',
         background: 'transparent',
-        foreColor: '#9ca3af'
+        foreColor: chartTextColor.value
     },
     labels: ['GREEN', 'AMBER', 'RED'],
     colors: ['#10b981', '#f59e0b', '#ef4444'],
     legend: {
         position: 'bottom',
         labels: {
-            colors: '#9ca3af'
+            colors: chartTextColor.value
         }
     },
     dataLabels: {
@@ -235,67 +244,92 @@ const ragChartOptions = computed(() => ({
                     total: {
                         show: true,
                         label: 'Total',
-                        color: '#fff'
+                        color: chartTextColor.value
                     }
                 }
             }
         }
     },
     theme: {
-        mode: 'dark'
+        mode: chartThemeMode.value
+    },
+    noData: {
+        text: 'Aucune donnée disponible',
+        style: {
+            color: chartTextColor.value
+        }
     }
 }));
 
 // Category Chart
-const categoryChartSeries = computed(() => [{
-    name: 'Projets',
-    data: props.stats.by_category?.map(c => c.count) || []
-}]);
-
-const categoryChartOptions = computed(() => ({
-    chart: {
-        type: 'bar',
-        background: 'transparent',
-        foreColor: '#9ca3af',
-        toolbar: {
-            show: false
-        }
-    },
-    xaxis: {
-        categories: props.stats.by_category?.map(c => c.name) || [],
-        labels: {
-            style: {
-                colors: '#9ca3af'
-            }
-        }
-    },
-    yaxis: {
-        labels: {
-            style: {
-                colors: '#9ca3af'
-            }
-        }
-    },
-    plotOptions: {
-        bar: {
-            borderRadius: 8,
-            distributed: true
-        }
-    },
-    colors: ['#667eea', '#764ba2', '#f59e0b', '#10b981', '#ef4444'],
-    dataLabels: {
-        enabled: false
-    },
-    legend: {
-        show: false
-    },
-    grid: {
-        borderColor: 'rgba(255, 255, 255, 0.1)'
-    },
-    theme: {
-        mode: 'dark'
+const categoryChartSeries = computed(() => {
+    if (!props.stats.by_category || props.stats.by_category.length === 0) {
+        return [{
+            name: 'Projets',
+            data: []
+        }];
     }
-}));
+    
+    return [{
+        name: 'Projets',
+        data: props.stats.by_category.map(c => c.count || 0)
+    }];
+});
+
+const categoryChartOptions = computed(() => {
+    const categories = props.stats.by_category?.map(c => c.name || 'Unknown') || [];
+    
+    return {
+        chart: {
+            type: 'bar',
+            background: 'transparent',
+            foreColor: chartTextColor.value,
+            toolbar: {
+                show: false
+            }
+        },
+        xaxis: {
+            categories: categories,
+            labels: {
+                style: {
+                    colors: chartTextColor.value
+                }
+            }
+        },
+        yaxis: {
+            labels: {
+                style: {
+                    colors: chartTextColor.value
+                }
+            }
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 8,
+                distributed: true
+            }
+        },
+        colors: ['#667eea', '#764ba2', '#f59e0b', '#10b981', '#ef4444'],
+        dataLabels: {
+            enabled: false
+        },
+        legend: {
+            show: false
+        },
+        grid: {
+            borderColor: isDarkText.value ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'
+        },
+        theme: {
+            mode: chartThemeMode.value
+        },
+        noData: {
+            text: 'Aucune donnée disponible',
+            style: {
+                color: chartTextColor.value
+            }
+        }
+    };
+});
 
 // Activity helpers
 const getActivityIcon = (type) => {

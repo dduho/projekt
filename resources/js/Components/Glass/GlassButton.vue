@@ -14,6 +14,9 @@
 
 <script setup>
 import { computed } from 'vue';
+import { useTheme } from '@/Composables/useTheme';
+
+const { isDarkText } = useTheme();
 
 const props = defineProps({
     type: {
@@ -39,7 +42,7 @@ const props = defineProps({
         default: false
     },
     icon: {
-        type: Object,
+        type: [Object, Function],
         default: null
     },
     fullWidth: {
@@ -53,16 +56,18 @@ const emit = defineEmits(['click']);
 const buttonClasses = computed(() => {
     const classes = [];
     
-    // Variant
+    // Variant avec couleur de texte dynamique
     switch (props.variant) {
         case 'primary':
             classes.push('btn-primary');
             break;
         case 'secondary':
             classes.push('btn-secondary');
+            classes.push(isDarkText.value ? 'text-gray-900' : 'text-white');
             break;
         case 'ghost':
             classes.push('btn-ghost');
+            classes.push(isDarkText.value ? 'text-gray-700 hover:text-gray-900' : 'text-white');
             break;
         case 'danger':
             classes.push('btn-danger');

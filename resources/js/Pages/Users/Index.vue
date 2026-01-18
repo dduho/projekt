@@ -1,11 +1,11 @@
 <template>
-  <AppLayout>
+  <AppLayout page-title="Users" page-description="Gestion des utilisateurs">
     <div class="space-y-6">
       <!-- Header -->
       <div class="flex justify-between items-center">
         <div>
-          <h1 class="text-3xl font-bold text-white mb-2">Users Management</h1>
-          <p class="text-slate-300">Manage users, roles and permissions</p>
+          <h1 :class="['text-3xl font-bold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">Users Management</h1>
+          <p :class="isDarkText ? 'text-gray-600' : 'text-slate-300'">Manage users, roles and permissions</p>
         </div>
         <GlassButton 
           variant="primary" 
@@ -25,8 +25,8 @@
         >
           <template #cell-name="{ row }">
             <div>
-              <p class="font-semibold text-white">{{ row.name }}</p>
-              <p class="text-sm text-slate-400">{{ row.email }}</p>
+              <p :class="['font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ row.name }}</p>
+              <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-slate-400']">{{ row.email }}</p>
             </div>
           </template>
 
@@ -43,7 +43,7 @@
           </template>
 
           <template #cell-created_at="{ row }">
-            <span class="text-slate-300">{{ formatDate(row.created_at) }}</span>
+            <span :class="isDarkText ? 'text-gray-700' : 'text-slate-300'">{{ formatDate(row.created_at) }}</span>
           </template>
 
           <template #cell-actions="{ row }">
@@ -79,7 +79,7 @@
             Previous
           </GlassButton>
           <div class="flex items-center gap-2 px-4">
-            <span class="text-white">Page {{ users.current_page }} of {{ users.last_page }}</span>
+            <span :class="isDarkText ? 'text-gray-900' : 'text-white'">Page {{ users.current_page }} of {{ users.last_page }}</span>
           </div>
           <GlassButton 
             variant="secondary" 
@@ -94,7 +94,8 @@
 
     <!-- Create/Edit Modal -->
     <GlassModal 
-      v-model="showModal" 
+      :show="showModal"
+      @close="showModal = false"
       :title="editingUser ? 'Edit User' : 'Create User'"
       size="lg"
     >
@@ -130,24 +131,24 @@
           />
 
           <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">
+            <label :class="['block text-sm font-medium mb-2', isDarkText ? 'text-gray-700' : 'text-slate-300']">
               Role
             </label>
             <div class="grid grid-cols-2 gap-3">
               <label 
                 v-for="role in availableRoles" 
                 :key="role.value"
-                class="flex items-center gap-2 p-3 glass rounded-lg cursor-pointer hover:bg-white/10 transition"
+                :class="['flex items-center gap-2 p-3 glass rounded-lg cursor-pointer transition', isDarkText ? 'hover:bg-gray-100' : 'hover:bg-white/10']"
               >
                 <input
                   type="radio"
                   v-model="form.role"
                   :value="role.value"
-                  class="w-4 h-4 text-prism-500 bg-slate-700 border-slate-600"
+                  class="w-4 h-4 text-prism-500"
                 />
                 <div>
-                  <p class="text-white font-semibold">{{ role.label }}</p>
-                  <p class="text-xs text-slate-400">{{ role.description }}</p>
+                  <p :class="['font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ role.label }}</p>
+                  <p :class="['text-xs', isDarkText ? 'text-gray-600' : 'text-slate-400']">{{ role.description }}</p>
                 </div>
               </label>
             </div>
@@ -178,8 +179,8 @@
     </GlassModal>
 
     <!-- Delete Confirmation -->
-    <GlassModal v-model="showDeleteModal" title="Delete User">
-      <p class="text-slate-300 mb-6">
+    <GlassModal :show="showDeleteModal" @close="showDeleteModal = false" title="Delete User">
+      <p :class="['mb-6', isDarkText ? 'text-gray-700' : 'text-slate-300']">
         Are you sure you want to delete "{{ deletingUser?.name }}"? This action cannot be undone.
       </p>
       <div class="flex justify-end gap-3">
@@ -198,6 +199,9 @@
 import { ref, computed } from 'vue'
 import { useForm, router, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import { useTheme } from '@/Composables/useTheme'
+
+const { isDarkText } = useTheme()
 import GlassCard from '@/Components/Glass/GlassCard.vue'
 import GlassButton from '@/Components/Glass/GlassButton.vue'
 import GlassInput from '@/Components/Glass/GlassInput.vue'

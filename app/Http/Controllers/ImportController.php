@@ -37,13 +37,7 @@ class ImportController extends Controller
 
         $validation = $this->importService->validate($fullPath);
 
-        if ($request->wantsJson() && !$request->has('file_path')) {
-            // Pure API call - clean up temp file
-            unlink($fullPath);
-            return response()->json($validation);
-        }
-
-        // Web call - keep file for preview/import
+        // Toujours retourner le format Web avec file_path pour le frontend
         return response()->json([
             'validation' => $validation,
             'file_path' => $path,
@@ -94,7 +88,7 @@ class ImportController extends Controller
     public function import(Request $request)
     {
         // API direct upload mode
-        if ($request->wantsJson() && $request->hasFile('file')) {
+        if ($request->hasFile('file')) {
             return $this->excel($request);
         }
 
@@ -106,6 +100,9 @@ class ImportController extends Controller
         $fullPath = Storage::disk('local')->path($request->file_path);
 
         if (!file_exists($fullPath)) {
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'Fichier non trouvé. Veuillez recommencer.'], 404);
+            }
             return back()->with('error', 'Fichier non trouvé. Veuillez recommencer.');
         }
 
@@ -114,6 +111,26 @@ class ImportController extends Controller
         // Clean up the uploaded file
         Storage::disk('local')->delete($request->file_path);
 
+        // Si c'est une requête AJAX/JSON
+        if ($request->wantsJson()) {
+            if ($result['success']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Import terminé avec succès!',
+                    'stats' => $result['stats'],
+                    'errors' => $result['errors'],
+                ]);
+            }
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'import: ' . ($result['error'] ?? 'Erreur inconnue'),
+                'stats' => $result['stats'] ?? [],
+                'errors' => $result['errors'] ?? [],
+            ], 422);
+        }
+
+        // Sinon retour classique Inertia
         if ($result['success']) {
             return back()->with([
                 'success' => 'Import terminé avec succès!',
@@ -123,9 +140,9 @@ class ImportController extends Controller
         }
 
         return back()->with([
-            'error' => 'Erreur lors de l\'import: ' . ($result['message'] ?? 'Erreur inconnue'),
-            'import_stats' => $result['stats'],
-            'import_errors' => $result['errors'],
+            'error' => 'Erreur lors de l\'import: ' . ($result['error'] ?? $result['message'] ?? 'Erreur inconnue'),
+            'import_stats' => $result['stats'] ?? [],
+            'import_errors' => $result['errors'] ?? [],
         ]);
     }
 
@@ -155,9 +172,9 @@ class ImportController extends Controller
                 ]);
             } else {
                 return response()->json([
-                    'message' => 'Erreur lors de l\'import: ' . ($result['message'] ?? 'Erreur inconnue'),
-                    'stats' => $result['stats'],
-                    'errors' => $result['errors'],
+                    'message' => 'Erreur lors de l\'import: ' . ($result['error'] ?? $result['message'] ?? 'Erreur inconnue'),
+                    'stats' => $result['stats'] ?? [],
+                    'errors' => $result['errors'] ?? [],
                 ], 422);
             }
         } catch (\Exception $e) {

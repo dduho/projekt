@@ -4,28 +4,28 @@
             <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
                 <!-- Overlay -->
                 <div 
-                    class="modal-overlay"
+                    class="fixed inset-0 bg-black/60 backdrop-blur-sm"
                     @click="handleOverlayClick"
                 />
                 
                 <!-- Modal Content -->
-                <div class="min-h-screen px-4 text-center">
+                <div class="relative min-h-screen px-4 text-center z-10">
                     <!-- Centering trick -->
                     <span class="inline-block h-screen align-middle">&#8203;</span>
                     
                     <div 
-                        class="inline-block align-middle glass-card max-w-2xl w-full text-left"
+                        class="inline-block align-middle glass-card max-w-2xl w-full text-left relative"
                         :class="sizeClasses"
                     >
                         <!-- Header -->
-                        <div class="card-header">
+                        <div :class="['card-header', isDarkText ? 'border-gray-200' : 'border-white/10']">
                             <slot name="header">
-                                <h3 class="card-title">{{ title }}</h3>
+                                <h3 :class="['card-title', isDarkText ? 'text-gray-900' : 'text-white']">{{ title }}</h3>
                             </slot>
                             <button 
                                 v-if="closeable"
                                 @click="close"
-                                class="btn btn-ghost p-2"
+                                :class="['p-2 rounded-lg transition-colors', isDarkText ? 'text-gray-600 hover:bg-gray-100' : 'text-white hover:bg-white/10']"
                             >
                                 <X class="w-5 h-5" />
                             </button>
@@ -37,7 +37,7 @@
                         </div>
                         
                         <!-- Footer -->
-                        <div v-if="$slots.footer" class="card-header mt-4 pt-4">
+                        <div v-if="$slots.footer" :class="['mt-4 pt-4 border-t', isDarkText ? 'border-gray-200' : 'border-white/10']">
                             <slot name="footer" />
                         </div>
                     </div>
@@ -50,6 +50,9 @@
 <script setup>
 import { computed, watch } from 'vue';
 import { X } from 'lucide-vue-next';
+import { useTheme } from '@/Composables/useTheme';
+
+const { isDarkText } = useTheme();
 
 const props = defineProps({
     show: {

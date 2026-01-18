@@ -39,6 +39,8 @@ class ExcelImportService
         
         $spreadsheet = IOFactory::load($filePath);
         
+        DB::beginTransaction();
+        
         try {
             // 1. Importer les projets depuis PROJECT REGISTER
             $projectSheet = $spreadsheet->getSheetByName('PROJECT REGISTER');
@@ -68,23 +70,20 @@ class ExcelImportService
                 Log::info('Changes imported', $this->stats['changes']);
             }
             
+            DB::commit();
+            
             $duration = round(microtime(true) - $startTime, 2);
             Log::info('Excel import completed', ['duration' => $duration . 's', 'stats' => $this->stats]);
             
-            // Déterminer le succès global
-            $totalCreated = $this->stats['projects']['created'] + $this->stats['phases']['created'] + 
-                           $this->stats['risks']['created'] + $this->stats['changes']['created'];
-            $totalErrors = $this->stats['projects']['errors'] + $this->stats['phases']['errors'] + 
-                          $this->stats['risks']['errors'] + $this->stats['changes']['errors'];
-            
             return [
-                'success' => $totalCreated > 0 || $totalErrors === 0,
+                'success' => true,
                 'stats' => $this->stats,
                 'errors' => $this->errors,
                 'duration' => $duration,
             ];
             
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Excel import failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             
             return [
@@ -92,51 +91,6 @@ class ExcelImportService
                 'error' => $e->getMessage(),
                 'stats' => $this->stats,
                 'errors' => $this->errors,
-            ];
-        }
-    }
-
-    /**
-     * Valider le fichier Excel sans importer
-     */
-    public function validate(string $filePath): array
-    {
-        try {
-            $spreadsheet = IOFactory::load($filePath);
-            $sheets = [];
-
-            foreach ($spreadsheet->getSheetNames() as $sheetName) {
-                $sheet = $spreadsheet->getSheetByName($sheetName);
-                $rowCount = $sheet->getHighestRow();
-                $sheets[$sheetName] = [
-                    'exists' => true,
-                    'rows' => max(0, $rowCount - 2), // Soustraire header rows
-                ];
-            }
-
-            $requiredSheets = ['PROJECT REGISTER', 'STATUS TRACKING', 'RISK & ISSUES LOG', 'CHANGE LOG'];
-            $missingSheets = [];
-
-            foreach ($requiredSheets as $required) {
-                if (!isset($sheets[$required])) {
-                    $missingSheets[] = $required;
-                    $sheets[$required] = ['exists' => false, 'rows' => 0];
-                }
-            }
-
-            return [
-                'valid' => empty($missingSheets),
-                'sheets' => $sheets,
-                'missing_sheets' => $missingSheets,
-                'message' => empty($missingSheets) 
-                    ? 'Fichier Excel valide' 
-                    : 'Feuilles manquantes: ' . implode(', ', $missingSheets),
-            ];
-        } catch (\Exception $e) {
-            return [
-                'valid' => false,
-                'error' => $e->getMessage(),
-                'message' => 'Erreur lors de la lecture du fichier: ' . $e->getMessage(),
             ];
         }
     }
@@ -214,11 +168,10 @@ class ExcelImportService
     {
         $data = $sheet->toArray(null, true, true, true);
         
-        Log::info('PROJECT REGISTER - Total rows: ' . count($data));
-        
-        // Les en-têtes sont sur les lignes 1-3, les données commencent à la ligne 4
-        for ($row = 4; $row <= count($data); $row++) {
-            $rowData = $data[$row] ?? [];
+        // La ligne d'en-tête est à la ligne 2 (index 2)
+        // Les données commencent à la ligne 3
+        for ($row = 3; $row <= count($data); $row++) {
+            $rowData = $data[$row];
             
             // Skip lignes vides
             $projectCode = trim($rowData['A'] ?? '');
@@ -227,9 +180,6 @@ class ExcelImportService
             }
             
             try {
-                // Utiliser un savepoint pour isoler chaque opération (PostgreSQL)
-                DB::beginTransaction();
-                
                 $categoryId = $this->getOrCreateCategory($rowData['D'] ?? 'Uncategorized');
                 $ownerId = $this->getOrCreateOwner($rowData['N'] ?? null);
                 
@@ -265,10 +215,7 @@ class ExcelImportService
                     $this->stats['projects']['updated']++;
                 }
                 
-                DB::commit();
-                
             } catch (\Exception $e) {
-                DB::rollBack();
                 $this->stats['projects']['errors']++;
                 $this->errors[] = "Projet {$projectCode} (ligne {$row}): " . $e->getMessage();
             }
@@ -282,17 +229,16 @@ class ExcelImportService
     {
         $data = $sheet->toArray(null, true, true, true);
         
-        // Mapping des colonnes de phases (basé sur le fichier Excel réel)
-        // F=FRS, G=Development, H=Testing, I=UAT, J=Deployment
+        // Mapping des colonnes de phases
         $phases = [
-            'F' => 'FRS',
-            'G' => 'Development',
-            'H' => 'Testing',
-            'I' => 'UAT',
-            'J' => 'Deployment',
+            'E' => 'FRS',
+            'F' => 'Development',
+            'G' => 'Testing',
+            'H' => 'UAT',
+            'I' => 'Deployment',
         ];
         
-        for ($row = 4; $row <= count($data); $row++) {
+        for ($row = 3; $row <= count($data); $row++) {
             $rowData = $data[$row];
             $projectCode = trim($rowData['A'] ?? '');
             
@@ -315,49 +261,32 @@ class ExcelImportService
                 continue;
             }
             
-            // Mettre à jour completion_percent et rag_status du projet
-            // K = Completion %, L = Health (RAG Status)
-            $completionRaw = $rowData['K'] ?? '0';
-            // Nettoyer le pourcentage (enlever % et convertir)
-            $completion = intval(str_replace(['%', ' '], '', $completionRaw));
-            $ragStatus = $this->normalizeRagStatus($rowData['L'] ?? 'Green');
-            
-            try {
-                DB::beginTransaction();
-                Project::where('id', $projectId)->update([
-                    'completion_percent' => min(100, max(0, $completion)),
-                    'rag_status' => $ragStatus,
-                ]);
-                DB::commit();
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::warning("Failed to update project {$projectCode} status", [
-                    'error' => $e->getMessage(),
-                    'line' => $row
-                ]);
-            }
+            // Mettre à jour le completion_percent du projet
+            $completion = intval($rowData['J'] ?? 0);
+            Project::where('id', $projectId)->update(['completion_percent' => $completion]);
             
             // Créer/mettre à jour chaque phase
+            $order = 1;
             foreach ($phases as $col => $phaseName) {
                 $status = $this->parsePhaseStatus($rowData[$col] ?? '-');
                 
                 try {
-                    DB::beginTransaction();
                     ProjectPhase::updateOrCreate(
                         ['project_id' => $projectId, 'phase' => $phaseName],
                         [
                             'status' => $status,
+                            'order' => $order,
                             'started_at' => in_array($status, ['Completed', 'In Progress']) ? now() : null,
                             'completed_at' => $status === 'Completed' ? now() : null,
                         ]
                     );
                     $this->stats['phases']['created']++;
-                    DB::commit();
                 } catch (\Exception $e) {
-                    DB::rollBack();
                     $this->stats['phases']['errors']++;
                     $this->errors[] = "Phase {$phaseName} pour {$projectCode}: " . $e->getMessage();
                 }
+                
+                $order++;
             }
         }
     }
@@ -369,8 +298,8 @@ class ExcelImportService
     {
         $data = $sheet->toArray(null, true, true, true);
         
-        for ($row = 4; $row <= count($data); $row++) {
-            $rowData = $data[$row] ?? [];
+        for ($row = 3; $row <= count($data); $row++) {
+            $rowData = $data[$row];
             $riskCode = trim($rowData['A'] ?? '');
             
             if (empty($riskCode) || !str_starts_with($riskCode, 'RISK-')) {
@@ -381,10 +310,7 @@ class ExcelImportService
             $projectId = $this->projectCache[$projectCode] 
                 ?? Project::where('project_code', $projectCode)->value('id');
             
-            $ownerId = $this->getOrCreateOwner($rowData['I'] ?? null);
-            
             try {
-                DB::beginTransaction();
                 Risk::updateOrCreate(
                     ['risk_code' => $riskCode],
                     [
@@ -395,14 +321,12 @@ class ExcelImportService
                         'probability' => $this->normalizePriority($rowData['F'] ?? 'Medium'),
                         'risk_score' => $this->normalizeRiskScore($rowData['G'] ?? 'Medium'),
                         'mitigation_plan' => trim($rowData['H'] ?? ''),
-                        'owner_id' => $ownerId,
+                        'owner' => trim($rowData['I'] ?? ''),
                         'status' => $this->normalizeRiskStatus($rowData['J'] ?? 'Open'),
                     ]
                 );
                 $this->stats['risks']['created']++;
-                DB::commit();
             } catch (\Exception $e) {
-                DB::rollBack();
                 $this->stats['risks']['errors']++;
                 $this->errors[] = "Risque {$riskCode} (ligne {$row}): " . $e->getMessage();
             }
@@ -416,8 +340,8 @@ class ExcelImportService
     {
         $data = $sheet->toArray(null, true, true, true);
         
-        for ($row = 4; $row <= count($data); $row++) {
-            $rowData = $data[$row] ?? [];
+        for ($row = 3; $row <= count($data); $row++) {
+            $rowData = $data[$row];
             $changeCode = trim($rowData['A'] ?? '');
             
             if (empty($changeCode) || !str_starts_with($changeCode, 'CHG-')) {
@@ -438,27 +362,21 @@ class ExcelImportService
                 continue;
             }
             
-            $requestedById = $this->getRequiredOwner($rowData['F'] ?? null);
-            $approvedById = !empty(trim($rowData['G'] ?? '')) ? $this->getOrCreateOwner($rowData['G']) : null;
-            
             try {
-                DB::beginTransaction();
                 ChangeRequest::updateOrCreate(
                     ['change_code' => $changeCode],
                     [
                         'project_id' => $projectId,
-                        'change_type' => $this->normalizeChangeType($rowData['D'] ?? 'Scope'),
+                        'change_type' => $this->normalizeChangeType($rowData['D'] ?? 'Scope Change'),
                         'description' => trim($rowData['E'] ?? ''),
-                        'requested_by_id' => $requestedById,
-                        'approved_by_id' => $approvedById,
+                        'requested_by' => trim($rowData['F'] ?? ''),
+                        'approved_by' => !empty(trim($rowData['G'] ?? '')) ? trim($rowData['G']) : null,
                         'status' => $this->normalizeChangeStatus($rowData['H'] ?? 'Pending'),
-                        'requested_at' => $this->parseDate($rowData['B'] ?? null) ?? now(),
+                        'requested_at' => $this->parseDate($rowData['B'] ?? null),
                     ]
                 );
                 $this->stats['changes']['created']++;
-                DB::commit();
             } catch (\Exception $e) {
-                DB::rollBack();
                 $this->stats['changes']['errors']++;
                 $this->errors[] = "Changement {$changeCode} (ligne {$row}): " . $e->getMessage();
             }
@@ -523,7 +441,8 @@ class ExcelImportService
             str_contains($value, 'deployed') || str_contains($value, 'live') || str_contains($value, 'production') => 'Deployed',
             str_contains($value, 'uat') => 'UAT',
             str_contains($value, 'testing') || str_contains($value, 'test') => 'Testing',
-            str_contains($value, 'development') || str_contains($value, 'dev') || str_contains($value, 'in progress') || str_contains($value, 'hold') || str_contains($value, 'pending') || str_contains($value, 'waiting') => 'In Development',
+            str_contains($value, 'development') || str_contains($value, 'dev') || str_contains($value, 'in progress') => 'In Development',
+            str_contains($value, 'hold') || str_contains($value, 'pending') || str_contains($value, 'waiting') => 'On Hold',
             default => 'Not Started',
         };
     }
@@ -537,7 +456,7 @@ class ExcelImportService
         return match($value) {
             '✓', '✔', 'Yes', 'Done', 'Complete', 'Completed', 'Y' => 'Completed',
             '⏳', 'In Progress', 'Ongoing', 'WIP' => 'In Progress',
-            '⏸', 'On Hold', 'Paused', 'Hold' => 'Pending',
+            '⏸', 'On Hold', 'Paused', 'Hold' => 'On Hold',
             '❌', 'Blocked', 'Failed' => 'Blocked',
             default => 'Pending',
         };
@@ -578,10 +497,10 @@ class ExcelImportService
     {
         $value = strtolower(trim($value ?? ''));
         return match(true) {
-            str_contains($value, 'schedule') || str_contains($value, 'planning') || str_contains($value, 'date') => 'Schedule',
-            str_contains($value, 'budget') || str_contains($value, 'cost') => 'Budget',
-            str_contains($value, 'resource') || str_contains($value, 'team') => 'Resource',
-            default => 'Scope',
+            str_contains($value, 'schedule') || str_contains($value, 'planning') || str_contains($value, 'date') => 'Schedule Change',
+            str_contains($value, 'budget') || str_contains($value, 'cost') => 'Budget Change',
+            str_contains($value, 'resource') || str_contains($value, 'team') => 'Resource Change',
+            default => 'Scope Change',
         };
     }
     
@@ -727,7 +646,7 @@ class ExcelImportService
         }
         
         // Chercher un utilisateur existant par nom
-        $user = User::where('name', 'like', '%' . $name . '%')->first();
+        $user = User::where('name', $name)->first();
         
         if (!$user) {
             // Créer un utilisateur "équipe" avec un email générique
@@ -743,26 +662,5 @@ class ExcelImportService
         
         $this->ownerCache[$name] = $user->id;
         return $user->id;
-    }
-    
-    /**
-     * Obtenir un owner obligatoire (pour change_requests)
-     */
-    protected function getRequiredOwner(?string $name): int
-    {
-        $ownerId = $this->getOrCreateOwner($name);
-        
-        if ($ownerId) {
-            return $ownerId;
-        }
-        
-        // Retourner l'admin par défaut
-        $admin = User::where('email', 'admin@moovmoney.tg')->first();
-        if ($admin) {
-            return $admin->id;
-        }
-        
-        // Si pas d'admin, prendre le premier utilisateur
-        return User::first()->id ?? 1;
     }
 }

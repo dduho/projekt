@@ -1,5 +1,5 @@
 <template>
-  <AppLayout>
+  <AppLayout page-title="Nouvelle Demande" page-description="Créer une demande de changement">
     <div class="max-w-4xl mx-auto space-y-6">
       <!-- Header -->
       <div class="flex items-center gap-4">

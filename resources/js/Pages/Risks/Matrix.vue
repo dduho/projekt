@@ -1,5 +1,5 @@
 <template>
-  <AppLayout>
+  <AppLayout page-title="Matrice des Risques" page-description="Vue matricielle">
     <div class="space-y-6">
       <!-- Header -->
       <div class="flex items-center justify-between">

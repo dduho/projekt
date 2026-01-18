@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\RiskCreated;
 use App\Http\Requests\RiskRequest;
 use App\Http\Resources\RiskResource;
 use App\Models\Risk;
@@ -126,7 +127,6 @@ class RiskController extends Controller
         ]);
 
         $validated['status'] = $validated['status'] ?? 'Open';
-        $validated['identified_at'] = now();
 
         $risk = Risk::create($validated);
 
@@ -140,6 +140,9 @@ class RiskController extends Controller
                 'risk_score' => $risk->risk_score,
             ],
         ]);
+
+        // Dispatch event
+        event(new RiskCreated($risk, Auth::user()));
 
         return redirect()->route('risks.index')
             ->with('success', 'Risque cree avec succes!');

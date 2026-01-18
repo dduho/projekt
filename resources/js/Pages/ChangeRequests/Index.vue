@@ -1,11 +1,11 @@
 <template>
-  <AppLayout>
+  <AppLayout page-title="Demandes de Changement" page-description="Gestion des changements">
     <div class="space-y-6">
       <!-- Header -->
       <div class="flex justify-between items-center">
         <div>
-          <h1 class="text-3xl font-bold text-white mb-2">Change Requests</h1>
-          <p class="text-slate-300">Manage project change requests and approvals</p>
+          <h1 :class="['text-3xl font-bold mb-2', isDarkText ? 'text-gray-900 font-bold' : 'text-white font-bold']">Change Requests</h1>
+          <p :class="[isDarkText ? 'text-gray-700' : 'text-gray-200']">Manage project change requests and approvals</p>
         </div>
         <GlassButton 
           variant="primary" 
@@ -23,7 +23,7 @@
           <GlassInput
             v-model="filters.search"
             placeholder="Search change requests..."
-            icon="Search"
+            :icon="Search"
             @input="debouncedSearch"
           />
           <GlassSelect
@@ -55,32 +55,32 @@
       <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
         <GlassCard>
           <div class="text-center">
-            <p class="text-3xl font-bold text-white mb-2">{{ stats.total }}</p>
-            <p class="text-slate-400 text-sm">Total</p>
+            <p :class="['text-3xl font-bold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">{{ stats.total }}</p>
+            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">Total</p>
           </div>
         </GlassCard>
         <GlassCard>
           <div class="text-center">
             <p class="text-3xl font-bold text-yellow-400 mb-2">{{ stats.pending }}</p>
-            <p class="text-slate-400 text-sm">Pending</p>
+            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">Pending</p>
           </div>
         </GlassCard>
         <GlassCard>
           <div class="text-center">
             <p class="text-3xl font-bold text-green-400 mb-2">{{ stats.approved }}</p>
-            <p class="text-slate-400 text-sm">Approved</p>
+            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">Approved</p>
           </div>
         </GlassCard>
         <GlassCard>
           <div class="text-center">
             <p class="text-3xl font-bold text-red-400 mb-2">{{ stats.rejected }}</p>
-            <p class="text-slate-400 text-sm">Rejected</p>
+            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">Rejected</p>
           </div>
         </GlassCard>
         <GlassCard>
           <div class="text-center">
-            <p class="text-2xl font-bold text-white mb-2">{{ formatCurrency(stats.totalCost) }}</p>
-            <p class="text-slate-400 text-sm">Total Cost Impact</p>
+            <p :class="['text-2xl font-bold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">{{ formatCurrency(stats.totalCost) }}</p>
+            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">Total Cost Impact</p>
           </div>
         </GlassCard>
       </div>
@@ -95,8 +95,8 @@
         >
           <template #cell-title="{ row }">
             <div>
-              <p class="font-semibold text-white">{{ row.title }}</p>
-              <p class="text-sm text-slate-400">{{ row.project?.code }}</p>
+              <p :class="['font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ row.title }}</p>
+              <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ row.project?.code }}</p>
             </div>
           </template>
           
@@ -107,11 +107,11 @@
           </template>
 
           <template #cell-cost_impact="{ row }">
-            <span class="text-white font-semibold">{{ formatCurrency(row.cost_impact) }}</span>
+            <span :class="['font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ formatCurrency(row.cost_impact) }}</span>
           </template>
 
           <template #cell-schedule_impact="{ row }">
-            <span class="text-white">{{ row.schedule_impact }} days</span>
+            <span :class="[isDarkText ? 'text-gray-900' : 'text-white']">{{ row.schedule_impact }} days</span>
           </template>
 
           <template #cell-status="{ row }">
@@ -160,7 +160,7 @@
             Previous
           </GlassButton>
           <div class="flex items-center gap-2 px-4">
-            <span class="text-white">Page {{ changeRequests.current_page }} of {{ changeRequests.last_page }}</span>
+            <span :class="[isDarkText ? 'text-gray-900' : 'text-white']">Page {{ changeRequests.current_page }} of {{ changeRequests.last_page }}</span>
           </div>
           <GlassButton 
             variant="secondary" 
@@ -175,9 +175,9 @@
       <!-- Empty State -->
       <div v-if="changeRequests.data.length === 0" class="text-center py-12">
         <GlassCard class="max-w-md mx-auto p-8">
-          <FileText class="w-16 h-16 mx-auto text-slate-400 mb-4" />
-          <h3 class="text-xl font-semibold text-white mb-2">No change requests found</h3>
-          <p class="text-slate-300 mb-6">
+          <FileText :class="['w-16 h-16 mx-auto mb-4', isDarkText ? 'text-gray-600' : 'text-gray-400']" />
+          <h3 :class="['text-xl font-semibold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">No change requests found</h3>
+          <p :class="['mb-6', isDarkText ? 'text-gray-700' : 'text-gray-200']">
             {{ filters.search || filters.status ? 'Try adjusting your filters' : 'Start by creating your first change request' }}
           </p>
           <GlassButton 
@@ -197,6 +197,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
+import { useTheme } from '@/Composables/useTheme';
+
+const { isDarkText } = useTheme();
 import AppLayout from '@/Layouts/AppLayout.vue'
 import GlassCard from '@/Components/Glass/GlassCard.vue'
 import GlassButton from '@/Components/Glass/GlassButton.vue'

@@ -1,11 +1,11 @@
 <template>
-  <AppLayout>
+  <AppLayout page-title="Risques" page-description="Gestion des risques">
     <div class="space-y-6">
       <!-- Header -->
       <div class="flex justify-between items-center">
         <div>
-          <h1 class="text-3xl font-bold text-white mb-2">Risks Management</h1>
-          <p class="text-slate-300">Identify, assess and mitigate project risks</p>
+          <h1 :class="['text-3xl font-bold mb-2', isDarkText ? 'text-gray-900 font-bold' : 'text-white font-bold']">Risks Management</h1>
+          <p :class="[isDarkText ? 'text-gray-700' : 'text-gray-200']">Identify, assess and mitigate project risks</p>
         </div>
         <div class="flex gap-2">
           <GlassButton 
@@ -32,7 +32,7 @@
           <GlassInput
             v-model="filters.search"
             placeholder="Search risks..."
-            icon="Search"
+            :icon="Search"
             @input="debouncedSearch"
           />
           <GlassSelect
@@ -58,26 +58,26 @@
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <GlassCard>
           <div class="text-center">
-            <p class="text-4xl font-bold text-white mb-2">{{ stats.total }}</p>
-            <p class="text-slate-400">Total Risks</p>
+            <p :class="['text-4xl font-bold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">{{ stats.total }}</p>
+            <p :class="[isDarkText ? 'text-gray-600' : 'text-gray-400']">Total Risks</p>
           </div>
         </GlassCard>
         <GlassCard>
           <div class="text-center">
             <p class="text-4xl font-bold text-red-400 mb-2">{{ stats.critical }}</p>
-            <p class="text-slate-400">Critical (Score > 15)</p>
+            <p :class="[isDarkText ? 'text-gray-600' : 'text-gray-400']">Critical (Score > 15)</p>
           </div>
         </GlassCard>
         <GlassCard>
           <div class="text-center">
             <p class="text-4xl font-bold text-yellow-400 mb-2">{{ stats.high }}</p>
-            <p class="text-slate-400">High (Score 10-15)</p>
+            <p :class="[isDarkText ? 'text-gray-600' : 'text-gray-400']">High (Score 10-15)</p>
           </div>
         </GlassCard>
         <GlassCard>
           <div class="text-center">
             <p class="text-4xl font-bold text-green-400 mb-2">{{ stats.low }}</p>
-            <p class="text-slate-400">Low (Score &lt; 10)</p>
+            <p :class="[isDarkText ? 'text-gray-600' : 'text-gray-400']">Low (Score &lt; 10)</p>
           </div>
         </GlassCard>
       </div>
@@ -93,9 +93,9 @@
           >
             <div class="flex justify-between items-start mb-3">
               <div class="flex-1">
-                <h3 class="text-lg font-semibold text-white mb-1">{{ risk.title }}</h3>
-                <p class="text-sm text-slate-300 mb-2">{{ risk.description }}</p>
-                <div class="flex items-center gap-2 text-sm text-slate-400">
+                <h3 :class="['text-lg font-semibold mb-1', isDarkText ? 'text-gray-900' : 'text-white']">{{ risk.title }}</h3>
+                <p :class="['text-sm mb-2', isDarkText ? 'text-gray-700' : 'text-gray-200']">{{ risk.description }}</p>
+                <div :class="['flex items-center gap-2 text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">
                   <FolderOpen class="w-4 h-4" />
                   <span>{{ risk.project?.name }}</span>
                   <span class="text-slate-600">•</span>
@@ -107,7 +107,7 @@
 
             <div class="grid grid-cols-4 gap-4">
               <div>
-                <p class="text-xs text-slate-400 mb-1">Impact</p>
+                <p :class="['text-xs mb-1', isDarkText ? 'text-gray-600' : 'text-gray-400']">Impact</p>
                 <div class="flex items-center gap-2">
                   <div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
                     <div 
@@ -115,11 +115,11 @@
                       :style="{ width: `${(risk.impact / 5) * 100}%` }"
                     ></div>
                   </div>
-                  <span class="text-white font-semibold">{{ risk.impact }}/5</span>
+                  <span :class="['font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ risk.impact }}/5</span>
                 </div>
               </div>
               <div>
-                <p class="text-xs text-slate-400 mb-1">Likelihood</p>
+                <p :class="['text-xs mb-1', isDarkText ? 'text-gray-600' : 'text-gray-400']">Likelihood</p>
                 <div class="flex items-center gap-2">
                   <div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
                     <div 
@@ -127,11 +127,11 @@
                       :style="{ width: `${(risk.likelihood / 5) * 100}%` }"
                     ></div>
                   </div>
-                  <span class="text-white font-semibold">{{ risk.likelihood }}/5</span>
+                  <span :class="['font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ risk.likelihood }}/5</span>
                 </div>
               </div>
               <div>
-                <p class="text-xs text-slate-400 mb-1">Risk Score</p>
+                <p :class="['text-xs mb-1', isDarkText ? 'text-gray-600' : 'text-gray-400']">Risk Score</p>
                 <div 
                   :class="[
                     'inline-block px-3 py-1 rounded-full text-sm font-semibold',
@@ -142,14 +142,14 @@
                 </div>
               </div>
               <div>
-                <p class="text-xs text-slate-400 mb-1">Identified</p>
-                <p class="text-white text-sm">{{ formatDate(risk.identified_date) }}</p>
+                <p :class="['text-xs mb-1', isDarkText ? 'text-gray-600' : 'text-gray-400']">Identified</p>
+                <p :class="['text-sm', isDarkText ? 'text-gray-900' : 'text-white']">{{ formatDate(risk.identified_date) }}</p>
               </div>
             </div>
 
             <div v-if="risk.mitigation" class="mt-3 pt-3 border-t border-white/10">
-              <p class="text-xs text-slate-400 mb-1">Mitigation Strategy</p>
-              <p class="text-sm text-slate-300">{{ risk.mitigation }}</p>
+              <p :class="['text-xs mb-1', isDarkText ? 'text-gray-600' : 'text-gray-400']">Mitigation Strategy</p>
+              <p :class="['text-sm', isDarkText ? 'text-gray-700' : 'text-gray-200']">{{ risk.mitigation }}</p>
             </div>
           </div>
         </div>
@@ -166,7 +166,7 @@
             Previous
           </GlassButton>
           <div class="flex items-center gap-2 px-4">
-            <span class="text-white">Page {{ risks.current_page }} of {{ risks.last_page }}</span>
+            <span :class="[isDarkText ? 'text-gray-900' : 'text-white']">Page {{ risks.current_page }} of {{ risks.last_page }}</span>
           </div>
           <GlassButton 
             variant="secondary" 
@@ -181,9 +181,9 @@
       <!-- Empty State -->
       <div v-if="risks.data.length === 0" class="text-center py-12">
         <GlassCard class="max-w-md mx-auto p-8">
-          <AlertTriangle class="w-16 h-16 mx-auto text-slate-400 mb-4" />
-          <h3 class="text-xl font-semibold text-white mb-2">No risks found</h3>
-          <p class="text-slate-300 mb-6">
+          <AlertTriangle :class="['w-16 h-16 mx-auto mb-4', isDarkText ? 'text-gray-600' : 'text-gray-400']" />
+          <h3 :class="['text-xl font-semibold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">No risks found</h3>
+          <p :class="['mb-6', isDarkText ? 'text-gray-700' : 'text-gray-200']">
             {{ filters.search || filters.status || filters.project ? 'Try adjusting your filters' : 'Start by identifying potential risks' }}
           </p>
           <GlassButton 
@@ -203,6 +203,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
+import { useTheme } from '@/Composables/useTheme';
+
+const { isDarkText } = useTheme();
 import AppLayout from '@/Layouts/AppLayout.vue'
 import GlassCard from '@/Components/Glass/GlassCard.vue'
 import GlassButton from '@/Components/Glass/GlassButton.vue'
