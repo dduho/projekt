@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -36,15 +37,38 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        
+        $userData = null;
+        if ($user) {
+            try {
+                // Charger les relations explicitement
+                $user->load('roles', 'permissions');
+                
+                $userData = [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->roles->first()?->name ?? 'user',
+                    'roles' => $user->roles->pluck('name')->toArray(),
+                    'permissions' => $user->permissions->pluck('name')->toArray(),
+                ];
+            } catch (\Exception $e) {
+                Log::error('HandleInertiaRequests error: ' . $e->getMessage());
+                $userData = [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => 'admin', // Fallback pour test
+                    'roles' => ['admin'],
+                    'permissions' => [],
+                ];
+            }
+        }
+        
         return array_merge(parent::share($request), [
             'auth' => [
-                'user' => $request->user() ? [
-                    'id' => $request->user()->id,
-                    'name' => $request->user()->name,
-                    'email' => $request->user()->email,
-                    'roles' => $request->user()->getRoleNames(),
-                    'permissions' => $request->user()->getAllPermissions()->pluck('name'),
-                ] : null,
+                'user' => $userData,
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),

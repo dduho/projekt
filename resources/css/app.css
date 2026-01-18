@@ -90,7 +90,7 @@
     }
 
     .rag-amber {
-        @apply bg-amber-500/20 text-amber-400 border border-amber-500/30;
+        @apply bg-amber-400/30 text-amber-900 border border-amber-500/50 font-bold;
     }
 
     .rag-green {

@@ -65,18 +65,38 @@
           <div class="flex items-center justify-between">
             <div>
               <p :class="[textMuted, 'text-sm mb-1']">Risks</p>
-              <p :class="['text-2xl font-bold', textPrimary]">{{ project.risks_count || 0 }}</p>
+              <div class="flex items-center gap-2">
+                <p :class="['text-2xl font-bold', textPrimary]">{{ project.risks_count || 0 }}</p>
+                <span 
+                  v-if="project.risk_analysis" 
+                  :class="[
+                    'text-xs px-2 py-0.5 rounded-full font-bold',
+                    riskLevelClass(project.risk_analysis.level)
+                  ]"
+                >
+                  {{ project.risk_analysis.level }}
+                </span>
+              </div>
             </div>
             <AlertTriangle class="w-8 h-8 text-yellow-400" />
           </div>
-          <GlassButton
-            variant="ghost"
-            size="sm"
-            class="mt-2 w-full"
-            @click="activeTab = 'risks'"
-          >
-            View Risks
-          </GlassButton>
+          <div class="flex gap-2 mt-2">
+            <GlassButton
+              variant="ghost"
+              size="sm"
+              @click="activeTab = 'risks'"
+            >
+              View Risks
+            </GlassButton>
+            <GlassButton
+              variant="secondary"
+              size="sm"
+              @click="analyzeRisks"
+              title="Analyser automatiquement via ML"
+            >
+              🤖 ML
+            </GlassButton>
+          </div>
         </GlassCard>
 
         <GlassCard>
@@ -135,10 +155,41 @@
                 <p :class="[textMuted, 'text-sm']">Planned Release</p>
                 <p :class="textPrimary">{{ project.planned_release }}</p>
               </div>
-              <div v-if="project.owner">
-                <p :class="[textMuted, 'text-sm']">Owner</p>
-                <p :class="textPrimary">{{ project.owner.name }}</p>
+              
+              <!-- Owner - Editable -->
+              <div>
+                <div class="flex items-center justify-between">
+                  <p :class="[textMuted, 'text-sm']">Owner</p>
+                  <button 
+                    v-if="can('edit projects') && !editingOwner" 
+                    @click="editingOwner = true"
+                    :class="['text-xs text-prism-400 hover:text-prism-300']"
+                  >
+                    Modifier
+                  </button>
+                </div>
+                <div v-if="editingOwner && can('edit projects')" class="mt-1 space-y-2">
+                  <select 
+                    v-model="selectedOwnerId"
+                    :class="[
+                      'w-full px-3 py-2 rounded-lg text-sm',
+                      isDarkText ? 'bg-white border border-gray-300 text-gray-900' : 'bg-white/10 border border-white/20 text-white'
+                    ]"
+                  >
+                    <option :value="null">-- Aucun --</option>
+                    <option v-for="user in users" :key="user.id" :value="user.id">{{ user.name }}</option>
+                  </select>
+                  <div class="flex gap-2">
+                    <GlassButton size="sm" @click="updateOwner">Sauvegarder</GlassButton>
+                    <GlassButton size="sm" variant="ghost" @click="cancelOwnerEdit">Annuler</GlassButton>
+                  </div>
+                </div>
+                <div v-else class="flex items-center gap-2 mt-1">
+                  <User class="w-4 h-4" :class="textMuted" />
+                  <p :class="textPrimary">{{ project.owner?.name || 'Non assigné' }}</p>
+                </div>
               </div>
+
               <div v-if="project.current_progress">
                 <p :class="[textMuted, 'text-sm']">Current Progress</p>
                 <p :class="textPrimary">{{ project.current_progress }}</p>
@@ -146,12 +197,71 @@
             </div>
           </GlassCard>
 
-          <GlassCard v-if="project.blockers">
-            <h3 :class="['text-lg font-semibold mb-3 flex items-center gap-2', textPrimary]">
-              <AlertCircle class="w-5 h-5 text-red-400" />
-              Blockers
-            </h3>
-            <p :class="[textSecondary, 'text-sm']">{{ project.blockers }}</p>
+          <!-- Blockers - Editable -->
+          <GlassCard>
+            <div class="flex items-center justify-between mb-3">
+              <h3 :class="['text-lg font-semibold flex items-center gap-2', textPrimary]">
+                <AlertCircle class="w-5 h-5 text-red-400" />
+                Blockers
+              </h3>
+              <button 
+                v-if="can('edit projects') && !editingBlockers" 
+                @click="editingBlockers = true"
+                :class="['text-xs text-prism-400 hover:text-prism-300']"
+              >
+                Modifier
+              </button>
+            </div>
+            
+            <div v-if="editingBlockers && can('edit projects')" class="space-y-2">
+              <textarea 
+                v-model="blockersText"
+                rows="3"
+                placeholder="Décrivez les blocants..."
+                :class="[
+                  'w-full px-3 py-2 rounded-lg text-sm resize-none',
+                  isDarkText ? 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400' : 'bg-white/10 border border-white/20 text-white placeholder-gray-400'
+                ]"
+              ></textarea>
+              <div class="flex gap-2">
+                <GlassButton size="sm" @click="updateBlockers">Sauvegarder</GlassButton>
+                <GlassButton size="sm" variant="ghost" @click="cancelBlockersEdit">Annuler</GlassButton>
+              </div>
+            </div>
+            <div v-else>
+              <p v-if="project.blockers" :class="[textSecondary, 'text-sm']">{{ project.blockers }}</p>
+              <p v-else :class="[textMuted, 'text-sm italic']">Aucun blocant</p>
+            </div>
+          </GlassCard>
+
+          <!-- Need PO Toggle -->
+          <GlassCard>
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 :class="['text-lg font-semibold flex items-center gap-2', textPrimary]">
+                  <AlertCircle class="w-5 h-5 text-orange-400" />
+                  Need PO
+                </h3>
+                <p :class="['text-xs mt-1', textMuted]">Product Owner requis</p>
+              </div>
+              <label v-if="can('edit projects')" class="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  :checked="project.need_po"
+                  @change="toggleNeedPO"
+                  class="sr-only peer"
+                >
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-prism-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-prism-500"></div>
+              </label>
+              <div v-else>
+                <span v-if="project.need_po" class="px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800 border border-orange-300">
+                  Oui
+                </span>
+                <span v-else class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-300">
+                  Non
+                </span>
+              </div>
+            </div>
           </GlassCard>
         </div>
 
@@ -357,6 +467,143 @@
                 </div>
               </div>
 
+              <!-- Comments Tab -->
+              <div v-if="activeTab === 'comments'">
+                <h3 :class="['text-lg font-semibold mb-4 flex items-center gap-2', textPrimary]">
+                  <MessageSquare class="w-5 h-5" />
+                  Comments ({{ project.comments?.length || 0 }})
+                </h3>
+                
+                <!-- New Comment Form -->
+                <div class="mb-6 pb-6" :class="[borderColor, 'border-b']">
+                  <div class="flex gap-3">
+                    <div :class="[
+                      'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0',
+                      isDarkText ? 'bg-prism-100 text-prism-600' : 'bg-prism-500/20 text-prism-300'
+                    ]">
+                      <User class="w-5 h-5" />
+                    </div>
+                    <div class="flex-1">
+                      <textarea 
+                        v-model="newComment"
+                        rows="3"
+                        placeholder="Ajouter un commentaire..."
+                        :class="[
+                          'w-full px-3 py-2 rounded-lg text-sm resize-none',
+                          isDarkText ? 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400' : 'bg-white/10 border border-white/20 text-white placeholder-gray-400'
+                        ]"
+                      ></textarea>
+                      <div class="flex justify-end mt-2">
+                        <GlassButton 
+                          size="sm" 
+                          @click="submitComment"
+                          :disabled="!newComment.trim()"
+                        >
+                          <Send class="w-4 h-4 mr-1" />
+                          Envoyer
+                        </GlassButton>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Comments List -->
+                <div v-if="project.comments?.length" class="space-y-4">
+                  <div
+                    v-for="comment in project.comments"
+                    :key="comment.id"
+                    class="space-y-3"
+                  >
+                    <!-- Main Comment -->
+                    <div class="flex gap-3">
+                      <div :class="[
+                        'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0',
+                        isDarkText ? 'bg-gray-100 text-gray-600' : 'bg-white/10 text-gray-300'
+                      ]">
+                        <User class="w-5 h-5" />
+                      </div>
+                      <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                          <span :class="['font-semibold text-sm', textPrimary]">{{ comment.user?.name }}</span>
+                          <span :class="['text-xs', textMuted]">{{ formatDateTime(comment.created_at) }}</span>
+                        </div>
+                        <p :class="[textSecondary, 'text-sm']">{{ comment.content }}</p>
+                        <div class="flex gap-4 mt-2">
+                          <button 
+                            @click="replyingTo = replyingTo === comment.id ? null : comment.id"
+                            :class="['text-xs text-prism-400 hover:text-prism-300']"
+                          >
+                            Répondre
+                          </button>
+                          <button 
+                            v-if="comment.user_id === currentUserId || can('delete projects')"
+                            @click="deleteComment(comment.id)"
+                            class="text-xs text-red-400 hover:text-red-300"
+                          >
+                            Supprimer
+                          </button>
+                        </div>
+
+                        <!-- Reply Form -->
+                        <div v-if="replyingTo === comment.id" class="mt-3 flex gap-2">
+                          <input 
+                            v-model="replyText"
+                            type="text"
+                            placeholder="Votre réponse..."
+                            :class="[
+                              'flex-1 px-3 py-2 rounded-lg text-sm',
+                              isDarkText ? 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400' : 'bg-white/10 border border-white/20 text-white placeholder-gray-400'
+                            ]"
+                            @keyup.enter="submitReply(comment.id)"
+                          />
+                          <GlassButton size="sm" @click="submitReply(comment.id)">
+                            <Send class="w-4 h-4" />
+                          </GlassButton>
+                          <GlassButton size="sm" variant="ghost" @click="replyingTo = null">
+                            <X class="w-4 h-4" />
+                          </GlassButton>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Replies -->
+                    <div v-if="comment.replies?.length" class="ml-12 space-y-3">
+                      <div
+                        v-for="reply in comment.replies"
+                        :key="reply.id"
+                        class="flex gap-3"
+                      >
+                        <div :class="[
+                          'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
+                          isDarkText ? 'bg-gray-100 text-gray-600' : 'bg-white/10 text-gray-300'
+                        ]">
+                          <User class="w-4 h-4" />
+                        </div>
+                        <div class="flex-1">
+                          <div class="flex items-center gap-2 mb-1">
+                            <span :class="['font-semibold text-sm', textPrimary]">{{ reply.user?.name }}</span>
+                            <span :class="['text-xs', textMuted]">{{ formatDateTime(reply.created_at) }}</span>
+                          </div>
+                          <p :class="[textSecondary, 'text-sm']">{{ reply.content }}</p>
+                          <button 
+                            v-if="reply.user_id === currentUserId || can('delete projects')"
+                            @click="deleteComment(reply.id)"
+                            class="text-xs text-red-400 hover:text-red-300 mt-1"
+                          >
+                            Supprimer
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div v-else :class="['text-center py-8', textMuted]">
+                  <MessageSquare class="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>Aucun commentaire</p>
+                  <p class="text-sm mt-1">Soyez le premier à commenter !</p>
+                </div>
+              </div>
+
               <!-- Activities Tab -->
               <div v-if="activeTab === 'activities'">
                 <h3 :class="['text-lg font-semibold mb-4', textPrimary]">Recent Activities</h3>
@@ -402,7 +649,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
 import { route } from '@/Composables/useRoute'
 import { useTheme } from '@/Composables/useTheme'
 import AppLayout from '@/Layouts/AppLayout.vue'
@@ -413,13 +660,16 @@ import StatusBadge from '@/Components/Glass/StatusBadge.vue'
 import ProgressBar from '@/Components/Glass/ProgressBar.vue'
 import {
   ArrowLeft, Edit, Trash2, TrendingUp, Flag,
-  AlertTriangle, FileText, AlertCircle, Plus, Check
+  AlertTriangle, FileText, AlertCircle, Plus, Check,
+  MessageSquare, Send, X, User
 } from 'lucide-vue-next'
 
 const props = defineProps({
   project: Object,
+  users: Array,
 })
 
+const page = usePage()
 const { isDarkText } = useTheme()
 
 // Classes de texte dynamiques selon le thème
@@ -431,20 +681,43 @@ const borderColor = computed(() => isDarkText.value ? 'border-gray-200' : 'borde
 const activeTab = ref('overview')
 const showDeleteModal = ref(false)
 
+// Inline editing states
+const editingBlockers = ref(false)
+const blockersText = ref(props.project.blockers || '')
+const editingOwner = ref(false)
+const selectedOwnerId = ref(props.project.owner_id)
+
+// Comment form
+const newComment = ref('')
+const replyingTo = ref(null)
+const replyText = ref('')
+
 const tabs = [
   { id: 'overview', label: 'Overview' },
   { id: 'risks', label: 'Risks' },
   { id: 'changes', label: 'Changes' },
+  { id: 'comments', label: 'Comments' },
   { id: 'activities', label: 'Activities' },
 ]
 
 const can = (permission) => {
-  const user = window.$page?.props?.auth?.user;
-  // Admin a toutes les permissions
-  if (user?.roles?.includes('admin') || user?.role === 'admin') {
+  const user = page.props.auth?.user;
+  console.log('can() debug:', {
+    permission,
+    role: user?.role,
+    roles: user?.roles,
+    permissions: user?.permissions
+  });
+  
+  // Admin a TOUTES les permissions
+  if (user?.role === 'admin' || user?.roles?.includes?.('admin')) {
+    console.log('✅ Admin detected - permission granted');
     return true;
   }
-  return user?.permissions?.includes(permission);
+  
+  const hasPermission = user?.permissions?.includes?.(permission);
+  console.log(hasPermission ? '✅ Permission granted' : '❌ Permission denied');
+  return hasPermission;
 }
 
 const formatDate = (date) => {
@@ -472,6 +745,16 @@ const riskScoreClass = (score) => {
     'Low': 'text-green-400',
   }
   return classes[score] || 'text-slate-400'
+}
+
+const riskLevelClass = (level) => {
+  const classes = {
+    'Critical': 'bg-red-500 text-white',
+    'High': 'bg-orange-500 text-white',
+    'Medium': 'bg-amber-500 text-white',
+    'Low': 'bg-green-500 text-white',
+  }
+  return classes[level] || 'bg-gray-500 text-white'
 }
 
 const phaseStatusToRag = (status) => {
@@ -608,5 +891,101 @@ const updatePriority = (priority) => {
     preserveScroll: true,
     preserveState: true,
   })
+}
+
+// Owner update
+const updateOwner = () => {
+  router.put(route('projects.update', props.project.id), {
+    owner_id: selectedOwnerId.value,
+  }, {
+    preserveScroll: true,
+    preserveState: true,
+    onSuccess: () => {
+      editingOwner.value = false
+    }
+  })
+}
+
+// Blockers update
+const updateBlockers = () => {
+  router.put(route('projects.update', props.project.id), {
+    blockers: blockersText.value || null,
+  }, {
+    preserveScroll: true,
+    preserveState: true,
+    onSuccess: () => {
+      editingBlockers.value = false
+    }
+  })
+}
+
+const cancelBlockersEdit = () => {
+  blockersText.value = props.project.blockers || ''
+  editingBlockers.value = false
+}
+
+const cancelOwnerEdit = () => {
+  selectedOwnerId.value = props.project.owner_id
+  editingOwner.value = false
+}
+
+// Need PO toggle
+const toggleNeedPO = () => {
+  router.put(route('projects.update', props.project.id), {
+    need_po: !props.project.need_po,
+  }, {
+    preserveScroll: true,
+    preserveState: true,
+  })
+}
+
+// Comments
+const submitComment = () => {
+  if (!newComment.value.trim()) return
+  
+  router.post(route('projects.comments.store', props.project.id), {
+    content: newComment.value,
+  }, {
+    preserveScroll: true,
+    onSuccess: () => {
+      newComment.value = ''
+    }
+  })
+}
+
+const submitReply = (parentId) => {
+  if (!replyText.value.trim()) return
+  
+  router.post(route('projects.comments.store', props.project.id), {
+    content: replyText.value,
+    parent_id: parentId,
+  }, {
+    preserveScroll: true,
+    onSuccess: () => {
+      replyText.value = ''
+      replyingTo.value = null
+    }
+  })
+}
+
+const deleteComment = (commentId) => {
+  if (confirm('Supprimer ce commentaire ?')) {
+    router.delete(route('comments.destroy', commentId), {
+      preserveScroll: true,
+    })
+  }
+}
+
+const currentUserId = computed(() => page.props.auth?.user?.id)
+
+const analyzeRisks = () => {
+  if (confirm('Lancer l\'analyse automatique des risques via ML ?')) {
+    router.post(route('projects.analyze-risks', props.project), {}, {
+      preserveScroll: true,
+      onSuccess: () => {
+        alert('Analyse ML terminée ! Consultez l\'onglet Risks.')
+      }
+    })
+  }
 }
 </script>

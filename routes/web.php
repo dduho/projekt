@@ -13,6 +13,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\CommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,14 @@ Route::middleware(['auth'])->group(function () {
     // Project Phases
     Route::put('/phases/{phase}/status', [ProjectPhaseController::class, 'updateStatus'])->name('phases.update-status');
     Route::put('/projects/{project}/phases', [ProjectPhaseController::class, 'bulkUpdate'])->name('projects.phases.bulk-update');
+
+    // Project Comments
+    Route::post('/projects/{project}/comments', [CommentController::class, 'store'])->name('projects.comments.store');
+    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+
+    // Risk Analysis (ML)
+    Route::post('/projects/{project}/analyze-risks', [ProjectController::class, 'analyzeRisks'])->name('projects.analyze-risks');
 
     // Risks
     Route::get('/risks', [RiskController::class, 'index'])->name('risks.index');

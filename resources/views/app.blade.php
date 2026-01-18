@@ -12,7 +12,7 @@
         <link href="https://fonts.bunny.net/css?family=lexend:300,400,500,600,700,800" rel="stylesheet" />
 
         <!-- Scripts -->
-        @routes
+        <!-- @routes -->
         @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
         @inertiaHead
     </head>

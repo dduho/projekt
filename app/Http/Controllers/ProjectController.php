@@ -13,6 +13,7 @@ use App\Models\Category;
 use App\Models\ActivityLog;
 use App\Models\User;
 use App\Services\ProjectService;
+use App\Services\RiskScoringService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -159,11 +160,16 @@ class ProjectController extends Controller
             'phases',
             'risks' => fn($q) => $q->orderByDesc('risk_score'),
             'changeRequests' => fn($q) => $q->orderBy('created_at', 'desc'),
-            'activities' => fn($q) => $q->with('user')->orderBy('created_at', 'desc')->limit(10)
+            'activities' => fn($q) => $q->with('user')->orderBy('created_at', 'desc')->limit(10),
+            'comments' => fn($q) => $q->with(['user', 'replies.user'])->whereNull('parent_id')->orderBy('created_at', 'desc')
         ]);
 
+        // Récupérer les utilisateurs pour le sélecteur de owner
+        $users = User::orderBy('name')->get(['id', 'name']);
+
         return Inertia::render('Projects/Show', [
-            'project' => $project
+            'project' => $project,
+            'users' => $users
         ]);
     }
 
@@ -195,11 +201,11 @@ class ProjectController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => 'sometimes|required|exists:categories,id',
             'business_area' => 'nullable|string|max:100',
-            'priority' => 'required|in:High,Medium,Low',
+            'priority' => 'sometimes|required|in:High,Medium,Low',
             'frs_status' => 'nullable|in:Draft,Review,Signoff',
             'dev_status' => 'nullable|in:Not Started,In Development,Testing,UAT,Deployed,On Hold',
             'rag_status' => 'nullable|in:Green,Amber,Red',
@@ -211,6 +217,7 @@ class ProjectController extends Controller
             'blockers' => 'nullable|string',
             'current_progress' => 'nullable|string',
             'owner_id' => 'nullable|exists:users,id',
+            'need_po' => 'nullable|boolean',
         ]);
 
         $project->update($validated);
@@ -393,4 +400,16 @@ class ProjectController extends Controller
             'data' => new ProjectResource($project),
         ]);
     }
+
+    /**
+     * Analyser les risques d'un projet via ML
+     */
+    public function analyzeRisks(Request $request, Project $project, RiskScoringService $riskService)
+    {
+        $analysis = $riskService->analyzeProject($project);
+        $created = $riskService->createSuggestedRisks($project);
+
+        return back()->with('success', "{$created} risque(s) détecté(s) et créé(s) automatiquement. Score de risque: {$analysis['score']} ({$analysis['level']})");
+    }
 }
+

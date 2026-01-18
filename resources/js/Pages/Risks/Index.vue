@@ -93,7 +93,16 @@
           >
             <div class="flex justify-between items-start mb-3">
               <div class="flex-1">
-                <h3 :class="['text-lg font-semibold mb-1', isDarkText ? 'text-gray-900' : 'text-white']">{{ risk.title }}</h3>
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 :class="['text-lg font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ risk.title }}</h3>
+                  <span 
+                    v-if="risk.auto_generated"
+                    class="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/50 font-bold"
+                    title="Risque détecté automatiquement par ML"
+                  >
+                    🤖 ML
+                  </span>
+                </div>
                 <p :class="['text-sm mb-2', isDarkText ? 'text-gray-700' : 'text-gray-200']">{{ risk.description }}</p>
                 <div :class="['flex items-center gap-2 text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">
                   <FolderOpen class="w-4 h-4" />

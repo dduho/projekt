@@ -31,18 +31,21 @@ class Project extends Model
         'submission_date',
         'rag_status',
         'completion_percent',
+        'need_po',
     ];
 
     protected $casts = [
         'target_date' => 'date',
         'submission_date' => 'date',
         'completion_percent' => 'integer',
+        'need_po' => 'boolean',
     ];
 
     protected $appends = [
         'calculated_completion_percent',
         'calculated_rag_status',
         'health_status',
+        'risk_analysis',
     ];
 
     // =====================
@@ -304,5 +307,14 @@ class Project extends Model
                 ]);
             }
         });
+    }
+
+    /**
+     * Analyse automatique des risques via ML
+     */
+    public function getRiskAnalysisAttribute(): array
+    {
+        $service = app(\App\Services\RiskScoringService::class);
+        return $service->analyzeProject($this);
     }
 }
