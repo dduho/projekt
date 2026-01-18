@@ -14,14 +14,14 @@ class ProjectService
     public function list(array $filters = []): LengthAwarePaginator
     {
         return Project::query()
-            ->with(['category', 'owner', 'phases'])
+            ->with(['category', 'phases'])
             ->withCount(['risks', 'changeRequests'])
             ->when($filters['search'] ?? null, fn($q, $s) => $q->search($s))
             ->when($filters['category_id'] ?? null, fn($q, $id) => $q->where('category_id', $id))
             ->when($filters['priority'] ?? null, fn($q, $p) => $q->byPriority($p))
             ->when($filters['rag_status'] ?? null, fn($q, $s) => $q->byRagStatus($s))
             ->when($filters['dev_status'] ?? null, fn($q, $s) => $q->byDevStatus($s))
-            ->when($filters['owner_id'] ?? null, fn($q, $id) => $q->where('owner_id', $id))
+            ->when($filters['owner'] ?? null, fn($q, $text) => $q->where('owner', 'LIKE', "%{$text}%"))
             ->when($filters['frs_status'] ?? null, fn($q, $s) => $q->where('frs_status', $s))
             ->when($filters['has_blockers'] ?? false, fn($q) => $q->whereNotNull('blockers'))
             ->orderBy($filters['sort_by'] ?? 'project_code', $filters['sort_dir'] ?? 'asc')
@@ -32,7 +32,6 @@ class ProjectService
     {
         return Project::with([
             'category',
-            'owner',
             'phases',
             'risks' => fn($q) => $q->orderByRaw("
                 CASE risk_score
@@ -55,7 +54,7 @@ class ProjectService
 
             $this->logActivity($project, 'created', $data);
 
-            return $project->load(['category', 'owner', 'phases']);
+            return $project->load(['category', 'phases']);
         });
     }
 
@@ -72,7 +71,7 @@ class ProjectService
 
             $this->logActivity($project, 'updated', $changes);
 
-            return $project->fresh(['category', 'owner', 'phases']);
+            return $project->fresh(['category', 'phases']);
         });
     }
 
@@ -140,7 +139,7 @@ class ProjectService
 
             $this->logActivity($newProject, 'created', ['duplicated_from' => $project->project_code]);
 
-            return $newProject->load(['category', 'owner', 'phases']);
+            return $newProject->load(['category', 'phases']);
         });
     }
 

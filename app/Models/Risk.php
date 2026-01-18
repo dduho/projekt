@@ -25,7 +25,7 @@ class Risk extends Model
         'mitigation_plan_translations',
         'response_plan',
         'response_plan_translations',
-        'owner_id',
+        'owner',
         'status',
     ];
 
@@ -113,11 +113,6 @@ class Risk extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
-    }
-
-    public function owner(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'owner_id');
     }
 
     public function activities(): MorphMany

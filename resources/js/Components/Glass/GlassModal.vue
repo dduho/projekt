@@ -1,7 +1,7 @@
 <template>
     <Teleport to="body">
         <Transition name="modal">
-            <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
+            <div v-if="show || modelValue" class="fixed inset-0 z-50 overflow-y-auto">
                 <!-- Overlay -->
                 <div 
                     class="fixed inset-0 bg-black/60 backdrop-blur-sm"
@@ -59,6 +59,10 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
+    modelValue: {
+        type: Boolean,
+        default: false
+    },
     title: {
         type: String,
         default: ''
@@ -78,7 +82,7 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'update:modelValue']);
 
 const sizeClasses = computed(() => {
     switch (props.size) {
@@ -96,6 +100,7 @@ const sizeClasses = computed(() => {
 const close = () => {
     if (props.closeable) {
         emit('close');
+        emit('update:modelValue', false);
     }
 };
 
@@ -106,7 +111,7 @@ const handleOverlayClick = () => {
 };
 
 // Prevent body scroll when modal is open
-watch(() => props.show, (show) => {
+watch(() => props.show || props.modelValue, (show) => {
     if (show) {
         document.body.style.overflow = 'hidden';
     } else {

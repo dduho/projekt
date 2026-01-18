@@ -18,7 +18,7 @@ class LogRiskCreation
 
         // Log the activity
         ActivityLog::create([
-            'user_id' => auth()->id(),
+            'user_id' => auth()->user()?->id,
             'loggable_type' => 'App\Models\Risk',
             'loggable_id' => $risk->id,
             'action' => 'created',
@@ -30,14 +30,13 @@ class LogRiskCreation
             ],
         ]);
 
-        // Send notification to project owner and admins for high/critical risks
+        // Send notification to admins for high/critical risks
         if (in_array($risk->risk_score, ['High', 'Critical'])) {
-            $usersToNotify = User::where('id', $risk->project->owner_id)
-                ->orWhereHas('roles', fn($q) => $q->where('name', 'admin'))
+            $usersToNotify = User::whereHas('roles', fn($q) => $q->where('name', 'admin'))
                 ->get();
 
             foreach ($usersToNotify as $user) {
-                if ($user->id !== auth()->id()) {
+                if ($user->id !== auth()->user()?->id) {
                     $user->notify(new RiskCreatedNotification($risk));
                 }
             }

@@ -11,11 +11,11 @@ class ExportService
 {
     public function exportProjects(array $filters = [], string $format = 'xlsx'): StreamedResponse
     {
-        $query = Project::with(['category', 'owner', 'phases'])
+        $query = Project::with(['category', 'phases'])
             ->when($filters['category_id'] ?? null, fn($q, $v) => $q->where('category_id', $v))
             ->when($filters['rag_status'] ?? null, fn($q, $v) => $q->where('rag_status', $v))
             ->when($filters['dev_status'] ?? null, fn($q, $v) => $q->where('dev_status', $v))
-            ->when($filters['owner_id'] ?? null, fn($q, $v) => $q->where('owner_id', $v));
+            ->when($filters['owner'] ?? null, fn($q, $v) => $q->where('owner', 'LIKE', "%{$v}%"));
 
         $projects = $query->get();
 
@@ -24,7 +24,7 @@ class ExportService
                 'Code' => $project->project_code,
                 'Nom' => $project->name,
                 'Categorie' => $project->category?->name,
-                'Proprietaire' => $project->owner?->name,
+                'Proprietaire' => $project->owner,
                 'Priorite' => $project->priority,
                 'Statut RAG' => $project->rag_status,
                 'Statut Dev' => $project->dev_status,
@@ -42,7 +42,7 @@ class ExportService
 
     public function exportRisks(array $filters = [], string $format = 'xlsx'): StreamedResponse
     {
-        $query = Risk::with(['project', 'owner'])
+        $query = Risk::with(['project'])
             ->when($filters['project_id'] ?? null, fn($q, $v) => $q->where('project_id', $v))
             ->when($filters['risk_score'] ?? null, fn($q, $v) => $q->where('risk_score', $v))
             ->when($filters['status'] ?? null, fn($q, $v) => $q->where('status', $v));
@@ -59,7 +59,7 @@ class ExportService
                 'Impact' => $risk->impact,
                 'Score' => $risk->risk_score,
                 'Statut' => $risk->status,
-                'Proprietaire' => $risk->owner?->name,
+                'Proprietaire' => $risk->owner,
                 'Plan mitigation' => $risk->mitigation_plan,
                 'Identifie le' => $risk->identified_at?->format('d/m/Y'),
             ];

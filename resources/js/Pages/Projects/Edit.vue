@@ -58,14 +58,14 @@
                 v-model="form.description_fr"
                 :label="t('Description') + ' (🇫🇷)'"
                 :error="form.errors.description_fr"
-                rows="4"
+                :rows="4"
               />
               <GlassTextarea
                 v-if="currentLang === 'en'"
                 v-model="form.description_en"
                 :label="t('Description') + ' (🇬🇧)'"
                 :error="form.errors.description_en"
-                rows="4"
+                :rows="4"
               />
             </div>
 
@@ -95,11 +95,11 @@
                 :error="form.errors.priority"
                 required
               />
-              <GlassSelect
-                v-model="form.owner_id"
+              <GlassInput
+                v-model="form.owner"
                 :label="t('Owner')"
-                :options="ownerOptions"
-                :error="form.errors.owner_id"
+                :error="form.errors.owner"
+                placeholder="Nom du responsable..."
               />
             </div>
 
@@ -192,7 +192,7 @@
                 :label="t('Blockers') + ' (🇫🇷)'"
                 :placeholder="t('Describe any blockers or issues')"
                 :error="form.errors.blockers_fr"
-                rows="3"
+                :rows="3"
               />
               <GlassTextarea
                 v-if="currentLang === 'en'"
@@ -200,7 +200,7 @@
                 :label="t('Blockers') + ' (🇬🇧)'"
                 :placeholder="t('Describe any blockers or issues')"
                 :error="form.errors.blockers_en"
-                rows="3"
+                :rows="3"
               />
             </div>
           </div>
@@ -259,6 +259,10 @@ const props = defineProps({
   users: Array,
 })
 
+// Debug: log props.project.owner at mount
+console.log('🔍 Edit.vue mounted - props.project.owner:', props.project?.owner)
+console.log('🔍 Full project data:', JSON.stringify(props.project, null, 2))
+
 const form = useForm({
   project_code: props.project.project_code,
   name_fr: props.project.name_translations?.fr || props.project.name || '',
@@ -274,7 +278,7 @@ const form = useForm({
   current_progress_en: props.project.current_progress_translations?.en || '',
   blockers_fr: props.project.blockers_translations?.fr || props.project.blockers || '',
   blockers_en: props.project.blockers_translations?.en || '',
-  owner_id: props.project.owner_id || '',
+  owner: props.project.owner || '',
   planned_release: props.project.planned_release || 'TBD',
   target_date: props.project.target_date || '',
   submission_date: props.project.submission_date || '',
@@ -318,6 +322,8 @@ const devStatusOptions = computed(() => [
 ])
 
 const submit = () => {
+  console.log('📤 Form data before submit:', JSON.stringify(form.data(), null, 2))
+  console.log('📤 form.owner value:', form.owner)
   form.put(route('projects.update', props.project.id), {
     onSuccess: () => {
       // Will be redirected by the controller

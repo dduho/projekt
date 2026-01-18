@@ -22,7 +22,8 @@ class ProjectResource extends JsonResource
             'current_progress' => $this->current_progress,
             'blockers' => $this->blockers,
             'is_blocked' => $this->is_blocked,
-            'owner' => new UserResource($this->whenLoaded('owner')),
+            // Owner is now a free text field, not a user relation
+            'owner' => $this->owner,
             'planned_release' => $this->planned_release,
             'submission_date' => $this->submission_date?->format('Y-m-d'),
             'target_date' => $this->target_date?->format('Y-m-d'),

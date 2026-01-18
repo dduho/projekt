@@ -161,16 +161,15 @@
                   </button>
                 </div>
                 <div v-if="editingOwner && can('edit projects')" class="mt-1 space-y-2">
-                  <select 
-                    v-model="selectedOwnerId"
+                  <input 
+                    v-model="ownerText"
+                    type="text"
+                    placeholder="Nom du responsable..."
                     :class="[
                       'w-full px-3 py-2 rounded-lg text-sm',
-                      isDarkText ? 'bg-white border border-gray-300 text-gray-900' : 'bg-white/10 border border-white/20 text-white'
+                      isDarkText ? 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400' : 'bg-white/10 border border-white/20 text-white placeholder-gray-400'
                     ]"
-                  >
-                    <option :value="null">-- Aucun --</option>
-                    <option v-for="user in users" :key="user.id" :value="user.id">{{ user.name }}</option>
-                  </select>
+                  />
                   <div class="flex gap-2">
                     <GlassButton size="sm" @click="updateOwner">Sauvegarder</GlassButton>
                     <GlassButton size="sm" variant="ghost" @click="cancelOwnerEdit">Annuler</GlassButton>
@@ -178,7 +177,7 @@
                 </div>
                 <div v-else class="flex items-center gap-2 mt-1">
                   <User class="w-4 h-4" :class="textMuted" />
-                  <p :class="textPrimary">{{ project.owner?.name || 'Non assigné' }}</p>
+                  <p :class="textPrimary">{{ project.owner || 'Non assigné' }}</p>
                 </div>
               </div>
 
@@ -234,7 +233,6 @@
                   <AlertCircle class="w-5 h-5 text-orange-400" />
                   Need PO
                 </h3>
-                <p :class="['text-xs mt-1', textMuted]">Product Owner requis</p>
               </div>
               <label v-if="can('edit projects')" class="relative inline-flex items-center cursor-pointer">
                 <input 
@@ -327,7 +325,7 @@
                           :value="phase.status"
                           @change="updatePhaseStatus(phase, $event.target.value)"
                           :class="[
-                            'px-3 py-1.5 rounded-lg text-sm font-medium border cursor-pointer',
+                            'pl-3 pr-8 py-1.5 rounded-lg text-sm font-medium border cursor-pointer',
                             getPhaseSelectClass(phase.status)
                           ]"
                         >
@@ -679,7 +677,7 @@ const showDeleteModal = ref(false)
 const editingBlockers = ref(false)
 const blockersText = ref(props.project.blockers || '')
 const editingOwner = ref(false)
-const selectedOwnerId = ref(props.project.owner_id)
+const ownerText = ref(props.project.owner || '')
 
 // Comment form
 const newComment = ref('')
@@ -696,21 +694,13 @@ const tabs = computed(() => [
 
 const can = (permission) => {
   const user = page.props.auth?.user;
-  console.log('can() debug:', {
-    permission,
-    role: user?.role,
-    roles: user?.roles,
-    permissions: user?.permissions
-  });
   
   // Admin a TOUTES les permissions
   if (user?.role === 'admin' || user?.roles?.includes?.('admin')) {
-    console.log('✅ Admin detected - permission granted');
     return true;
   }
   
   const hasPermission = user?.permissions?.includes?.(permission);
-  console.log(hasPermission ? '✅ Permission granted' : '❌ Permission denied');
   return hasPermission;
 }
 
@@ -882,10 +872,9 @@ const updatePriority = (priority) => {
 // Owner update
 const updateOwner = () => {
   router.put(route('projects.update', props.project.id), {
-    owner_id: selectedOwnerId.value,
+    owner: ownerText.value || null,
   }, {
     preserveScroll: true,
-    preserveState: true,
     onSuccess: () => {
       editingOwner.value = false
     }
@@ -898,7 +887,6 @@ const updateBlockers = () => {
     blockers: blockersText.value || null,
   }, {
     preserveScroll: true,
-    preserveState: true,
     onSuccess: () => {
       editingBlockers.value = false
     }
@@ -911,7 +899,7 @@ const cancelBlockersEdit = () => {
 }
 
 const cancelOwnerEdit = () => {
-  selectedOwnerId.value = props.project.owner_id
+  ownerText.value = props.project.owner || ''
   editingOwner.value = false
 }
 

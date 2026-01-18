@@ -136,7 +136,7 @@ class RiskScoringService
     {
         if ($project->need_po) {
             // Très critique si pas d'owner ET need PO
-            if (!$project->owner_id) {
+            if (!$project->owner) {
                 return 1.0;
             }
             return 0.7; // Critique même avec owner

@@ -25,7 +25,6 @@ class ProjectCreated implements ShouldBroadcast
     {
         return [
             new Channel('projects'),
-            new PrivateChannel('user.' . $this->project->owner_id),
         ];
     }
 

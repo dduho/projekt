@@ -35,7 +35,7 @@ class ProjectController extends Controller
             return new ProjectCollection($projects);
         }
 
-        $query = Project::with(['category', 'owner'])
+        $query = Project::with(['category'])
             ->withCount(['risks', 'changeRequests']);
 
         if ($request->filled('search')) {
@@ -191,7 +191,6 @@ class ProjectController extends Controller
 
         $project->load([
             'category',
-            'owner',
             'phases',
             'risks' => fn($q) => $q->orderByDesc('risk_score'),
             'changeRequests' => fn($q) => $q->orderBy('created_at', 'desc'),
@@ -203,12 +202,9 @@ class ProjectController extends Controller
         $analysis = $riskService->analyzeProject($project);
         $project->ml_risk_analysis = $analysis;
 
-        // Récupérer les utilisateurs pour le sélecteur de owner
-        $users = User::orderBy('name')->get(['id', 'name']);
-
         return Inertia::render('Projects/Show', [
             'project' => $project,
-            'users' => $users
+                // 'users' => $users,
         ]);
     }
 
@@ -399,7 +395,6 @@ class ProjectController extends Controller
     public function risks(Project $project): JsonResponse
     {
         $risks = $project->risks()
-            ->with('owner')
             ->orderByRaw("CASE risk_score WHEN 'Critical' THEN 1 WHEN 'High' THEN 2 WHEN 'Medium' THEN 3 ELSE 4 END")
             ->get();
 

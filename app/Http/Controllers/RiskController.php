@@ -159,7 +159,7 @@ class RiskController extends Controller
             'probability' => 'required|in:Low,Medium,High',
             'status' => 'nullable|in:Open,In Progress,Mitigated,Closed',
             'mitigation_plan' => 'nullable|string',
-            'owner_id' => 'nullable|exists:users,id'
+            'owner' => 'nullable|string|max:100'
         ]);
 
         $validated['status'] = $validated['status'] ?? 'Open';
@@ -194,7 +194,7 @@ class RiskController extends Controller
             return new RiskResource($risk);
         }
 
-        $risk->load(['project', 'owner']);
+        $risk->load(['project']);
 
         return Inertia::render('Risks/Show', [
             'risk' => $risk
@@ -253,7 +253,7 @@ class RiskController extends Controller
             'probability' => 'required|in:Low,Medium,High',
             'status' => 'required|in:Open,In Progress,Mitigated,Closed',
             'mitigation_plan' => 'nullable|string',
-            'owner_id' => 'nullable|exists:users,id'
+            'owner' => 'nullable|string|max:100'
         ]);
 
         // Set resolved_at if closing

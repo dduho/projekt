@@ -29,7 +29,7 @@ class Project extends Model
         'current_progress_translations',
         'blockers',
         'blockers_translations',
-        'owner_id',
+        'owner',
         'planned_release',
         'target_date',
         'submission_date',
@@ -103,11 +103,6 @@ class Project extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
-    }
-
-    public function owner(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'owner_id');
     }
 
     public function phases(): HasMany

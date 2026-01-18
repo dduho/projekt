@@ -18,7 +18,7 @@ class ExportController extends Controller
     public function exportProjects(Request $request): StreamedResponse
     {
         $format = $request->input('format', 'xlsx');
-        $filters = $request->only(['category_id', 'rag_status', 'dev_status', 'owner_id']);
+        $filters = $request->only(['category_id', 'rag_status', 'dev_status', 'owner']);
 
         return $this->exportService->exportProjects($filters, $format);
     }

@@ -16,7 +16,7 @@ class LogProjectStatusChange
     {
         // Log the activity
         ActivityLog::create([
-            'user_id' => auth()->id(),
+            'user_id' => auth()->user()?->id,
             'loggable_type' => 'App\Models\Project',
             'loggable_id' => $event->project->id,
             'action' => 'status_changed',
@@ -26,14 +26,13 @@ class LogProjectStatusChange
             ],
         ]);
 
-        // Send notification to project owner and admins
-        $usersToNotify = User::where('id', $event->project->owner_id)
-            ->orWhereHas('roles', fn($q) => $q->where('name', 'admin'))
+        // Send notification to admins
+        $usersToNotify = User::whereHas('roles', fn($q) => $q->where('name', 'admin'))
             ->get();
 
         foreach ($usersToNotify as $user) {
             // Don't notify the user who made the change
-            if ($user->id !== auth()->id()) {
+            if ($user->id !== auth()->user()?->id) {
                 $user->notify(new ProjectStatusChangedNotification(
                     $event->project,
                     $event->oldStatus,

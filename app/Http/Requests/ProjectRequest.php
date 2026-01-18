@@ -27,7 +27,7 @@ class ProjectRequest extends FormRequest
             ])],
             'current_progress' => ['nullable', 'string', 'max:100'],
             'blockers' => ['nullable', 'string', 'max:2000'],
-            'owner_id' => ['nullable', 'exists:users,id'],
+            'owner' => ['nullable', 'string', 'max:100'],
             'planned_release' => ['nullable', 'string', 'max:50'],
             'submission_date' => ['nullable', 'date'],
             'target_date' => ['nullable', 'date', 'after_or_equal:submission_date'],

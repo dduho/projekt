@@ -156,7 +156,7 @@ class DashboardService
 
     public function getCriticalProjects(int $limit = 10): array
     {
-        return Project::with(['category', 'owner'])
+        return Project::with(['category'])
             ->withCount(['risks' => fn($q) => $q->critical()->open()])
             ->where(function ($query) {
                 $query->where('rag_status', 'Red')
@@ -185,7 +185,7 @@ class DashboardService
 
     public function getUpcomingDeadlines(int $days = 30): array
     {
-        return Project::with(['category', 'owner'])
+        return Project::with(['category'])
             ->whereNotNull('target_date')
             ->whereBetween('target_date', [now(), now()->addDays($days)])
             ->whereNotIn('dev_status', ['Deployed', 'On Hold'])
@@ -244,7 +244,7 @@ class DashboardService
      */
     public function getOverdueProjects(): array
     {
-        return Project::with(['category', 'owner'])
+        return Project::with(['category'])
             ->whereNotNull('target_date')
             ->where('target_date', '<', now())
             ->whereNotIn('dev_status', ['Deployed'])
@@ -271,7 +271,7 @@ class DashboardService
      */
     public function getBlockedProjects(): array
     {
-        return Project::with(['category', 'owner'])
+        return Project::with(['category'])
             ->whereNotNull('blockers')
             ->where('blockers', '!=', '')
             ->whereNotIn('dev_status', ['Deployed'])

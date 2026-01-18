@@ -21,7 +21,7 @@ class RiskRequest extends FormRequest
             'impact' => ['required', Rule::in(['Low', 'Medium', 'High', 'Critical'])],
             'probability' => ['required', Rule::in(['Low', 'Medium', 'High'])],
             'mitigation_plan' => ['nullable', 'string', 'max:5000'],
-            'owner_id' => ['nullable', 'exists:users,id'],
+            'owner' => ['nullable', 'string', 'max:100'],
             'status' => ['sometimes', Rule::in(['Open', 'In Progress', 'Mitigated', 'Closed'])],
         ];
     }

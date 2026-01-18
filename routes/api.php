@@ -43,7 +43,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/dashboard/refresh-cache', [DashboardController::class, 'refreshCache'])->name('api.dashboard.refresh');
 
     // Projects
-    Route::apiResource('projects', ProjectController::class);
+    Route::apiResource('projects', ProjectController::class)->names([
+        'index' => 'api.projects.index',
+        'store' => 'api.projects.store',
+        'show' => 'api.projects.show',
+        'update' => 'api.projects.update',
+        'destroy' => 'api.projects.destroy',
+    ]);
     Route::get('/projects/{project}/phases', [ProjectController::class, 'phases'])->name('api.projects.phases');
     Route::put('/projects/{project}/phases/{phase}', [ProjectController::class, 'updatePhase'])->name('api.projects.phases.update');
     Route::get('/projects/{project}/risks', [ProjectController::class, 'risks'])->name('api.projects.risks');

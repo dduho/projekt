@@ -220,7 +220,7 @@
                                             : isDarkText ? 'bg-gray-200' : 'bg-white/20'
                                 ]"
                             >
-                                {{ project.days_until_deadline < 0 ? Math.abs(project.days_until_deadline) + 'j retard' : project.days_until_deadline + 'j' }}
+                                {{ project.days_until_deadline < 0 ? Math.abs(Math.round(project.days_until_deadline)) + 'j retard' : Math.round(project.days_until_deadline) + 'j' }}
                             </span>
                         </div>
                         <p :class="['text-xs p-2 rounded', isDarkText ? 'bg-amber-100 text-amber-800' : 'bg-amber-500/20 text-amber-200']">
@@ -302,10 +302,10 @@
                             <div class="text-right">
                                 <p :class="[
                                     'text-sm font-bold',
-                                    project.days_remaining <= 3 ? 'text-red-500' : 
-                                    project.days_remaining <= 7 ? 'text-orange-500' : 'text-blue-500'
+                                    Math.round(project.days_remaining) <= 3 ? 'text-red-500' : 
+                                    Math.round(project.days_remaining) <= 7 ? 'text-orange-500' : 'text-blue-500'
                                 ]">
-                                    {{ project.days_remaining }}j
+                                    {{ Math.round(project.days_remaining) }}j
                                 </p>
                                 <p :class="['text-xs', textMuted]">{{ formatDate(project.target_date) }}</p>
                             </div>

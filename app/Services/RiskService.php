@@ -13,7 +13,7 @@ class RiskService
     public function list(array $filters = []): LengthAwarePaginator
     {
         return Risk::query()
-            ->with(['project', 'owner'])
+            ->with(['project'])
             ->when($filters['search'] ?? null, function ($q, $search) {
                 $q->where(function ($query) use ($search) {
                     $query->where('description', 'like', "%{$search}%")
@@ -27,7 +27,7 @@ class RiskService
             ->when($filters['impact'] ?? null, fn($q, $i) => $q->where('impact', $i))
             ->when($filters['probability'] ?? null, fn($q, $p) => $q->where('probability', $p))
             ->when($filters['risk_score'] ?? null, fn($q, $s) => $q->where('risk_score', $s))
-            ->when($filters['owner_id'] ?? null, fn($q, $id) => $q->where('owner_id', $id))
+            ->when($filters['owner'] ?? null, fn($q, $text) => $q->where('owner', 'LIKE', "%{$text}%"))
             ->when($filters['critical_only'] ?? false, fn($q) => $q->critical())
             ->when($filters['active_only'] ?? false, fn($q) => $q->active())
             ->orderByRaw("
@@ -59,7 +59,7 @@ class RiskService
 
             $this->logActivity($risk, 'created', $data);
 
-            return $risk->load(['project', 'owner']);
+            return $risk->load(['project']);
         });
     }
 

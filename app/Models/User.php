@@ -39,16 +39,6 @@ class User extends Authenticatable
     // RELATIONS
     // =====================
 
-    public function ownedProjects(): HasMany
-    {
-        return $this->hasMany(Project::class, 'owner_id');
-    }
-
-    public function ownedRisks(): HasMany
-    {
-        return $this->hasMany(Risk::class, 'owner_id');
-    }
-
     public function changeRequests(): HasMany
     {
         return $this->hasMany(ChangeRequest::class, 'requested_by_id');

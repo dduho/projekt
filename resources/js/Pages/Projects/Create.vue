@@ -74,11 +74,11 @@
                 :error="form.errors.priority"
                 required
               />
-              <GlassSelect
-                v-model="form.owner_id"
+              <GlassInput
+                v-model="form.owner"
                 label="Project Owner"
-                :options="ownerOptions"
-                :error="form.errors.owner_id"
+                :error="form.errors.owner"
+                placeholder="Nom du responsable..."
               />
             </div>
 
@@ -218,7 +218,7 @@ const form = useForm({
   dev_status: 'Not Started',
   current_progress: '',
   blockers: '',
-  owner_id: '',
+  owner: '',
   planned_release: 'TBD',
   target_date: '',
   submission_date: '',

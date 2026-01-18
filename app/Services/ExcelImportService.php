@@ -244,7 +244,7 @@ class ExcelImportService
                     'dev_status' => $this->normalizeDevStatus($rowData['J'] ?? 'Not Started'),
                     'current_progress' => trim($rowData['K'] ?? ''),
                     'blockers' => trim($rowData['L'] ?? ''),
-                    'owner_id' => $ownerId,
+                    'owner' => $ownerId ? User::find($ownerId)?->name : null,
                     'planned_release' => trim($rowData['H'] ?? ''),
                     'submission_date' => $this->parseDate($rowData['C'] ?? null),
                     'target_date' => $this->parseTargetDate($rowData['M'] ?? null),
@@ -395,7 +395,7 @@ class ExcelImportService
                         'probability' => $this->normalizePriority($rowData['F'] ?? 'Medium'),
                         'risk_score' => $this->normalizeRiskScore($rowData['G'] ?? 'Medium'),
                         'mitigation_plan' => trim($rowData['H'] ?? ''),
-                        'owner_id' => $ownerId,
+                        'owner' => $ownerId ? User::find($ownerId)?->name : null,
                         'status' => $this->normalizeRiskStatus($rowData['J'] ?? 'Open'),
                     ]
                 );
