@@ -316,8 +316,6 @@
     "Project Name": "Nom du Projet",
     "e.g., Payment Services": "ex: Services de paiement",
     "Select owner...": "Sélectionner un responsable...",
-    "Timeline": "Échéancier",
-    "Target Date": "Date de livraison",
     "Describe any blockers or issues": "Décrire tout blocage ou problème",
     "Save Changes": "Enregistrer les modifications",
     "e.g., Integration phase completed": "ex: Phase d'intégration terminée",
@@ -362,36 +360,67 @@
     "alerts.upcoming_deadlines_message": ":count projet(s) arrivent à échéance dans 7 jours",
     "alerts.pending_changes": "Demandes en attente",
     "alerts.pending_changes_message": ":count demande(s) de changement en attente",
-    "Project Information": "Informations du projet"
-    , "View Risks": "Voir les risques"
-    , "View Changes": "Voir les changements"
-    , "Owner name placeholder": "Nom du responsable..."
-    , "Unassigned": "Non assigné"
-    , "Describe blockers": "Décrivez les blocants..."
-    , "No blockers": "Aucun blocant"
-    , "No description provided": "Pas de description fournie"
-    , "Phases": "Phases"
-    , "completed": "terminées"
-    , "Started": "Commencée"
-    , "No phases defined": "Aucune phase définie"
-    , "Add Risk": "Ajouter un risque"
-    , "Add Change": "Ajouter un changement"
-    , "Requested by": "Demandé par"
-    , "on": "le"
-    , "Score": "Score"
-    , "No risks recorded": "Aucun risque enregistré"
-    , "No change requests": "Aucune demande de changement"
-    , "Add a comment": "Ajouter un commentaire..."
-    , "Reply": "Répondre"
-    , "Your reply": "Votre réponse..."
-    , "No comments yet": "Aucun commentaire"
-    , "Be the first to comment": "Soyez le premier à commenter !"
-    , "Recent Activities": "Activités récentes"
-    , "No activities yet": "Aucune activité pour le moment"
-    , "Delete project": "Supprimer le projet"
-    , "Delete project confirmation": "Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible."
-    , "Confirm delete comment": "Supprimer ce commentaire ?"
-    , "Run ML risk analysis?": "Lancer l'analyse automatique des risques via ML ?"
-    , "ML analysis finished, check Risks tab": "Analyse ML terminée ! Consultez l'onglet Risques."
-    , "ML Score": "Score ML"
+    "Project Information": "Informations du projet",
+    "Owner name placeholder": "Nom du responsable...",
+    "Unassigned": "Non assigné",
+    "Describe blockers": "Décrivez les blocants...",
+    "No blockers": "Aucun blocant",
+    "No description provided": "Pas de description fournie",
+    "completed": "terminées",
+    "Started": "Commencée",
+    "No phases defined": "Aucune phase définie",
+    "Add Risk": "Ajouter un risque",
+    "Add Change": "Ajouter un changement",
+    "on": "le",
+    "Score": "Score",
+    "No risks recorded": "Aucun risque enregistré",
+    "No change requests": "Aucune demande de changement",
+    "Add a comment": "Ajouter un commentaire...",
+    "Your reply": "Votre réponse...",
+    "No comments yet": "Aucun commentaire",
+    "Be the first to comment": "Soyez le premier à commenter !",
+    "Recent Activities": "Activités récentes",
+    "No activities yet": "Aucune activité pour le moment",
+    "Delete project": "Supprimer le projet",
+    "Delete project confirmation": "Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.",
+    "Confirm delete comment": "Supprimer ce commentaire ?",
+    "Run ML risk analysis?": "Lancer l'analyse automatique des risques via ML ?",
+    "ML analysis finished, check Risks tab": "Analyse ML terminée ! Consultez l'onglet Risques.",
+    "ML Score": "Score ML",
+    "ML": "ML",
+    "Send": "Envoyer",
+    "Create a new project": "Créer un nouveau projet",
+    "Fill in the details to create a new project": "Remplissez les détails pour créer un nouveau projet",
+    "Auto-generated if empty": "Généré automatiquement si vide",
+    "Enter project name": "Entrez le nom du projet",
+    "Enter project description": "Entrez la description du projet",
+    "Project Owner": "Responsable du projet",
+    "Completion (%)": "Complétion (%)",
+    "Blockers (Optional)": "Blocages (Optionnel)",
+    "Create New Risk": "Créer un nouveau risque",
+    "Identify and assess a potential risk": "Identifier et évaluer un risque potentiel",
+    "Risk Information": "Informations sur le risque",
+    "Risk Title": "Titre du risque",
+    "Brief description of the risk": "Brève description du risque",
+    "Detailed Description": "Description détaillée",
+    "Describe the risk in detail": "Décrivez le risque en détail",
+    "Risk Assessment": "Évaluation du risque",
+    "Likelihood": "Probabilité",
+    "Identified Date": "Date d'identification",
+    "Response Planning": "Planification de la réponse",
+    "Mitigation Strategy": "Stratégie d'atténuation",
+    "How will you reduce the likelihood or impact?": "Comment réduirez-vous la probabilité ou l'impact ?",
+    "Contingency Plan": "Plan de contingence",
+    "What will you do if the risk occurs?": "Que ferez-vous si le risque se produit ?",
+    "Submit a new change request for approval": "Soumettre une nouvelle demande de changement pour approbation",
+    "Change Details": "Détails du changement",
+    "Change Type": "Type de changement",
+    "Describe the change request in detail": "Décrivez la demande de changement en détail",
+    "Submit Change Request": "Soumettre la demande de changement",
+    "Scope Change": "Changement de périmètre",
+    "Schedule Change": "Changement d'échéancier",
+    "Budget Change": "Changement de budget",
+    "Resource Change": "Changement de ressources",
+    "Very Low": "Très faible",
+    "Very High": "Très élevé"
 }

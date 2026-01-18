@@ -82,7 +82,7 @@
         <GlassCard>
           <div class="text-center">
             <p class="text-4xl font-bold text-purple-400 mb-2">{{ stats.auto_generated || 0 }}</p>
-            <p :class="[isDarkText ? 'text-gray-600' : 'text-gray-400']">ML</p>
+            <p :class="[isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ t('ML') }}</p>
           </div>
         </GlassCard>
       </div>

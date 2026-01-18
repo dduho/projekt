@@ -245,10 +245,10 @@ const statusOptions = computed(() => [
 
 const priorityOptions = computed(() => [
   { value: '', label: t('All Priorities') },
-  { value: 'Low', label: t('Low') },
-  { value: 'Medium', label: t('Medium') },
-  { value: 'High', label: t('High') },
-  { value: 'Critical', label: t('Critical') },
+  { value: 'Low', label: te('priority', 'Low') },
+  { value: 'Medium', label: te('priority', 'Medium') },
+  { value: 'High', label: te('priority', 'High') },
+  { value: 'Critical', label: te('priority', 'Critical') },
 ])
 
 const projectOptions = computed(() => [

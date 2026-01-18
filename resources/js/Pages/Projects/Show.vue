@@ -367,10 +367,10 @@
                             : (isDarkText ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : 'bg-white/10 text-gray-300 hover:bg-white/20')
                         ]"
                       >
-                        {{ priority }}
+                        {{ te('priority', priority) }}
                       </button>
                     </div>
-                    <span v-else :class="priorityTextClass(project.priority)">{{ project.priority }}</span>
+                    <span v-else :class="priorityTextClass(project.priority)">{{ te('priority', project.priority) }}</span>
                   </div>
                 </div>
               </div>

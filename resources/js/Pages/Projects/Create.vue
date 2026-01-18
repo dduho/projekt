@@ -1,5 +1,5 @@
 <template>
-  <AppLayout page-title="Nouveau Projet" page-description="Créer un nouveau projet">
+  <AppLayout :page-title="t('New Project')" :page-description="t('Create a new project')">
     <div class="max-w-4xl mx-auto space-y-6">
       <!-- Header -->
       <div class="flex items-center gap-4">
@@ -10,8 +10,8 @@
           <ArrowLeft class="w-5 h-5" />
         </GlassButton>
         <div>
-          <h1 class="text-3xl font-bold text-white mb-2">Create New Project</h1>
-          <p class="text-slate-300">Fill in the details to create a new project</p>
+          <h1 :class="['text-3xl font-bold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">{{ t('Create Project') }}</h1>
+          <p :class="isDarkText ? 'text-gray-700' : 'text-slate-300'">{{ t('Fill in the details to create a new project') }}</p>
         </div>
       </div>
 
@@ -193,6 +193,8 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3'
 import { route } from '@/Composables/useRoute'
+import { useTranslation } from '@/Composables/useTranslation'
+import { useTheme } from '@/Composables/useTheme'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import GlassCard from '@/Components/Glass/GlassCard.vue'
 import GlassButton from '@/Components/Glass/GlassButton.vue'
@@ -201,6 +203,9 @@ import GlassSelect from '@/Components/Glass/GlassSelect.vue'
 import GlassTextarea from '@/Components/Glass/GlassTextarea.vue'
 import { ArrowLeft, Save, Loader2 } from 'lucide-vue-next'
 import { computed } from 'vue'
+
+const { t, te } = useTranslation()
+const { isDarkText } = useTheme()
 
 const props = defineProps({
   categories: Array,

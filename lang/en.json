@@ -137,7 +137,6 @@
     "ML Risk Level": "ML Risk Level",
     "Critical/High": "Critical/High",
     "Need PO": "Need PO",
-    "No projects found": "No projects found",
 
     "Import Data": "Import Data",
     "Import your data": "Import your data",
@@ -210,7 +209,6 @@
     "Application Settings": "Application Settings",
     "General": "General",
     "Security": "Security",
-    "Notifications": "Notifications",
 
     "Green": "Green",
     "Amber": "Amber",
@@ -349,39 +347,71 @@
     "alerts.upcoming_deadlines": "Upcoming Deadlines",
     "alerts.upcoming_deadlines_message": ":count project(s) due within 7 days",
     "alerts.pending_changes": "Pending Changes",
-    "alerts.pending_changes_message": ":count pending change request(s)"
+    "alerts.pending_changes_message": ":count pending change request(s)",
 
-    , "Project Details": "Project Details"
-    , "Project Information": "Project Information"
-    , "View Risks": "View Risks"
-    , "View Changes": "View Changes"
-    , "Owner name placeholder": "Owner name..."
-    , "Unassigned": "Unassigned"
-    , "Describe blockers": "Describe blockers..."
-    , "No blockers": "No blockers"
-    , "No description provided": "No description provided"
-    , "Phases": "Phases"
-    , "completed": "completed"
-    , "Started": "Started"
-    , "No phases defined": "No phases defined"
-    , "Add Risk": "Add Risk"
-    , "Add Change": "Add Change"
-    , "Requested by": "Requested by"
-    , "on": "on"
-    , "Score": "Score"
-    , "No risks recorded": "No risks recorded"
-    , "No change requests": "No change requests"
-    , "Add a comment": "Add a comment..."
-    , "Reply": "Reply"
-    , "Your reply": "Your reply..."
-    , "No comments yet": "No comments yet"
-    , "Be the first to comment": "Be the first to comment!"
-    , "Recent Activities": "Recent Activities"
-    , "No activities yet": "No activities yet"
-    , "Delete project": "Delete project"
-    , "Delete project confirmation": "Are you sure you want to delete this project? This action is irreversible."
-    , "Confirm delete comment": "Delete this comment?"
-    , "Run ML risk analysis?": "Run automatic ML risk analysis?"
-    , "ML analysis finished, check Risks tab": "ML analysis finished! Check the Risks tab."
-    , "ML Score": "ML Score"
+    "Project Information": "Project Information",
+    "Owner name placeholder": "Owner name...",
+    "Unassigned": "Unassigned",
+    "Describe blockers": "Describe blockers...",
+    "No blockers": "No blockers",
+    "No description provided": "No description provided",
+    "completed": "completed",
+    "Started": "Started",
+    "No phases defined": "No phases defined",
+    "Add Risk": "Add Risk",
+    "Add Change": "Add Change",
+    "on": "on",
+    "Score": "Score",
+    "No risks recorded": "No risks recorded",
+    "No change requests": "No change requests",
+    "Add a comment": "Add a comment...",
+    "Your reply": "Your reply...",
+    "No comments yet": "No comments yet",
+    "Be the first to comment": "Be the first to comment!",
+    "Recent Activities": "Recent Activities",
+    "No activities yet": "No activities yet",
+    "Delete project": "Delete project",
+    "Delete project confirmation": "Are you sure you want to delete this project? This action is irreversible.",
+    "Confirm delete comment": "Delete this comment?",
+    "Run ML risk analysis?": "Run automatic ML risk analysis?",
+    "ML analysis finished, check Risks tab": "ML analysis finished! Check the Risks tab.",
+    "ML Score": "ML Score",
+    "ML": "ML",
+    "Send": "Send",
+    "Create a new project": "Create a new project",
+    "Fill in the details to create a new project": "Fill in the details to create a new project",
+    "Auto-generated if empty": "Auto-generated if empty",
+    "Enter project name": "Enter project name",
+    "Enter project description": "Enter project description",
+    "Project Owner": "Project Owner",
+    "Development Status": "Development Status",
+    "Completion (%)": "Completion (%)",
+    "Blockers (Optional)": "Blockers (Optional)",
+    "Select owner...": "Select owner...",
+    "Create New Risk": "Create New Risk",
+    "Identify and assess a potential risk": "Identify and assess a potential risk",
+    "Risk Information": "Risk Information",
+    "Risk Title": "Risk Title",
+    "Brief description of the risk": "Brief description of the risk",
+    "Detailed Description": "Detailed Description",
+    "Describe the risk in detail": "Describe the risk in detail",
+    "Risk Assessment": "Risk Assessment",
+    "Likelihood": "Likelihood",
+    "Identified Date": "Identified Date",
+    "Response Planning": "Response Planning",
+    "Mitigation Strategy": "Mitigation Strategy",
+    "How will you reduce the likelihood or impact?": "How will you reduce the likelihood or impact?",
+    "Contingency Plan": "Contingency Plan",
+    "What will you do if the risk occurs?": "What will you do if the risk occurs?",
+    "Submit a new change request for approval": "Submit a new change request for approval",
+    "Change Details": "Change Details",
+    "Change Type": "Change Type",
+    "Describe the change request in detail": "Describe the change request in detail",
+    "Submit Change Request": "Submit Change Request",
+    "Scope Change": "Scope Change",
+    "Schedule Change": "Schedule Change",
+    "Budget Change": "Budget Change",
+    "Resource Change": "Resource Change",
+    "Very Low": "Very Low",
+    "Very High": "Very High"
 }

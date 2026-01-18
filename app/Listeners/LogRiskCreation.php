@@ -6,6 +6,7 @@ use App\Events\RiskCreated;
 use App\Models\ActivityLog;
 use App\Models\User;
 use App\Notifications\RiskCreatedNotification;
+use Illuminate\Support\Facades\Auth;
 
 class LogRiskCreation
 {
@@ -18,7 +19,7 @@ class LogRiskCreation
 
         // Log the activity
         ActivityLog::create([
-            'user_id' => auth()->user()?->id,
+            'user_id' => Auth::user()?->id,
             'loggable_type' => 'App\Models\Risk',
             'loggable_id' => $risk->id,
             'action' => 'created',
@@ -36,7 +37,7 @@ class LogRiskCreation
                 ->get();
 
             foreach ($usersToNotify as $user) {
-                if ($user->id !== auth()->user()?->id) {
+                if ($user->id !== Auth::user()?->id) {
                     $user->notify(new RiskCreatedNotification($risk));
                 }
             }
