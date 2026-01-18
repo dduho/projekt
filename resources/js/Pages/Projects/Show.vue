@@ -68,35 +68,27 @@
               <div class="flex items-center gap-2">
                 <p :class="['text-2xl font-bold', textPrimary]">{{ project.risks_count || 0 }}</p>
                 <span 
-                  v-if="project.risk_analysis" 
+                  v-if="project.ml_risk_analysis" 
                   :class="[
                     'text-xs px-2 py-0.5 rounded-full font-bold',
-                    riskLevelClass(project.risk_analysis.level)
+                    riskLevelClass(project.ml_risk_analysis.level)
                   ]"
+                  :title="`Score ML: ${(project.ml_risk_analysis.score * 100).toFixed(0)}%`"
                 >
-                  {{ project.risk_analysis.level }}
+                  {{ project.ml_risk_analysis.level }}
                 </span>
               </div>
             </div>
             <AlertTriangle class="w-8 h-8 text-yellow-400" />
           </div>
-          <div class="flex gap-2 mt-2">
-            <GlassButton
-              variant="ghost"
-              size="sm"
-              @click="activeTab = 'risks'"
-            >
-              View Risks
-            </GlassButton>
-            <GlassButton
-              variant="secondary"
-              size="sm"
-              @click="analyzeRisks"
-              title="Analyser automatiquement via ML"
-            >
-              🤖 ML
-            </GlassButton>
-          </div>
+          <GlassButton
+            variant="ghost"
+            size="sm"
+            class="w-full mt-2"
+            @click="activeTab = 'risks'"
+          >
+            View Risks
+          </GlassButton>
         </GlassCard>
 
         <GlassCard>

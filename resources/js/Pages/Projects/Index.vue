@@ -7,23 +7,49 @@
           <h1 :class="['text-3xl font-bold mb-2', isDarkText ? 'text-gray-900 font-bold' : 'text-white font-bold']">Projects</h1>
           <p :class="[isDarkText ? 'text-gray-700' : 'text-gray-200']">Manage all your projects and track their progress</p>
         </div>
-        <GlassButton
-          variant="primary"
-          @click="$inertia.visit(route('projects.create'))"
-          v-if="can('create projects')"
-        >
-          <Plus class="w-5 h-5 mr-2" />
-          New Project
-        </GlassButton>
+        <div class="flex gap-3 items-center">
+          <!-- View Toggle -->
+          <div class="flex gap-1 bg-white/5 rounded-lg p-1">
+            <button
+              @click="viewMode = 'grid'"
+              :class="[
+                'px-4 py-2 rounded-md transition-all text-sm font-medium',
+                viewMode === 'grid' 
+                  ? 'bg-indigo-500 text-white' 
+                  : 'text-gray-400 hover:text-white'
+              ]"
+            >
+              Grid
+            </button>
+            <button
+              @click="viewMode = 'list'"
+              :class="[
+                'px-4 py-2 rounded-md transition-all text-sm font-medium',
+                viewMode === 'list' 
+                  ? 'bg-indigo-500 text-white' 
+                  : 'text-gray-400 hover:text-white'
+              ]"
+            >
+              List
+            </button>
+          </div>
+          <GlassButton
+            variant="primary"
+            @click="$inertia.visit(route('projects.create'))"
+            v-if="can('create projects')"
+          >
+            <Plus class="w-5 h-5 mr-2" />
+            New Project
+          </GlassButton>
+        </div>
       </div>
 
       <!-- Filters -->
       <GlassCard>
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
           <GlassInput
             v-model="filters.search"
             placeholder="Search projects..."
-            :icon="Search"
             @input="debouncedSearch"
           />
           <GlassSelect
@@ -44,6 +70,12 @@
             placeholder="All Categories"
             @change="applyFilters"
           />
+          <GlassSelect
+            v-model="filters.sort"
+            :options="sortOptions"
+            placeholder="Sort by"
+            @change="applyFilters"
+          />
           <GlassButton variant="secondary" @click="resetFilters">
             <X class="w-4 h-4 mr-2" />
             Reset
@@ -51,8 +83,8 @@
         </div>
       </GlassCard>
 
-      <!-- Projects Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Projects Grid View -->
+      <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
           v-for="project in projects.data"
           :key="project.id"
@@ -61,8 +93,14 @@
         >
           <!-- Project Header -->
           <div class="flex justify-between items-start mb-4">
-            <div>
-              <h3 :class="['text-xl font-bold mb-1', isDarkText ? 'text-gray-900 font-bold' : 'text-white font-bold']">{{ project.name }}</h3>
+            <div class="flex-1 min-w-0 pr-2">
+              <Tooltip :text="project.name" position="top" class="block min-w-0">
+                <h3 
+                  :class="['text-lg font-bold mb-1 truncate block', isDarkText ? 'text-gray-900 font-bold' : 'text-white font-bold']"
+                >
+                  {{ project.name }}
+                </h3>
+              </Tooltip>
               <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ project.project_code }}</p>
             </div>
             <StatusBadge :status="project.calculated_rag_status ?? project.rag_status ?? 'gray'" />
@@ -129,6 +167,98 @@
         </div>
       </div>
 
+      <!-- Projects List View -->
+      <div v-if="viewMode === 'list'" class="space-y-2">
+        <GlassCard
+          v-for="project in projects.data"
+          :key="project.id"
+          class="cursor-pointer hover:scale-[1.01] transition-transform !p-0 compact-card"
+          @click="$inertia.visit(route('projects.show', project.id))"
+        >
+          <div class="p-2">
+            <!-- Header Row -->
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <h3 :class="['text-sm font-bold', isDarkText ? 'text-gray-900' : 'text-white']">
+                    {{ project.name }}
+                  </h3>
+                  <StatusBadge :status="project.calculated_rag_status ?? project.rag_status ?? 'gray'" />
+                </div>
+                <p :class="['text-xs', isDarkText ? 'text-gray-600' : 'text-gray-400']">
+                  {{ project.project_code }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Info Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+              <!-- Dev Status -->
+              <div>
+                <p :class="['text-xs mb-0.5', isDarkText ? 'text-gray-600' : 'text-gray-400']">Dev Status</p>
+                <span :class="['text-xs px-1.5 py-0.5 rounded-full inline-block', devStatusBadgeClass(project.dev_status)]">
+                  {{ project.dev_status }}
+                </span>
+              </div>
+
+              <!-- Category -->
+              <div>
+                <p :class="['text-xs mb-0.5', isDarkText ? 'text-gray-600' : 'text-gray-400']">Category</p>
+                <div class="flex items-center gap-1">
+                  <div
+                    class="w-2 h-2 rounded-full"
+                    :style="{ backgroundColor: project.category?.color }"
+                  ></div>
+                  <span :class="['text-xs', isDarkText ? 'text-gray-900' : 'text-white']">
+                    {{ project.category?.name }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Completion -->
+              <div>
+                <p :class="['text-xs mb-0.5', isDarkText ? 'text-gray-600' : 'text-gray-400']">Completion</p>
+                <div class="flex items-center gap-1">
+                  <div class="w-12 h-1.5 bg-gray-700 rounded-full overflow-hidden shadow-inner">
+                    <div 
+                      class="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 transition-all"
+                      :style="{ width: `${project.calculated_completion_percent ?? project.completion_percent ?? 0}%` }"
+                    ></div>
+                  </div>
+                  <span :class="['text-xs font-bold', isDarkText ? 'text-gray-900' : 'text-white']">
+                    {{ project.calculated_completion_percent ?? project.completion_percent ?? 0 }}%
+                  </span>
+                </div>
+              </div>
+
+              <!-- Owner -->
+              <div>
+                <p :class="['text-xs mb-0.5', isDarkText ? 'text-gray-600' : 'text-gray-400']">Owner</p>
+                <p :class="['text-xs', isDarkText ? 'text-gray-900' : 'text-white']">
+                  {{ project.owner?.name || '-' }}
+                </p>
+              </div>
+
+              <!-- Submission Date -->
+              <div>
+                <p :class="['text-xs mb-0.5', isDarkText ? 'text-gray-600' : 'text-gray-400']">Submission</p>
+                <p :class="['text-xs', isDarkText ? 'text-gray-900' : 'text-white']">
+                  {{ formatDate(project.submission_date) }}
+                </p>
+              </div>
+
+              <!-- Target Date -->
+              <div>
+                <p :class="['text-xs mb-0.5', isDarkText ? 'text-gray-600' : 'text-gray-400']">Target Date</p>
+                <p :class="['text-xs', isDarkText ? 'text-gray-900' : 'text-white']">
+                  {{ formatDate(project.target_date) }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+      </div>
+
       <!-- Pagination -->
       <div class="flex justify-center" v-if="projects.last_page > 1">
         <div class="flex gap-2">
@@ -186,6 +316,7 @@ import GlassInput from '@/Components/Glass/GlassInput.vue'
 import GlassSelect from '@/Components/Glass/GlassSelect.vue'
 import StatusBadge from '@/Components/Glass/StatusBadge.vue'
 import ProgressBar from '@/Components/Glass/ProgressBar.vue'
+import Tooltip from '@/Components/Glass/Tooltip.vue'
 import { Plus, Search, X, AlertTriangle, FileText, FolderOpen } from 'lucide-vue-next'
 
 const { isDarkText } = useTheme();
@@ -196,11 +327,14 @@ const props = defineProps({
   filters: Object,
 })
 
+const viewMode = ref('grid')
+
 const filters = ref({
   search: props.filters?.search || '',
   rag_status: props.filters?.rag_status || '',
   dev_status: props.filters?.dev_status || '',
   category: props.filters?.category || '',
+  sort: props.filters?.sort || '',
 })
 
 const ragStatusOptions = [
@@ -217,6 +351,18 @@ const devStatusOptions = [
   { value: 'Testing', label: 'Testing' },
   { value: 'UAT', label: 'UAT' },
   { value: 'Deployed', label: 'Deployed' },
+]
+
+const sortOptions = [
+  { value: '', label: 'Default Sort' },
+  { value: 'name_asc', label: 'Name (A-Z)' },
+  { value: 'name_desc', label: 'Name (Z-A)' },
+  { value: 'completion_desc', label: 'Completion (High-Low)' },
+  { value: 'completion_asc', label: 'Completion (Low-High)' },
+  { value: 'target_date_asc', label: 'Target Date (Near-Far)' },
+  { value: 'target_date_desc', label: 'Target Date (Far-Near)' },
+  { value: 'created_desc', label: 'Recently Created' },
+  { value: 'created_asc', label: 'Oldest First' },
 ]
 
 const categoryOptions = computed(() => [
@@ -240,7 +386,7 @@ const applyFilters = () => {
 }
 
 const resetFilters = () => {
-  filters.value = { search: '', rag_status: '', dev_status: '', category: '' }
+  filters.value = { search: '', rag_status: '', dev_status: '', category: '', sort: '' }
   applyFilters()
 }
 
@@ -268,4 +414,20 @@ const priorityClass = (priority) => {
   }
   return classes[priority] || 'bg-slate-500/20 text-slate-400'
 }
+
+const devStatusBadgeClass = (status) => {
+  const classes = {
+    'Not Started': 'bg-gray-600 text-white font-medium',
+    'In Development': 'bg-blue-600 text-white font-medium',
+    'Testing': 'bg-purple-600 text-white font-medium',
+    'UAT': 'bg-amber-600 text-white font-medium',
+    'Deployed': 'bg-green-600 text-white font-medium',
+  }
+  return classes[status] || 'bg-gray-600 text-white font-medium'
+}
 </script>
+<style scoped>
+.compact-card :deep(> div) {
+  padding-top: 0 !important;
+}
+</style>

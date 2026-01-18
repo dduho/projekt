@@ -57,13 +57,47 @@ class ProjectController extends Controller
             $query->where('category_id', $request->category);
         }
 
-        $projects = $query->orderBy('created_at', 'desc')->paginate(12);
+        // Apply sorting
+        $sort = $request->get('sort', '');
+        if ($sort) {
+            switch ($sort) {
+                case 'name_asc':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'name_desc':
+                    $query->orderBy('name', 'desc');
+                    break;
+                case 'completion_desc':
+                    $query->orderBy('completion_percent', 'desc');
+                    break;
+                case 'completion_asc':
+                    $query->orderBy('completion_percent', 'asc');
+                    break;
+                case 'target_date_asc':
+                    $query->orderBy('target_date', 'asc');
+                    break;
+                case 'target_date_desc':
+                    $query->orderBy('target_date', 'desc');
+                    break;
+                case 'created_desc':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                case 'created_asc':
+                    $query->orderBy('created_at', 'asc');
+                    break;
+            }
+        } else {
+            // Default sort
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $projects = $query->paginate(12);
         $categories = Category::orderBy('name')->get();
 
         return Inertia::render('Projects/Index', [
             'projects' => $projects,
             'categories' => $categories,
-            'filters' => $request->only(['search', 'rag_status', 'dev_status', 'category'])
+            'filters' => $request->only(['search', 'rag_status', 'dev_status', 'category', 'sort'])
         ]);
     }
 
@@ -147,7 +181,7 @@ class ProjectController extends Controller
     /**
      * Show project - Web (Inertia) or API (JSON)
      */
-    public function show(Request $request, Project $project)
+    public function show(Request $request, Project $project, RiskScoringService $riskService)
     {
         if ($request->wantsJson()) {
             $project = $this->projectService->find($project->id);
@@ -163,6 +197,10 @@ class ProjectController extends Controller
             'activities' => fn($q) => $q->with('user')->orderBy('created_at', 'desc')->limit(10),
             'comments' => fn($q) => $q->with(['user', 'replies.user'])->whereNull('parent_id')->orderBy('created_at', 'desc')
         ]);
+
+        // Auto-calculate ML risk analysis
+        $analysis = $riskService->analyzeProject($project);
+        $project->ml_risk_analysis = $analysis;
 
         // Récupérer les utilisateurs pour le sélecteur de owner
         $users = User::orderBy('name')->get(['id', 'name']);

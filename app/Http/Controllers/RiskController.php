@@ -72,6 +72,40 @@ class RiskController extends Controller
 
         $projects = Project::orderBy('name')->get(['id', 'name', 'project_code']);
 
+        // Build projects risk data manually
+        $allProjects = [];
+        $projectsList = Project::with('risks', 'phases')->get();
+        
+        foreach ($projectsList as $p) {
+            // Skip projects with no risks
+            if ($p->risks->count() === 0) {
+                continue;
+            }
+            
+            $highRiskCount = 0;
+            foreach ($p->risks as $risk) {
+                if (in_array($risk->risk_score, ['Critical', 'High'])) {
+                    $highRiskCount++;
+                }
+            }
+            
+            $allProjects[] = [
+                'id' => (int)$p->id,
+                'name' => (string)$p->name,
+                'code' => (string)$p->project_code,
+                'completion' => (int)($p->calculated_completion_percent ?? $p->completion_percent ?? 0),
+                'risks_count' => $p->risks->count(),
+                'risk_analysis' => $p->risk_analysis,
+                'high_risks' => $highRiskCount,
+                'need_po' => (bool)$p->need_po,
+            ];
+        }
+        
+        // Sort manually
+        usort($allProjects, function($a, $b) {
+            return $b['high_risks'] - $a['high_risks'];
+        });
+
         $stats = [
             'total' => Risk::count(),
             'critical' => Risk::where('risk_score', 'Critical')->count(),
@@ -79,11 +113,13 @@ class RiskController extends Controller
             'medium' => Risk::where('risk_score', 'Medium')->count(),
             'low' => Risk::where('risk_score', 'Low')->count(),
             'open' => Risk::where('status', 'Open')->count(),
+            'auto_generated' => Risk::where('auto_generated', true)->count(),
         ];
 
         return Inertia::render('Risks/Index', [
             'risks' => $risks,
             'projects' => $projects,
+            'allProjects' => $allProjects,
             'stats' => $stats,
             'filters' => $request->only(['search', 'status', 'project_id', 'risk_score'])
         ]);
