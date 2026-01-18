@@ -167,7 +167,8 @@ import {
     Search,
     LogOut,
     Tag,
-    Palette
+    Palette,
+    BarChart3
 } from 'lucide-vue-next';
 import NotificationBell from '@/Components/NotificationBell.vue';
 import BackgroundIcons from '@/Components/BackgroundIcons.vue';
@@ -338,6 +339,7 @@ const navigation = computed(() => [
     { name: t('Dashboard'), href: '/dashboard', icon: LayoutDashboard },
     { name: t('Projects'), href: '/projects', icon: FolderKanban },
     { name: t('Risks'), href: '/risks', icon: AlertTriangle },
+    { name: t('Reports'), href: '/reports', icon: BarChart3 },
     { name: t('Import Excel'), href: '/import', icon: Upload },
     { name: t('Categories'), href: '/categories', icon: Tag },
     { name: t('Users'), href: '/users', icon: Users },

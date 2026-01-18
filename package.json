@@ -25,6 +25,7 @@
         "vue3-apexcharts": "^1.10.0"
     },
     "dependencies": {
+        "chart.js": "^4.5.1",
         "vuedraggable": "^4.1.0"
     }
 }

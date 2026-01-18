@@ -14,6 +14,7 @@ use App\Http\Controllers\ImportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\Web\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -89,6 +90,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/export/risks', [ExportController::class, 'exportRisks'])->name('export.risks');
     Route::get('/export/changes', [ExportController::class, 'exportChangeRequests'])->name('export.changes');
     Route::get('/export/dashboard', [ExportController::class, 'exportDashboard'])->name('export.dashboard');
+
+    // Reports
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/projects/{project}/pdf', [ReportController::class, 'projectPdf'])->name('reports.project-pdf');
+    Route::get('/reports/projects/{project}/excel', [ReportController::class, 'projectExcel'])->name('reports.project-excel');
+    Route::get('/reports/portfolio/pdf', [ReportController::class, 'portfolioPdf'])->name('reports.portfolio-pdf');
+    Route::get('/reports/portfolio/excel', [ReportController::class, 'portfolioExcel'])->name('reports.portfolio-excel');
 
     // Admin - Categories
     Route::middleware('role:admin')->group(function () {

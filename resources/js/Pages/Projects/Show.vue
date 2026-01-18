@@ -594,6 +594,16 @@
                   {{ t('No activities yet') }}
                 </div>
               </div>
+
+              <!-- Trends Tab -->
+              <div v-if="activeTab === 'trends'">
+                <TrendsChart :project-id="project.id" />
+              </div>
+
+              <!-- Forecast Tab -->
+              <div v-if="activeTab === 'forecast'">
+                <ForecastWidget :project-id="project.id" />
+              </div>
             </div>
           </GlassCard>
         </div>
@@ -632,6 +642,8 @@ import ProgressBar from '@/Components/Glass/ProgressBar.vue'
 import ChecklistWidget from '@/Components/ChecklistWidget.vue'
 import FileUpload from '@/Components/FileUpload.vue'
 import GanttChart from '@/Components/GanttChart.vue'
+import TrendsChart from '@/Components/TrendsChart.vue'
+import ForecastWidget from '@/Components/ForecastWidget.vue'
 import {
   ArrowLeft, Edit, Trash2, TrendingUp, Flag,
   AlertTriangle, FileText, AlertCircle, Plus, Check,
@@ -676,6 +688,8 @@ const tabs = computed(() => [
   { id: 'risks', label: t('Risks') },
   { id: 'comments', label: t('Comments') },
   { id: 'activities', label: t('Activities') },
+  { id: 'trends', label: t('Trends') },
+  { id: 'forecast', label: t('Forecast') },
 ])
 
 const can = (permission) => {

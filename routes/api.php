@@ -114,4 +114,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/projects/{project}/attachments', [AttachmentController::class, 'store'])->name('api.attachments.store');
     Route::get('/attachments/{attachment}/download', [AttachmentController::class, 'download'])->name('api.attachments.download');
     Route::delete('/attachments/{attachment}', [AttachmentController::class, 'destroy'])->name('api.attachments.destroy');
+
+    // PHASE 3 - Rapports & Analytics
+    Route::get('/projects/{project}/data', [\App\Http\Controllers\Web\ReportController::class, 'projectData'])->name('api.reports.project-data');
+    Route::get('/projects/{project}/trends', [\App\Http\Controllers\Web\ReportController::class, 'projectTrends'])->name('api.reports.trends');
+    Route::get('/portfolio/data', [\App\Http\Controllers\Web\ReportController::class, 'portfolioData'])->name('api.reports.portfolio-data');
 });
