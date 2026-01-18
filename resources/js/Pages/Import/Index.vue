@@ -1,18 +1,18 @@
 <template>
-  <AppLayout page-title="Import Excel" page-description="Importer des données">
+  <AppLayout :page-title="t('Import Excel')" :page-description="t('Import your data')">
     <div class="max-w-4xl mx-auto space-y-6">
       <!-- Header -->
       <div class="flex items-center justify-between">
         <div>
-          <h1 :class="['text-2xl font-bold', isDarkText ? 'text-gray-900' : 'text-white']">Import de Donnees</h1>
-          <p :class="['mt-1', isDarkText ? 'text-gray-600' : 'text-white/60']">Importez vos projets, risques et demandes de changement depuis un fichier Excel</p>
+          <h1 :class="['text-2xl font-bold', isDarkText ? 'text-gray-900' : 'text-white']">{{ t('Import Data') }}</h1>
+          <p :class="['mt-1', isDarkText ? 'text-gray-600' : 'text-white/60']">{{ t('Import your projects, risks and change requests from an Excel file') }}</p>
         </div>
         <GlassButton
           variant="secondary"
           :icon="Download"
           @click="downloadTemplate"
         >
-          Telecharger le template
+          {{ t('Download template') }}
         </GlassButton>
       </div>
 
@@ -21,15 +21,15 @@
         <template #header>
           <div class="flex items-center gap-3">
             <FileSpreadsheet class="w-5 h-5 text-emerald-400" />
-            <h2 :class="['text-lg font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">1. Selectionner un fichier</h2>
+            <h2 :class="['text-lg font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ t('1. Select a file') }}</h2>
           </div>
         </template>
 
         <div
           :class="[
             'border-2 border-dashed rounded-xl p-8 text-center transition-colors',
-            isDragging 
-              ? 'border-emerald-400/50 bg-emerald-400/10' 
+            isDragging
+              ? 'border-emerald-400/50 bg-emerald-400/10'
               : (isDarkText ? 'border-gray-300 hover:border-gray-400' : 'border-white/30 hover:border-white/50')
           ]"
           @dragover.prevent="isDragging = true"
@@ -39,11 +39,11 @@
           <Upload :class="['w-12 h-12 mx-auto mb-4', isDarkText ? 'text-gray-400' : 'text-white/40']" />
 
           <div v-if="!selectedFile">
-            <p :class="['mb-2', isDarkText ? 'text-gray-700' : 'text-white/80']">Glissez-deposez votre fichier Excel ici</p>
-            <p :class="['text-sm mb-4', isDarkText ? 'text-gray-500' : 'text-white/50']">ou</p>
+            <p :class="['mb-2', isDarkText ? 'text-gray-700' : 'text-white/80']">{{ t('Drag and drop your Excel file here') }}</p>
+            <p :class="['text-sm mb-4', isDarkText ? 'text-gray-500' : 'text-white/50']">{{ t('or') }}</p>
             <label class="cursor-pointer">
               <GlassButton variant="primary" as="span">
-                Parcourir les fichiers
+                {{ t('Browse files') }}
               </GlassButton>
               <input
                 type="file"
@@ -52,7 +52,7 @@
                 @change="handleFileSelect"
               />
             </label>
-            <p :class="['text-xs mt-4', isDarkText ? 'text-gray-500' : 'text-white/40']">Formats acceptes: .xlsx, .xls (max 10MB)</p>
+            <p :class="['text-xs mt-4', isDarkText ? 'text-gray-500' : 'text-white/40']">{{ t('Accepted formats: .xlsx, .xls (max 10MB)') }}</p>
           </div>
 
           <div v-else class="flex items-center justify-center gap-4">
@@ -76,7 +76,7 @@
           <div class="flex items-center gap-3">
             <CheckCircle v-if="validation.valid" class="w-5 h-5 text-emerald-400" />
             <AlertCircle v-else class="w-5 h-5 text-red-400" />
-            <h2 :class="['text-lg font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">2. Validation du fichier</h2>
+            <h2 :class="['text-lg font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ t('2. File validation') }}</h2>
           </div>
         </template>
 
@@ -95,7 +95,7 @@
                 <span :class="['text-sm font-medium truncate', isDarkText ? 'text-gray-900' : 'text-white']">{{ sheetName }}</span>
               </div>
               <p :class="['text-xs', isDarkText ? 'text-gray-600' : 'text-white/60']">
-                {{ info.exists ? `${info.rows} lignes` : 'Non trouve' }}
+                {{ info.exists ? `${info.rows} ${t('rows')}` : t('Not found') }}
               </p>
             </div>
           </div>
@@ -105,9 +105,9 @@
             <div class="flex items-start gap-3">
               <AlertTriangle class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p class="text-amber-300 font-medium">Feuilles manquantes</p>
+                <p class="text-amber-300 font-medium">{{ t('Missing sheets') }}</p>
                 <p :class="['text-sm mt-1', isDarkText ? 'text-gray-600' : 'text-white/60']">
-                  Les feuilles suivantes n'ont pas ete trouvees: {{ validation.missing_sheets.join(', ') }}
+                  {{ t('The following sheets were not found') }}: {{ validation.missing_sheets.join(', ') }}
                 </p>
               </div>
             </div>
@@ -117,7 +117,7 @@
           <div v-if="validation.valid" class="p-4 bg-emerald-400/10 border border-emerald-400/30 rounded-lg">
             <div class="flex items-center gap-3">
               <CheckCircle class="w-5 h-5 text-emerald-400" />
-              <p class="text-emerald-300">Fichier valide et pret pour l'import!</p>
+              <p class="text-emerald-300">{{ t('File valid and ready for import!') }}</p>
             </div>
           </div>
         </div>
@@ -128,7 +128,7 @@
         <template #header>
           <div class="flex items-center gap-3">
             <Eye class="w-5 h-5 text-blue-400" />
-            <h2 :class="['text-lg font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">3. Apercu des donnees</h2>
+            <h2 :class="['text-lg font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ t('3. Data preview') }}</h2>
           </div>
         </template>
 
@@ -136,7 +136,7 @@
           <div v-for="(data, sheetName) in preview" :key="sheetName">
             <div class="flex items-center justify-between mb-3">
               <h3 :class="['font-medium', isDarkText ? 'text-gray-900' : 'text-white']">{{ sheetName }}</h3>
-              <span :class="['text-sm', isDarkText ? 'text-gray-500' : 'text-white/50']">{{ data.total_rows }} lignes</span>
+              <span :class="['text-sm', isDarkText ? 'text-gray-500' : 'text-white/50']">{{ data.total_rows }} {{ t('rows') }}</span>
             </div>
 
             <div class="overflow-x-auto">
@@ -172,7 +172,7 @@
       <!-- Import Button -->
       <div v-if="validation?.valid" class="flex justify-end gap-4">
         <GlassButton variant="secondary" @click="clearFile">
-          Annuler
+          {{ t('Cancel') }}
         </GlassButton>
         <GlassButton
           variant="primary"
@@ -181,7 +181,7 @@
           :disabled="!filePath"
           @click="startImport"
         >
-          {{ filePath ? 'Lancer l\'import' : 'Chargement...' }}
+          {{ filePath ? t('Start import') : t('Loading') + '...' }}
         </GlassButton>
       </div>
 
@@ -191,7 +191,7 @@
           <div class="flex items-center gap-3">
             <CheckCircle v-if="importResult.success" class="w-5 h-5 text-emerald-400" />
             <AlertCircle v-else class="w-5 h-5 text-red-400" />
-            <h2 :class="['text-lg font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">Resultat de l'import</h2>
+            <h2 :class="['text-lg font-semibold', isDarkText ? 'text-gray-900' : 'text-white']">{{ t('Import result') }}</h2>
           </div>
         </template>
 
@@ -202,22 +202,22 @@
               <p :class="['text-2xl font-bold', isDarkText ? 'text-gray-900' : 'text-white']">
                 {{ importResult.stats?.projects?.created || 0 }}
               </p>
-              <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-white/60']">Projets crees</p>
+              <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-white/60']">{{ t('Projects created') }}</p>
               <p class="text-emerald-400 text-xs mt-1">
-                +{{ importResult.stats?.projects?.updated || 0 }} mis a jour
+                +{{ importResult.stats?.projects?.updated || 0 }} {{ t('updated') }}
               </p>
             </div>
             <div :class="['text-center p-4 rounded-lg', isDarkText ? 'bg-gray-100' : 'bg-white/5']">
               <p :class="['text-2xl font-bold', isDarkText ? 'text-gray-900' : 'text-white']">
                 {{ importResult.stats?.risks?.created || 0 }}
               </p>
-              <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-white/60']">Risques importes</p>
+              <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-white/60']">{{ t('Risks imported') }}</p>
             </div>
             <div :class="['text-center p-4 rounded-lg', isDarkText ? 'bg-gray-100' : 'bg-white/5']">
               <p :class="['text-2xl font-bold', isDarkText ? 'text-gray-900' : 'text-white']">
                 {{ importResult.stats?.changes?.created || 0 }}
               </p>
-              <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-white/60']">Changements importes</p>
+              <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-white/60']">{{ t('Changes imported') }}</p>
             </div>
           </div>
 
@@ -226,7 +226,7 @@
             <div class="flex items-start gap-3">
               <AlertTriangle class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p class="text-red-300 font-medium">Erreurs rencontrees ({{ importResult.errors.length }})</p>
+                <p class="text-red-300 font-medium">{{ t('Errors encountered') }} ({{ importResult.errors.length }})</p>
                 <ul :class="['text-sm mt-2 space-y-1 max-h-40 overflow-y-auto', isDarkText ? 'text-gray-600' : 'text-white/60']">
                   <li v-for="(error, i) in importResult.errors" :key="i">{{ error }}</li>
                 </ul>
@@ -237,10 +237,10 @@
           <!-- Success Actions -->
           <div v-if="importResult.success" class="flex justify-end gap-3">
             <GlassButton variant="secondary" @click="resetImport">
-              Nouvel import
+              {{ t('New import') }}
             </GlassButton>
             <GlassButton variant="primary" :href="route('projects.index')">
-              Voir les projets
+              {{ t('View projects') }}
             </GlassButton>
           </div>
         </div>
@@ -250,11 +250,13 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import GlassCard from '@/Components/Glass/GlassCard.vue';
 import GlassButton from '@/Components/Glass/GlassButton.vue';
+import { useTheme } from '@/Composables/useTheme';
+import { useTranslation } from '@/Composables/useTranslation';
 import {
   Upload,
   Download,
@@ -266,9 +268,9 @@ import {
   Eye,
 } from 'lucide-vue-next';
 import axios from 'axios';
-import { useTheme } from '@/Composables/useTheme';
 
 const { isDarkText } = useTheme();
+const { t } = useTranslation();
 
 const page = usePage();
 
@@ -286,7 +288,7 @@ const importResult = computed(() => {
   if (localImportResult.value) {
     return localImportResult.value;
   }
-  
+
   const flash = page.props.flash || {};
   if (flash.import_stats) {
     return {
@@ -329,11 +331,11 @@ const processFile = async (file) => {
     });
 
     console.log('Validation response:', validateResponse.data);
-    
+
     // Le backend retourne soit {validation, file_path, file_name} pour Web
     // soit directement {valid, sheets, ...} pour API
     const validationData = validateResponse.data.validation || validateResponse.data;
-    
+
     validation.value = validationData;
     filePath.value = validateResponse.data.file_path;
 
@@ -356,7 +358,7 @@ const processFile = async (file) => {
     console.error('Validation error:', error);
     validation.value = {
       valid: false,
-      error: error.response?.data?.message || 'Erreur lors de la validation',
+      error: error.response?.data?.message || t('Validation error'),
     };
   }
 };
@@ -383,28 +385,28 @@ const startImport = async () => {
         'X-Requested-With': 'XMLHttpRequest'
       }
     });
-    
+
     console.log('Import response:', response.data);
-    
+
     localImportResult.value = {
       success: true,
       stats: response.data.stats || response.data.import_stats,
       errors: response.data.errors || response.data.import_errors || [],
     };
-    
+
     // Garder selectedFile pour montrer quel fichier a été importé
     validation.value = null;
     preview.value = null;
     filePath.value = null;
-    
+
   } catch (error) {
     console.error('Import error:', error);
-    
+
     const errorData = error.response?.data;
     localImportResult.value = {
       success: false,
       stats: errorData?.stats || errorData?.import_stats || {},
-      errors: errorData?.errors || errorData?.import_errors || [errorData?.message || error.message || 'Erreur lors de l\'import'],
+      errors: errorData?.errors || errorData?.import_errors || [errorData?.message || error.message || t('Error')],
     };
   } finally {
     importing.value = false;

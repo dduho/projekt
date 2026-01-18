@@ -436,13 +436,13 @@ class DashboardService
             ->where('target_date', '<', now())
             ->whereNotIn('dev_status', ['Deployed'])
             ->count();
-        
+
         if ($overdueCount > 0) {
             $alerts[] = [
                 'type' => 'danger',
                 'icon' => 'clock',
-                'title' => 'Projets en retard',
-                'message' => "{$overdueCount} projet(s) ont dépassé leur date cible",
+                'title_key' => 'alerts.overdue_projects',
+                'message_key' => 'alerts.overdue_projects_message',
                 'count' => $overdueCount,
                 'action' => 'overdue',
             ];
@@ -452,13 +452,13 @@ class DashboardService
         $blockedCount = Project::whereNotNull('blockers')
             ->whereNotIn('dev_status', ['Deployed'])
             ->count();
-        
+
         if ($blockedCount > 0) {
             $alerts[] = [
                 'type' => 'warning',
                 'icon' => 'alert-triangle',
-                'title' => 'Projets bloqués',
-                'message' => "{$blockedCount} projet(s) ont des blocages signalés",
+                'title_key' => 'alerts.blocked_projects',
+                'message_key' => 'alerts.blocked_projects_message',
                 'count' => $blockedCount,
                 'action' => 'blocked',
             ];
@@ -466,13 +466,13 @@ class DashboardService
 
         // Critical risks alert
         $criticalRisks = Risk::critical()->open()->count();
-        
+
         if ($criticalRisks > 0) {
             $alerts[] = [
                 'type' => 'danger',
                 'icon' => 'flame',
-                'title' => 'Risques critiques',
-                'message' => "{$criticalRisks} risque(s) critique(s) non résolus",
+                'title_key' => 'alerts.critical_risks',
+                'message_key' => 'alerts.critical_risks_message',
                 'count' => $criticalRisks,
                 'action' => 'risks',
             ];
@@ -483,13 +483,13 @@ class DashboardService
             ->whereBetween('target_date', [now(), now()->addDays(7)])
             ->whereNotIn('dev_status', ['Deployed'])
             ->count();
-        
+
         if ($urgentDeadlines > 0) {
             $alerts[] = [
                 'type' => 'info',
                 'icon' => 'calendar',
-                'title' => 'Échéances proches',
-                'message' => "{$urgentDeadlines} projet(s) arrivent à échéance dans 7 jours",
+                'title_key' => 'alerts.upcoming_deadlines',
+                'message_key' => 'alerts.upcoming_deadlines_message',
                 'count' => $urgentDeadlines,
                 'action' => 'deadlines',
             ];
@@ -497,13 +497,13 @@ class DashboardService
 
         // Pending change requests
         $pendingChanges = ChangeRequest::pending()->count();
-        
+
         if ($pendingChanges > 0) {
             $alerts[] = [
                 'type' => 'info',
                 'icon' => 'file-edit',
-                'title' => 'Demandes en attente',
-                'message' => "{$pendingChanges} demande(s) de changement en attente",
+                'title_key' => 'alerts.pending_changes',
+                'message_key' => 'alerts.pending_changes_message',
                 'count' => $pendingChanges,
                 'action' => 'changes',
             ];

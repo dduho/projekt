@@ -1,18 +1,18 @@
 <template>
-  <AppLayout page-title="Categories" page-description="Gestion des catégories">
+  <AppLayout :page-title="t('Categories')" :page-description="t('Manage project categories and their colors')">
     <div class="space-y-6">
       <!-- Header -->
       <div class="flex justify-between items-center">
         <div>
-          <h1 :class="['text-3xl font-bold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">Categories</h1>
-          <p :class="isDarkText ? 'text-gray-600' : 'text-slate-300'">Manage project categories and their colors</p>
+          <h1 :class="['text-3xl font-bold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">{{ t('Categories') }}</h1>
+          <p :class="isDarkText ? 'text-gray-600' : 'text-slate-300'">{{ t('Manage project categories and their colors') }}</p>
         </div>
         <GlassButton 
           variant="primary" 
           @click="showModal = true; editingCategory = null; resetForm()"
         >
           <Plus class="w-5 h-5 mr-2" />
-          New Category
+          {{ t('New Category') }}
         </GlassButton>
       </div>
 
@@ -171,8 +171,10 @@ import GlassTextarea from '@/Components/Glass/GlassTextarea.vue'
 import GlassModal from '@/Components/Glass/GlassModal.vue'
 import { Plus, Edit, Trash2, Tag, Save, Loader2 } from 'lucide-vue-next'
 import { useTheme } from '@/Composables/useTheme'
+import { useTranslation } from '@/Composables/useTranslation'
 
 const { isDarkText } = useTheme()
+const { t } = useTranslation()
 
 const props = defineProps({
   categories: Array,

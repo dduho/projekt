@@ -1,19 +1,19 @@
 <template>
-  <AppLayout page-title="Demandes de Changement" page-description="Gestion des changements">
+  <AppLayout :page-title="t('Change Requests')" :page-description="t('Manage project change requests and approvals')">
     <div class="space-y-6">
       <!-- Header -->
       <div class="flex justify-between items-center">
         <div>
-          <h1 :class="['text-3xl font-bold mb-2', isDarkText ? 'text-gray-900 font-bold' : 'text-white font-bold']">Change Requests</h1>
-          <p :class="[isDarkText ? 'text-gray-700' : 'text-gray-200']">Manage project change requests and approvals</p>
+          <h1 :class="['text-3xl font-bold mb-2', isDarkText ? 'text-gray-900 font-bold' : 'text-white font-bold']">{{ t('Change Requests') }}</h1>
+          <p :class="[isDarkText ? 'text-gray-700' : 'text-gray-200']">{{ t('Manage project change requests and approvals') }}</p>
         </div>
-        <GlassButton 
-          variant="primary" 
+        <GlassButton
+          variant="primary"
           @click="$inertia.visit(route('change-requests.create'))"
           v-if="can('create change-requests')"
         >
           <Plus class="w-5 h-5 mr-2" />
-          New Change Request
+          {{ t('New Change Request') }}
         </GlassButton>
       </div>
 
@@ -22,31 +22,31 @@
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
           <GlassInput
             v-model="filters.search"
-            placeholder="Search change requests..."
+            :placeholder="t('Search change requests...')"
             :icon="Search"
             @input="debouncedSearch"
           />
           <GlassSelect
             v-model="filters.status"
             :options="statusOptions"
-            placeholder="All Statuses"
+            :placeholder="t('All Statuses')"
             @change="applyFilters"
           />
           <GlassSelect
             v-model="filters.priority"
             :options="priorityOptions"
-            placeholder="All Priorities"
+            :placeholder="t('All Priorities')"
             @change="applyFilters"
           />
           <GlassSelect
             v-model="filters.project"
             :options="projectOptions"
-            placeholder="All Projects"
+            :placeholder="t('All Projects')"
             @change="applyFilters"
           />
           <GlassButton variant="secondary" @click="resetFilters">
             <X class="w-4 h-4 mr-2" />
-            Reset
+            {{ t('Reset') }}
           </GlassButton>
         </div>
       </GlassCard>
@@ -56,31 +56,31 @@
         <GlassCard>
           <div class="text-center">
             <p :class="['text-3xl font-bold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">{{ stats.total }}</p>
-            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">Total</p>
+            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ t('Total') }}</p>
           </div>
         </GlassCard>
         <GlassCard>
           <div class="text-center">
             <p class="text-3xl font-bold text-yellow-400 mb-2">{{ stats.pending }}</p>
-            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">Pending</p>
+            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ t('Pending') }}</p>
           </div>
         </GlassCard>
         <GlassCard>
           <div class="text-center">
             <p class="text-3xl font-bold text-green-400 mb-2">{{ stats.approved }}</p>
-            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">Approved</p>
+            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ t('Approved') }}</p>
           </div>
         </GlassCard>
         <GlassCard>
           <div class="text-center">
             <p class="text-3xl font-bold text-red-400 mb-2">{{ stats.rejected }}</p>
-            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">Rejected</p>
+            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ t('Rejected') }}</p>
           </div>
         </GlassCard>
         <GlassCard>
           <div class="text-center">
             <p :class="['text-2xl font-bold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">{{ formatCurrency(stats.totalCost) }}</p>
-            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">Total Cost Impact</p>
+            <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ t('Total Cost Impact') }}</p>
           </div>
         </GlassCard>
       </div>
@@ -99,10 +99,10 @@
               <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ row.project?.code }}</p>
             </div>
           </template>
-          
+
           <template #cell-priority="{ row }">
             <span :class="getPriorityClass(row.priority)">
-              {{ row.priority }}
+              {{ te('priority', row.priority) }}
             </span>
           </template>
 
@@ -111,7 +111,7 @@
           </template>
 
           <template #cell-schedule_impact="{ row }">
-            <span :class="[isDarkText ? 'text-gray-900' : 'text-white']">{{ row.schedule_impact }} days</span>
+            <span :class="[isDarkText ? 'text-gray-900' : 'text-white']">{{ row.schedule_impact }} {{ t('days') }}</span>
           </template>
 
           <template #cell-status="{ row }">
@@ -152,22 +152,22 @@
       <!-- Pagination -->
       <div class="flex justify-center" v-if="changeRequests.last_page > 1">
         <div class="flex gap-2">
-          <GlassButton 
-            variant="secondary" 
+          <GlassButton
+            variant="secondary"
             :disabled="!changeRequests.prev_page_url"
             @click="changePage(changeRequests.current_page - 1)"
           >
-            Previous
+            {{ t('Previous') }}
           </GlassButton>
           <div class="flex items-center gap-2 px-4">
-            <span :class="[isDarkText ? 'text-gray-900' : 'text-white']">Page {{ changeRequests.current_page }} of {{ changeRequests.last_page }}</span>
+            <span :class="[isDarkText ? 'text-gray-900' : 'text-white']">{{ t('Page :current of :total', { current: changeRequests.current_page, total: changeRequests.last_page }) }}</span>
           </div>
-          <GlassButton 
-            variant="secondary" 
+          <GlassButton
+            variant="secondary"
             :disabled="!changeRequests.next_page_url"
             @click="changePage(changeRequests.current_page + 1)"
           >
-            Next
+            {{ t('Next') }}
           </GlassButton>
         </div>
       </div>
@@ -176,17 +176,17 @@
       <div v-if="changeRequests.data.length === 0" class="text-center py-12">
         <GlassCard class="max-w-md mx-auto p-8">
           <FileText :class="['w-16 h-16 mx-auto mb-4', isDarkText ? 'text-gray-600' : 'text-gray-400']" />
-          <h3 :class="['text-xl font-semibold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">No change requests found</h3>
+          <h3 :class="['text-xl font-semibold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">{{ t('No change requests found') }}</h3>
           <p :class="['mb-6', isDarkText ? 'text-gray-700' : 'text-gray-200']">
-            {{ filters.search || filters.status ? 'Try adjusting your filters' : 'Start by creating your first change request' }}
+            {{ filters.search || filters.status ? t('Try adjusting your filters') : t('Start by creating your first change request') }}
           </p>
-          <GlassButton 
-            variant="primary" 
+          <GlassButton
+            variant="primary"
             @click="$inertia.visit(route('change-requests.create'))"
             v-if="can('create change-requests')"
           >
             <Plus class="w-5 h-5 mr-2" />
-            Create Change Request
+            {{ t('Create Change Request') }}
           </GlassButton>
         </GlassCard>
       </div>
@@ -198,9 +198,8 @@
 import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { route } from '@/Composables/useRoute'
-import { useTheme } from '@/Composables/useTheme';
-
-const { isDarkText } = useTheme();
+import { useTheme } from '@/Composables/useTheme'
+import { useTranslation } from '@/Composables/useTranslation'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import GlassCard from '@/Components/Glass/GlassCard.vue'
 import GlassButton from '@/Components/Glass/GlassButton.vue'
@@ -209,6 +208,9 @@ import GlassSelect from '@/Components/Glass/GlassSelect.vue'
 import StatusBadge from '@/Components/Glass/StatusBadge.vue'
 import DataTable from '@/Components/DataTable.vue'
 import { Plus, Search, X, FileText, Eye, Check } from 'lucide-vue-next'
+
+const { isDarkText } = useTheme()
+const { t, te, formatCurrency: formatCurrencyFn, locale } = useTranslation()
 
 const props = defineProps({
   changeRequests: Object,
@@ -224,33 +226,33 @@ const filters = ref({
   project: props.filters?.project || '',
 })
 
-const columns = [
-  { key: 'title', label: 'Title', sortable: true },
-  { key: 'priority', label: 'Priority', sortable: true },
-  { key: 'cost_impact', label: 'Cost Impact', sortable: true },
-  { key: 'schedule_impact', label: 'Schedule Impact', sortable: true },
-  { key: 'status', label: 'Status', sortable: true },
-  { key: 'actions', label: 'Actions', sortable: false },
-]
+const columns = computed(() => [
+  { key: 'title', label: t('Title'), sortable: true },
+  { key: 'priority', label: t('Priority'), sortable: true },
+  { key: 'cost_impact', label: t('Cost Impact'), sortable: true },
+  { key: 'schedule_impact', label: t('Schedule Impact'), sortable: true },
+  { key: 'status', label: t('Status'), sortable: true },
+  { key: 'actions', label: t('Actions'), sortable: false },
+])
 
-const statusOptions = [
-  { value: '', label: 'All Statuses' },
-  { value: 'Pending', label: 'Pending' },
-  { value: 'Approved', label: 'Approved' },
-  { value: 'Rejected', label: 'Rejected' },
-  { value: 'Implemented', label: 'Implemented' },
-]
+const statusOptions = computed(() => [
+  { value: '', label: t('All Statuses') },
+  { value: 'Pending', label: t('Pending') },
+  { value: 'Approved', label: t('Approved') },
+  { value: 'Rejected', label: t('Rejected') },
+  { value: 'Implemented', label: t('Implemented') },
+])
 
-const priorityOptions = [
-  { value: '', label: 'All Priorities' },
-  { value: 'Low', label: 'Low' },
-  { value: 'Medium', label: 'Medium' },
-  { value: 'High', label: 'High' },
-  { value: 'Critical', label: 'Critical' },
-]
+const priorityOptions = computed(() => [
+  { value: '', label: t('All Priorities') },
+  { value: 'Low', label: t('Low') },
+  { value: 'Medium', label: t('Medium') },
+  { value: 'High', label: t('High') },
+  { value: 'Critical', label: t('Critical') },
+])
 
 const projectOptions = computed(() => [
-  { value: '', label: 'All Projects' },
+  { value: '', label: t('All Projects') },
   ...props.projects.map(p => ({ value: p.id, label: `${p.code} - ${p.name}` }))
 ])
 
@@ -286,7 +288,7 @@ const viewChange = (row) => {
 }
 
 const approveChange = (row) => {
-  if (confirm('Are you sure you want to approve this change request?')) {
+  if (confirm(t('Are you sure you want to approve this change request?'))) {
     router.post(route('api.change-requests.approve', row.id), {}, {
       onSuccess: () => applyFilters()
     })
@@ -294,7 +296,7 @@ const approveChange = (row) => {
 }
 
 const rejectChange = (row) => {
-  if (confirm('Are you sure you want to reject this change request?')) {
+  if (confirm(t('Are you sure you want to reject this change request?'))) {
     router.post(route('api.change-requests.reject', row.id), {}, {
       onSuccess: () => applyFilters()
     })
@@ -306,7 +308,8 @@ const can = (permission) => {
 }
 
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('fr-FR', {
+  const localeCode = locale.value === 'fr' ? 'fr-FR' : 'en-US'
+  return new Intl.NumberFormat(localeCode, {
     style: 'currency',
     currency: 'XOF',
     minimumFractionDigits: 0,

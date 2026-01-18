@@ -47,7 +47,7 @@
 
                 <!-- Theme Switcher -->
                 <div :class="['px-4 pb-4 border-t', isDarkText ? 'border-gray-200' : 'border-white/10']">
-                    <button 
+                    <button
                         @click="showThemeSelector = !showThemeSelector"
                         :class="[
                             'w-full px-4 py-2 rounded-lg text-sm transition-smooth hover-scale-sm flex items-center gap-2 justify-center',
@@ -55,7 +55,7 @@
                         ]"
                     >
                         <Palette class="w-4 h-4" />
-                        Thème
+                        {{ t('Theme') }}
                     </button>
                     
                     <div v-if="showThemeSelector" class="mt-2 space-y-2 animate-fadeInUp">
@@ -86,15 +86,15 @@
                             <p :class="['text-xs truncate', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ user.email }}</p>
                         </div>
                     </div>
-                    <button 
-                        @click="logout" 
+                    <button
+                        @click="logout"
                         :class="[
                             'w-full text-sm transition-smooth hover-scale-sm ripple flex items-center gap-2 justify-center px-4 py-2 rounded-lg',
                             isDarkText ? 'text-gray-700 hover:bg-white/30 hover:text-gray-900' : 'text-white hover:bg-white/10'
                         ]"
                     >
                         <LogOut class="w-4 h-4" />
-                        Déconnexion
+                        {{ t('Logout') }}
                     </button>
                 </div>
             </div>
@@ -119,8 +119,10 @@
                         <p :class="['text-sm', isDarkText ? 'text-gray-600' : 'text-gray-400']">{{ props.pageDescription }}</p>
                     </div>
                 </div>
-
                 <div class="flex items-center gap-4 animate-fadeInRight">
+                    <!-- Language Switcher -->
+                    <LanguageSwitcher />
+
                     <!-- Search -->
                     <button :class="[
                         'transition-smooth hover-scale ripple p-2 rounded-lg',
@@ -169,7 +171,11 @@ import {
 } from 'lucide-vue-next';
 import NotificationBell from '@/Components/NotificationBell.vue';
 import BackgroundIcons from '@/Components/BackgroundIcons.vue';
+import LanguageSwitcher from '@/Components/LanguageSwitcher.vue';
 import { useTheme } from '@/Composables/useTheme';
+import { useTranslation } from '@/Composables/useTranslation';
+
+const { t } = useTranslation();
 
 const props = defineProps({
     pageTitle: {
@@ -328,16 +334,16 @@ const changeTheme = (themeName) => {
     showThemeSelector.value = false;
 };
 
-const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Projects', href: '/projects', icon: FolderKanban },
-    { name: 'Risks', href: '/risks', icon: AlertTriangle },
-    { name: 'Changes', href: '/change-requests', icon: FileEdit },
-    { name: 'Import Excel', href: '/import', icon: Upload },
-    { name: 'Categories', href: '/categories', icon: Tag },
-    { name: 'Users', href: '/users', icon: Users },
-    { name: 'Settings', href: '/settings', icon: Settings },
-];
+const navigation = computed(() => [
+    { name: t('Dashboard'), href: '/dashboard', icon: LayoutDashboard },
+    { name: t('Projects'), href: '/projects', icon: FolderKanban },
+    { name: t('Risks'), href: '/risks', icon: AlertTriangle },
+    { name: t('Changes'), href: '/change-requests', icon: FileEdit },
+    { name: t('Import Excel'), href: '/import', icon: Upload },
+    { name: t('Categories'), href: '/categories', icon: Tag },
+    { name: t('Users'), href: '/users', icon: Users },
+    { name: t('Settings'), href: '/settings', icon: Settings },
+]);
 
 const userInitials = computed(() => {
     if (!user.value) return '';

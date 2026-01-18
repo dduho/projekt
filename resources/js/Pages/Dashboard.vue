@@ -1,13 +1,13 @@
 <template>
-    <AppLayout 
-        page-title="Dashboard"
-        page-description="Vue d'ensemble de vos projets"
+    <AppLayout
+        :page-title="t('Dashboard')"
+        :page-description="t('Project overview')"
     >
         <!-- Alerts Banner -->
         <div v-if="alerts?.length" class="mb-6 space-y-3">
-            <div 
-                v-for="alert in alerts" 
-                :key="alert.title"
+            <div
+                v-for="alert in alerts"
+                :key="alert.title_key"
                 :class="[
                     'p-4 rounded-xl flex items-center justify-between',
                     getAlertClass(alert.type)
@@ -16,8 +16,8 @@
                 <div class="flex items-center gap-3">
                     <component :is="getAlertIcon(alert.icon)" class="w-5 h-5" />
                     <div>
-                        <p class="font-semibold">{{ alert.title }}</p>
-                        <p class="text-sm opacity-80">{{ alert.message }}</p>
+                        <p class="font-semibold">{{ t(alert.title_key) }}</p>
+                        <p class="text-sm opacity-80">{{ t(alert.message_key, { count: alert.count }) }}</p>
                     </div>
                 </div>
                 <span class="text-2xl font-bold">{{ alert.count }}</span>
@@ -29,7 +29,7 @@
             <!-- Portfolio Health Score -->
             <GlassCard animated class="lg:col-span-1">
                 <div class="text-center">
-                    <p :class="['text-sm mb-2', textMuted]">Portfolio Health</p>
+                    <p :class="['text-sm mb-2', textMuted]">{{ t('Portfolio Health') }}</p>
                     <div class="relative inline-flex items-center justify-center">
                         <svg class="w-32 h-32 transform -rotate-90">
                             <circle 
@@ -78,7 +78,7 @@
         <!-- Main Content Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <!-- Phase Progress Chart -->
-            <GlassCard title="Progression des Phases" animated class="lg:col-span-2">
+            <GlassCard :title="t('Phase Progress')" animated class="lg:col-span-2">
                 <div class="space-y-4">
                     <div v-for="phase in phaseBreakdown" :key="phase.phase" class="space-y-1">
                         <div class="flex justify-between items-center">
@@ -106,14 +106,14 @@
                     </div>
                 </div>
                 <div class="flex gap-4 mt-4 text-xs" :class="textMuted">
-                    <span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-500 rounded"></span> Completed</span>
-                    <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-500 rounded"></span> In Progress</span>
-                    <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-500 rounded"></span> Blocked</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-500 rounded"></span> {{ t('Completed') }}</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-500 rounded"></span> {{ t('In Progress') }}</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-500 rounded"></span> {{ t('Blocked') }}</span>
                 </div>
             </GlassCard>
 
             <!-- RAG Distribution -->
-            <GlassCard title="Distribution RAG" animated>
+            <GlassCard :title="t('RAG Distribution')" animated>
                 <div class="space-y-3">
                     <div v-for="rag in ragDistribution" :key="rag.name" class="flex items-center gap-3">
                         <div 
@@ -150,7 +150,7 @@
                 <template #header>
                     <div class="flex items-center gap-2">
                         <Clock class="w-5 h-5 text-red-500" />
-                        <h3 :class="['font-semibold', textPrimary]">Projets en Retard ({{ overdueProjects?.length || 0 }})</h3>
+                        <h3 :class="['font-semibold', textPrimary]">{{ t('Overdue Projects') }} ({{ overdueProjects?.length || 0 }})</h3>
                     </div>
                 </template>
                 
@@ -174,14 +174,14 @@
                             </span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span :class="['text-xs', textMuted]">Target: {{ project.target_date }}</span>
+                            <span :class="['text-xs', textMuted]">{{ t('Target') }}: {{ project.target_date }}</span>
                             <ProgressBar :progress="project.completion_percent" class="w-24" />
                         </div>
                     </div>
                 </div>
                 <div v-else class="text-center py-8">
                     <CheckCircle class="w-12 h-12 text-green-500 mx-auto mb-2" />
-                    <p :class="textMuted">Aucun projet en retard 🎉</p>
+                    <p :class="textMuted">{{ t('No overdue projects') }}</p>
                 </div>
             </GlassCard>
 
@@ -190,7 +190,7 @@
                 <template #header>
                     <div class="flex items-center gap-2">
                         <AlertTriangle class="w-5 h-5 text-amber-500" />
-                        <h3 :class="['font-semibold', textPrimary]">Projets Bloqués ({{ blockedProjects?.length || 0 }})</h3>
+                        <h3 :class="['font-semibold', textPrimary]">{{ t('Blocked Projects') }} ({{ blockedProjects?.length || 0 }})</h3>
                     </div>
                 </template>
                 
@@ -220,7 +220,7 @@
                 </div>
                 <div v-else class="text-center py-8">
                     <CheckCircle class="w-12 h-12 text-green-500 mx-auto mb-2" />
-                    <p :class="textMuted">Aucun projet bloqué 🎉</p>
+                    <p :class="textMuted">{{ t('No blocked projects') }}</p>
                 </div>
             </GlassCard>
         </div>
@@ -232,7 +232,7 @@
                 <template #header>
                     <div class="flex items-center gap-2">
                         <FileText class="w-5 h-5 text-prism-400" />
-                        <h3 :class="['font-semibold', textPrimary]">Journal des Modifications</h3>
+                        <h3 :class="['font-semibold', textPrimary]">{{ t('Modification Log') }}</h3>
                     </div>
                 </template>
                 
@@ -253,12 +253,12 @@
                         <p :class="['text-sm', getChangelogTextClass(entry.action)]">
                             {{ entry.description }}
                         </p>
-                        <p :class="['text-xs mt-1', textMuted]">par {{ entry.user }}</p>
+                        <p :class="['text-xs mt-1', textMuted]">{{ t('by') }} {{ entry.user }}</p>
                     </div>
                     
                     <div v-if="!changelog?.length" class="text-center py-8">
                         <FileText :class="['w-12 h-12 mx-auto mb-2', textMuted]" />
-                        <p :class="textMuted">Aucune modification récente</p>
+                        <p :class="textMuted">{{ t('No recent modifications') }}</p>
                     </div>
                 </div>
             </GlassCard>
@@ -268,7 +268,7 @@
                 <template #header>
                     <div class="flex items-center gap-2">
                         <Calendar class="w-5 h-5 text-blue-400" />
-                        <h3 :class="['font-semibold', textPrimary]">Échéances à Venir</h3>
+                        <h3 :class="['font-semibold', textPrimary]">{{ t('Upcoming Deadlines') }}</h3>
                     </div>
                 </template>
                 
@@ -308,7 +308,7 @@
                     
                     <div v-if="!upcomingDeadlines?.length" class="text-center py-8">
                         <Calendar :class="['w-12 h-12 mx-auto mb-2', textMuted]" />
-                        <p :class="textMuted">Pas d'échéances imminentes</p>
+                        <p :class="textMuted">{{ t('No upcoming deadlines') }}</p>
                     </div>
                 </div>
             </GlassCard>
@@ -323,7 +323,7 @@
                     </div>
                     <div>
                         <p :class="['text-3xl font-bold', textPrimary]">{{ healthMetrics?.velocity || 0 }}</p>
-                        <p :class="['text-sm', textMuted]">Projets déployés (30j)</p>
+                        <p :class="['text-sm', textMuted]">{{ t('Projects deployed (30d)') }}</p>
                     </div>
                 </div>
             </GlassCard>
@@ -335,7 +335,7 @@
                     </div>
                     <div>
                         <p :class="['text-3xl font-bold', textPrimary]">{{ healthMetrics?.started_last_30 || 0 }}</p>
-                        <p :class="['text-sm', textMuted]">Nouveaux projets (30j)</p>
+                        <p :class="['text-sm', textMuted]">{{ t('New projects (30d)') }}</p>
                     </div>
                 </div>
             </GlassCard>
@@ -347,7 +347,7 @@
                     </div>
                     <div>
                         <p :class="['text-3xl font-bold', textPrimary]">{{ healthMetrics?.avg_completion || 0 }}%</p>
-                        <p :class="['text-sm', textMuted]">Completion moyenne</p>
+                        <p :class="['text-sm', textMuted]">{{ t('Average completion') }}</p>
                     </div>
                 </div>
             </GlassCard>
@@ -359,7 +359,7 @@
 import { computed } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { route } from '@/Composables/useRoute';
-import { 
+import {
     FolderKanban, AlertTriangle, CheckCircle, Clock, TrendingUp,
     FileText, Calendar, Rocket, PlayCircle, Flame, AlertCircle
 } from 'lucide-vue-next';
@@ -368,8 +368,10 @@ import GlassCard from '@/Components/Glass/GlassCard.vue';
 import StatusBadge from '@/Components/Glass/StatusBadge.vue';
 import ProgressBar from '@/Components/Glass/ProgressBar.vue';
 import { useTheme } from '@/Composables/useTheme';
+import { useTranslation } from '@/Composables/useTranslation';
 
 const { isDarkText } = useTheme();
+const { t, te, formatDate } = useTranslation();
 
 const textPrimary = computed(() => isDarkText.value ? 'text-gray-900' : 'text-white');
 const textMuted = computed(() => isDarkText.value ? 'text-gray-500' : 'text-slate-400');
@@ -390,33 +392,33 @@ const props = defineProps({
 
 // Quick stats
 const quickStats = computed(() => [
-    { 
-        label: 'Total Projets', 
-        value: props.healthMetrics?.total || 0, 
-        icon: FolderKanban, 
-        bg: 'bg-prism-500/20', 
-        color: 'text-prism-400' 
+    {
+        label: t('Total Projects'),
+        value: props.healthMetrics?.total || 0,
+        icon: FolderKanban,
+        bg: 'bg-prism-500/20',
+        color: 'text-prism-400'
     },
-    { 
-        label: 'En Cours', 
-        value: props.healthMetrics?.in_progress || 0, 
-        icon: PlayCircle, 
-        bg: 'bg-blue-500/20', 
-        color: 'text-blue-400' 
+    {
+        label: t('In Progress'),
+        value: props.healthMetrics?.in_progress || 0,
+        icon: PlayCircle,
+        bg: 'bg-blue-500/20',
+        color: 'text-blue-400'
     },
-    { 
-        label: 'Déployés', 
-        value: props.healthMetrics?.deployed || 0, 
-        icon: CheckCircle, 
-        bg: 'bg-green-500/20', 
-        color: 'text-green-400' 
+    {
+        label: t('Deployed'),
+        value: props.healthMetrics?.deployed || 0,
+        icon: CheckCircle,
+        bg: 'bg-green-500/20',
+        color: 'text-green-400'
     },
-    { 
-        label: 'À Risque', 
-        value: props.healthMetrics?.at_risk || 0, 
-        icon: AlertTriangle, 
-        bg: 'bg-red-500/20', 
-        color: 'text-red-400' 
+    {
+        label: t('At Risk'),
+        value: props.healthMetrics?.at_risk || 0,
+        icon: AlertTriangle,
+        bg: 'bg-red-500/20',
+        color: 'text-red-400'
     },
 ]);
 
@@ -428,10 +430,10 @@ const getHealthColor = (score) => {
 };
 
 const getHealthLabel = (score) => {
-    if (score >= 80) return 'Excellent';
-    if (score >= 60) return 'Correct';
-    if (score >= 40) return 'À surveiller';
-    return 'Critique';
+    if (score >= 80) return t('Excellent');
+    if (score >= 60) return t('Good');
+    if (score >= 40) return t('Needs attention');
+    return t('Critical');
 };
 
 const getPercentage = (value) => {

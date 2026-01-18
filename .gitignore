@@ -62,3 +62,5 @@ yarn-error.log*
 Homestead.json
 Homestead.yaml
 .vagrant
+.claude/settings.local.json
+.claude/settings.local.json

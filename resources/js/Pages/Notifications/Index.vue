@@ -1,11 +1,11 @@
 <template>
-  <AppLayout page-title="Notifications" page-description="Historique de vos notifications">
+  <AppLayout :page-title="t('Notifications')" :page-description="t('History of your notifications')">
     <div class="max-w-4xl mx-auto">
       <!-- Header Actions -->
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-4">
           <span class="text-white/60">
-            {{ unreadCount }} non lue(s) sur {{ notifications.total }} notification(s)
+            {{ unreadCount }} {{ t('unread') }} / {{ notifications.total }} {{ t('total') }}
           </span>
         </div>
         <div class="flex items-center gap-3">
@@ -16,7 +16,7 @@
             @click="markAllAsRead"
           >
             <CheckCheck class="w-4 h-4 mr-2" />
-            Tout marquer comme lu
+            {{ t('Mark all as read') }}
           </GlassButton>
           <GlassButton
             v-if="notifications.total > 0"
@@ -25,7 +25,7 @@
             @click="deleteAll"
           >
             <Trash2 class="w-4 h-4 mr-2" />
-            Tout supprimer
+            {{ t('Delete all') }}
           </GlassButton>
         </div>
       </div>
@@ -34,8 +34,8 @@
       <GlassCard v-if="notifications.data.length === 0">
         <div class="py-12 text-center">
           <BellOff class="w-16 h-16 text-white/20 mx-auto mb-4" />
-          <h3 class="text-lg font-medium text-white mb-2">Aucune notification</h3>
-          <p class="text-white/50">Vous n'avez pas encore de notifications.</p>
+          <h3 class="text-lg font-medium text-white mb-2">{{ t('No notifications') }}</h3>
+          <p class="text-white/50">{{ t('You have no notifications yet.') }}</p>
         </div>
       </GlassCard>
 
@@ -120,6 +120,7 @@ import { router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import GlassCard from '@/Components/Glass/GlassCard.vue';
 import GlassButton from '@/Components/Glass/GlassButton.vue';
+import { useTranslation } from '@/Composables/useTranslation';
 import {
   BellOff,
   Check,
@@ -130,6 +131,8 @@ import {
   FileText,
   Info,
 } from 'lucide-vue-next';
+
+const { t } = useTranslation();
 
 const props = defineProps({
   notifications: Object,

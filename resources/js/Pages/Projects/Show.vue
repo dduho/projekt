@@ -25,7 +25,7 @@
             v-if="can('edit projects')"
           >
             <Edit class="w-4 h-4 mr-2" />
-            Edit
+            {{ t('Edit') }}
           </GlassButton>
           <GlassButton
             variant="danger"
@@ -42,7 +42,7 @@
         <GlassCard>
           <div class="flex items-center justify-between">
             <div>
-              <p :class="[textMuted, 'text-sm mb-1']">Completion</p>
+              <p :class="[textMuted, 'text-sm mb-1']">{{ t('Completion') }}</p>
               <p :class="['text-2xl font-bold', textPrimary]">{{ project.calculated_completion_percent ?? project.completion_percent ?? 0 }}%</p>
             </div>
             <TrendingUp class="w-8 h-8 text-prism-400" />
@@ -53,18 +53,18 @@
         <GlassCard>
           <div class="flex items-center justify-between">
             <div>
-              <p :class="[textMuted, 'text-sm mb-1']">Priority</p>
-              <p class="text-2xl font-bold" :class="priorityTextClass(project.priority)">{{ project.priority || '-' }}</p>
+              <p :class="[textMuted, 'text-sm mb-1']">{{ t('Priority') }}</p>
+              <p class="text-2xl font-bold" :class="priorityTextClass(project.priority)">{{ te('priority', project.priority) || '-' }}</p>
             </div>
             <Flag class="w-8 h-8" :class="priorityTextClass(project.priority)" />
           </div>
-          <p :class="['text-sm mt-2', textSecondary]">FRS: {{ project.frs_status || '-' }}</p>
+          <p :class="['text-sm mt-2', textSecondary]">FRS: {{ te('frs_status', project.frs_status) || '-' }}</p>
         </GlassCard>
 
         <GlassCard>
           <div class="flex items-center justify-between">
             <div>
-              <p :class="[textMuted, 'text-sm mb-1']">Risks</p>
+              <p :class="[textMuted, 'text-sm mb-1']">{{ t('Risks') }}</p>
               <div class="flex items-center gap-2">
                 <p :class="['text-2xl font-bold', textPrimary]">{{ project.risks_count || 0 }}</p>
                 <span 
@@ -87,14 +87,14 @@
             class="w-full mt-2"
             @click="activeTab = 'risks'"
           >
-            View Risks
+            {{ t('View Risks') }}
           </GlassButton>
         </GlassCard>
 
         <GlassCard>
           <div class="flex items-center justify-between">
             <div>
-              <p :class="[textMuted, 'text-sm mb-1']">Changes</p>
+              <p :class="[textMuted, 'text-sm mb-1']">{{ t('Changes') }}</p>
               <p :class="['text-2xl font-bold', textPrimary]">{{ project.changes_count || 0 }}</p>
             </div>
             <FileText class="w-8 h-8 text-blue-400" />
@@ -105,7 +105,7 @@
             class="mt-2 w-full"
             @click="activeTab = 'changes'"
           >
-            View Changes
+            {{ t('View Changes') }}
           </GlassButton>
         </GlassCard>
       </div>
@@ -115,10 +115,10 @@
         <!-- Sidebar -->
         <div class="space-y-4">
           <GlassCard>
-            <h3 :class="['text-lg font-semibold mb-4', textPrimary]">Project Details</h3>
+            <h3 :class="['text-lg font-semibold mb-4', textPrimary]">{{ t('Project Details') }}</h3>
             <div class="space-y-3">
               <div>
-                <p :class="[textMuted, 'text-sm']">Category</p>
+                <p :class="[textMuted, 'text-sm']">{{ t('Category') }}</p>
                 <div class="flex items-center gap-2 mt-1">
                   <div
                     class="w-3 h-3 rounded-full"
@@ -128,36 +128,36 @@
                 </div>
               </div>
               <div v-if="project.business_area">
-                <p :class="[textMuted, 'text-sm']">Business Area</p>
+                <p :class="[textMuted, 'text-sm']">{{ t('Business Area') }}</p>
                 <p :class="textPrimary">{{ project.business_area }}</p>
               </div>
               <div>
-                <p :class="[textMuted, 'text-sm']">Dev Status</p>
-                <p :class="textPrimary">{{ project.dev_status || '-' }}</p>
+                <p :class="[textMuted, 'text-sm']">{{ t('Dev Status') }}</p>
+                <p :class="textPrimary">{{ te('dev_status', project.dev_status) || '-' }}</p>
               </div>
               <div>
-                <p :class="[textMuted, 'text-sm']">Target Date</p>
+                <p :class="[textMuted, 'text-sm']">{{ t('Target Date') }}</p>
                 <p :class="textPrimary">{{ formatDate(project.target_date) }}</p>
               </div>
               <div v-if="project.submission_date">
-                <p :class="[textMuted, 'text-sm']">Submission Date</p>
+                <p :class="[textMuted, 'text-sm']">{{ t('Submission Date') }}</p>
                 <p :class="textPrimary">{{ formatDate(project.submission_date) }}</p>
               </div>
               <div v-if="project.planned_release">
-                <p :class="[textMuted, 'text-sm']">Planned Release</p>
+                <p :class="[textMuted, 'text-sm']">{{ t('Planned Release') }}</p>
                 <p :class="textPrimary">{{ project.planned_release }}</p>
               </div>
               
               <!-- Owner - Editable -->
               <div>
                 <div class="flex items-center justify-between">
-                  <p :class="[textMuted, 'text-sm']">Owner</p>
+                  <p :class="[textMuted, 'text-sm']">{{ t('Owner') }}</p>
                   <button 
                     v-if="can('edit projects') && !editingOwner" 
                     @click="editingOwner = true"
                     :class="['text-xs text-prism-400 hover:text-prism-300']"
                   >
-                    Modifier
+                    {{ t('Edit') }}
                   </button>
                 </div>
                 <div v-if="editingOwner && can('edit projects')" class="mt-1 space-y-2">
@@ -183,7 +183,7 @@
               </div>
 
               <div v-if="project.current_progress">
-                <p :class="[textMuted, 'text-sm']">Current Progress</p>
+                <p :class="[textMuted, 'text-sm']">{{ t('Current Progress') }}</p>
                 <p :class="textPrimary">{{ project.current_progress }}</p>
               </div>
             </div>
@@ -194,7 +194,7 @@
             <div class="flex items-center justify-between mb-3">
               <h3 :class="['text-lg font-semibold flex items-center gap-2', textPrimary]">
                 <AlertCircle class="w-5 h-5 text-red-400" />
-                Blockers
+                {{ t('Blockers') }}
               </h3>
               <button 
                 v-if="can('edit projects') && !editingBlockers" 
@@ -644,6 +644,7 @@ import { ref, computed } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import { route } from '@/Composables/useRoute'
 import { useTheme } from '@/Composables/useTheme'
+import { useTranslation } from '@/Composables/useTranslation'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import GlassCard from '@/Components/Glass/GlassCard.vue'
 import GlassButton from '@/Components/Glass/GlassButton.vue'
@@ -663,6 +664,7 @@ const props = defineProps({
 
 const page = usePage()
 const { isDarkText } = useTheme()
+const { t, te } = useTranslation()
 
 // Classes de texte dynamiques selon le thème
 const textPrimary = computed(() => isDarkText.value ? 'text-gray-900' : 'text-white')
@@ -684,13 +686,13 @@ const newComment = ref('')
 const replyingTo = ref(null)
 const replyText = ref('')
 
-const tabs = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'risks', label: 'Risks' },
-  { id: 'changes', label: 'Changes' },
-  { id: 'comments', label: 'Comments' },
-  { id: 'activities', label: 'Activities' },
-]
+const tabs = computed(() => [
+  { id: 'overview', label: t('Overview') },
+  { id: 'risks', label: t('Risks') },
+  { id: 'changes', label: t('Changes') },
+  { id: 'comments', label: t('Comments') },
+  { id: 'activities', label: t('Activities') },
+])
 
 const can = (permission) => {
   const user = page.props.auth?.user;

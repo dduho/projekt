@@ -70,6 +70,25 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $userData,
             ],
+            'locale' => app()->getLocale(),
+            'translations' => function () {
+                $locale = app()->getLocale();
+                $translations = [];
+                
+                // Load JSON translations
+                $jsonPath = lang_path("{$locale}.json");
+                if (file_exists($jsonPath)) {
+                    $translations = json_decode(file_get_contents($jsonPath), true);
+                }
+                
+                // Load enum translations
+                $enumPath = lang_path("{$locale}/enums.php");
+                if (file_exists($enumPath)) {
+                    $translations['enums'] = require $enumPath;
+                }
+                
+                return $translations;
+            },
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

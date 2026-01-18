@@ -3,7 +3,11 @@
     "allow": [
       "Bash(composer create-project:*)",
       "Bash(docker-compose:*)",
-      "Bash(Remove-Item -Recurse -Force \"c:\\\\Users\\\\black\\\\OneDrive\\\\Documents\\\\Web Projects\\\\projekt\\\\app\\\\Http\\\\Controllers\\\\Api\")"
+      "Bash(Remove-Item -Recurse -Force \"c:\\\\Users\\\\black\\\\OneDrive\\\\Documents\\\\Web Projects\\\\projekt\\\\app\\\\Http\\\\Controllers\\\\Api\")",
+      "Bash(find:*)",
+      "Bash(npm run build:*)",
+      "Bash(php artisan:*)",
+      "Bash(php artisan config:clear:*)"
     ]
   }
 }

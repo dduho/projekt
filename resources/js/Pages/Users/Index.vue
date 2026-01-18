@@ -1,18 +1,18 @@
 <template>
-  <AppLayout page-title="Users" page-description="Gestion des utilisateurs">
+  <AppLayout :page-title="t('Users')" :page-description="t('User Management')">
     <div class="space-y-6">
       <!-- Header -->
       <div class="flex justify-between items-center">
         <div>
-          <h1 :class="['text-3xl font-bold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">Users Management</h1>
-          <p :class="isDarkText ? 'text-gray-600' : 'text-slate-300'">Manage users, roles and permissions</p>
+          <h1 :class="['text-3xl font-bold mb-2', isDarkText ? 'text-gray-900' : 'text-white']">{{ t('User Management') }}</h1>
+          <p :class="isDarkText ? 'text-gray-600' : 'text-slate-300'">{{ t('Manage users and their roles') }}</p>
         </div>
         <GlassButton 
           variant="primary" 
           @click="showModal = true; editingUser = null; resetForm()"
         >
           <Plus class="w-5 h-5 mr-2" />
-          New User
+          {{ t('New User') }}
         </GlassButton>
       </div>
 
@@ -201,8 +201,10 @@ import { useForm, router, usePage } from '@inertiajs/vue3'
 import { route } from '@/Composables/useRoute'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { useTheme } from '@/Composables/useTheme'
+import { useTranslation } from '@/Composables/useTranslation'
 
 const { isDarkText } = useTheme()
+const { t } = useTranslation()
 import GlassCard from '@/Components/Glass/GlassCard.vue'
 import GlassButton from '@/Components/Glass/GlassButton.vue'
 import GlassInput from '@/Components/Glass/GlassInput.vue'
@@ -222,12 +224,12 @@ const showDeleteModal = ref(false)
 const editingUser = ref(null)
 const deletingUser = ref(null)
 
-const columns = [
-  { key: 'name', label: 'User', sortable: true },
-  { key: 'roles', label: 'Role', sortable: false },
-  { key: 'created_at', label: 'Created', sortable: true },
-  { key: 'actions', label: 'Actions', sortable: false },
-]
+const columns = computed(() => [
+  { key: 'name', label: t('User'), sortable: true },
+  { key: 'roles', label: t('Role'), sortable: false },
+  { key: 'created_at', label: t('Created at'), sortable: true },
+  { key: 'actions', label: t('Actions'), sortable: false },
+])
 
 const availableRoles = [
   { 

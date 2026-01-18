@@ -1,14 +1,14 @@
 <template>
     <GuestLayout>
-        <h2 class="text-2xl font-bold text-white mb-6">Connexion</h2>
+        <h2 class="text-2xl font-bold text-white mb-6">{{ t('Login') }}</h2>
         
         <form @submit.prevent="handleSubmit" class="space-y-6">
             <!-- Email -->
             <GlassInput
                 v-model="form.email"
                 type="email"
-                label="Email"
-                placeholder="votre.email@moovmoney.tg"
+                :label="t('Email')"
+                :placeholder="t('Email')"
                 :icon="Mail"
                 :error="form.errors.email"
                 required
@@ -18,7 +18,7 @@
             <GlassInput
                 v-model="form.password"
                 type="password"
-                label="Mot de passe"
+                :label="t('Password')"
                 placeholder="••••••••"
                 :icon="Lock"
                 :error="form.errors.password"
@@ -33,11 +33,11 @@
                         type="checkbox"
                         class="w-4 h-4 rounded bg-white/10 border-white/20 text-prism-500 focus:ring-2 focus:ring-prism-500"
                     />
-                    <span class="text-sm text-gray-300">Se souvenir de moi</span>
+                    <span class="text-sm text-gray-300">{{ t('Remember me') }}</span>
                 </label>
 
                 <Link href="/forgot-password" class="text-sm text-prism-400 hover:text-prism-300">
-                    Mot de passe oublié ?
+                    {{ t('Forgot password?') }}
                 </Link>
             </div>
 
@@ -49,7 +49,7 @@
                 :disabled="form.processing"
                 full-width
             >
-                Se connecter
+                {{ t('Login') }}
             </GlassButton>
         </form>
 
@@ -67,6 +67,9 @@ import GuestLayout from '@/Layouts/GuestLayout.vue';
 import GlassInput from '@/Components/Glass/GlassInput.vue';
 import GlassButton from '@/Components/Glass/GlassButton.vue';
 import { Link } from '@inertiajs/vue3';
+import { useTranslation } from '@/Composables/useTranslation';
+
+const { t } = useTranslation();
 
 const form = useForm({
     email: '',
