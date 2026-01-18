@@ -17,6 +17,11 @@ class ChangeRequest extends Model
         'project_id',
         'change_type',
         'description',
+        'description_translations',
+        'impact_analysis',
+        'impact_analysis_translations',
+        'implementation_plan',
+        'implementation_plan_translations',
         'requested_by_id',
         'approved_by_id',
         'status',
@@ -27,6 +32,9 @@ class ChangeRequest extends Model
     protected $casts = [
         'requested_at' => 'datetime',
         'resolved_at' => 'datetime',
+        'description_translations' => 'array',
+        'impact_analysis_translations' => 'array',
+        'implementation_plan_translations' => 'array',
     ];
 
     // =====================
@@ -47,6 +55,37 @@ class ChangeRequest extends Model
 
             $change->requested_at = $change->requested_at ?? now();
         });
+    }
+
+    // =====================
+    // ACCESSORS FOR TRANSLATIONS
+    // =====================
+
+    public function getDescriptionAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($this->description_translations && isset($this->description_translations[$locale])) {
+            return $this->description_translations[$locale];
+        }
+        return $value;
+    }
+
+    public function getImpactAnalysisAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($this->impact_analysis_translations && isset($this->impact_analysis_translations[$locale])) {
+            return $this->impact_analysis_translations[$locale];
+        }
+        return $value;
+    }
+
+    public function getImplementationPlanAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($this->implementation_plan_translations && isset($this->implementation_plan_translations[$locale])) {
+            return $this->implementation_plan_translations[$locale];
+        }
+        return $value;
     }
 
     // =====================

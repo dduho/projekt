@@ -22,29 +22,52 @@
             <!-- Basic Information -->
             <div>
               <h2 :class="['text-xl font-semibold mb-4', textPrimary]">{{ t('Basic Information') }}</h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              <div class="mb-4">
                 <GlassInput
                   v-model="form.project_code"
                   :label="t('Project Code')"
                   :error="form.errors.project_code"
                   required
                 />
+              </div>
+
+              <!-- Language Tabs -->
+              <LanguageTabs v-model="currentLang" />
+
+              <!-- Project Name (Translatable) -->
+              <div class="mb-4">
                 <GlassInput
-                  v-model="form.name"
-                  :label="t('Project Name')"
-                  :error="form.errors.name"
+                  v-if="currentLang === 'fr'"
+                  v-model="form.name_fr"
+                  :label="t('Project Name') + ' (🇫🇷)'"
+                  :error="form.errors.name_fr"
                   required
                 />
+                <GlassInput
+                  v-if="currentLang === 'en'"
+                  v-model="form.name_en"
+                  :label="t('Project Name') + ' (🇬🇧)'"
+                  :error="form.errors.name_en"
+                />
               </div>
-            </div>
 
-            <!-- Description -->
-            <GlassTextarea
-              v-model="form.description"
-              :label="t('Description')"
-              :error="form.errors.description"
-              rows="4"
-            />
+              <!-- Description (Translatable) -->
+              <GlassTextarea
+                v-if="currentLang === 'fr'"
+                v-model="form.description_fr"
+                :label="t('Description') + ' (🇫🇷)'"
+                :error="form.errors.description_fr"
+                rows="4"
+              />
+              <GlassTextarea
+                v-if="currentLang === 'en'"
+                v-model="form.description_en"
+                :label="t('Description') + ' (🇬🇧)'"
+                :error="form.errors.description_en"
+                rows="4"
+              />
+            </div>
 
             <!-- Category & Business Area -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -109,13 +132,23 @@
             </div>
 
             <!-- Progress -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <GlassInput
-                v-model="form.current_progress"
-                :label="t('Current Progress')"
-                :placeholder="t('e.g., Integration phase completed')"
-                :error="form.errors.current_progress"
-              />
+            <div>
+              <div class="mb-4">
+                <GlassInput
+                  v-if="currentLang === 'fr'"
+                  v-model="form.current_progress_fr"
+                  :label="t('Current Progress') + ' (🇫🇷)'"
+                  :placeholder="t('e.g., Integration phase completed')"
+                  :error="form.errors.current_progress_fr"
+                />
+                <GlassInput
+                  v-if="currentLang === 'en'"
+                  v-model="form.current_progress_en"
+                  :label="t('Current Progress') + ' (🇬🇧)'"
+                  :placeholder="t('e.g., Integration phase completed')"
+                  :error="form.errors.current_progress_en"
+                />
+              </div>
               <GlassInput
                 v-model.number="form.completion_percent"
                 :label="t('Completion')"
@@ -152,13 +185,24 @@
             </div>
 
             <!-- Blockers -->
-            <GlassTextarea
-              v-model="form.blockers"
-              :label="t('Blockers')"
-              :placeholder="t('Describe any blockers or issues')"
-              :error="form.errors.blockers"
-              rows="3"
-            />
+            <div>
+              <GlassTextarea
+                v-if="currentLang === 'fr'"
+                v-model="form.blockers_fr"
+                :label="t('Blockers') + ' (🇫🇷)'"
+                :placeholder="t('Describe any blockers or issues')"
+                :error="form.errors.blockers_fr"
+                rows="3"
+              />
+              <GlassTextarea
+                v-if="currentLang === 'en'"
+                v-model="form.blockers_en"
+                :label="t('Blockers') + ' (🇬🇧)'"
+                :placeholder="t('Describe any blockers or issues')"
+                :error="form.errors.blockers_en"
+                rows="3"
+              />
+            </div>
           </div>
         </GlassCard>
 
@@ -198,13 +242,16 @@ import GlassButton from '@/Components/Glass/GlassButton.vue'
 import GlassInput from '@/Components/Glass/GlassInput.vue'
 import GlassSelect from '@/Components/Glass/GlassSelect.vue'
 import GlassTextarea from '@/Components/Glass/GlassTextarea.vue'
+import LanguageTabs from '@/Components/Glass/LanguageTabs.vue'
 import { ArrowLeft, Save, Loader2 } from 'lucide-vue-next'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 const { t, te } = useTranslation()
 const { isDarkText } = useTheme()
 
 const textPrimary = computed(() => isDarkText.value ? 'text-gray-900' : 'text-white')
+
+const currentLang = ref('fr')
 
 const props = defineProps({
   project: Object,
@@ -214,15 +261,19 @@ const props = defineProps({
 
 const form = useForm({
   project_code: props.project.project_code,
-  name: props.project.name,
-  description: props.project.description || '',
+  name_fr: props.project.name_translations?.fr || props.project.name || '',
+  name_en: props.project.name_translations?.en || '',
+  description_fr: props.project.description_translations?.fr || props.project.description || '',
+  description_en: props.project.description_translations?.en || '',
   category_id: props.project.category_id,
   business_area: props.project.business_area || '',
   priority: props.project.priority,
   frs_status: props.project.frs_status,
   dev_status: props.project.dev_status,
-  current_progress: props.project.current_progress || '',
-  blockers: props.project.blockers || '',
+  current_progress_fr: props.project.current_progress_translations?.fr || props.project.current_progress || '',
+  current_progress_en: props.project.current_progress_translations?.en || '',
+  blockers_fr: props.project.blockers_translations?.fr || props.project.blockers || '',
+  blockers_en: props.project.blockers_translations?.en || '',
   owner_id: props.project.owner_id || '',
   planned_release: props.project.planned_release || '',
   target_date: props.project.target_date || '',

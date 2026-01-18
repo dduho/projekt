@@ -17,14 +17,18 @@ class Project extends Model
     protected $fillable = [
         'project_code',
         'name',
+        'name_translations',
         'description',
+        'description_translations',
         'category_id',
         'business_area',
         'priority',
         'frs_status',
         'dev_status',
         'current_progress',
+        'current_progress_translations',
         'blockers',
+        'blockers_translations',
         'owner_id',
         'planned_release',
         'target_date',
@@ -40,6 +44,10 @@ class Project extends Model
         'planned_release' => 'date',
         'completion_percent' => 'integer',
         'need_po' => 'boolean',
+        'name_translations' => 'array',
+        'description_translations' => 'array',
+        'current_progress_translations' => 'array',
+        'blockers_translations' => 'array',
     ];
 
     protected $appends = [
@@ -48,6 +56,46 @@ class Project extends Model
         'health_status',
         'risk_analysis',
     ];
+
+    // =====================
+    // ACCESSORS FOR TRANSLATIONS
+    // =====================
+
+    public function getNameAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($this->name_translations && isset($this->name_translations[$locale])) {
+            return $this->name_translations[$locale];
+        }
+        return $value;
+    }
+
+    public function getDescriptionAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($this->description_translations && isset($this->description_translations[$locale])) {
+            return $this->description_translations[$locale];
+        }
+        return $value;
+    }
+
+    public function getCurrentProgressAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($this->current_progress_translations && isset($this->current_progress_translations[$locale])) {
+            return $this->current_progress_translations[$locale];
+        }
+        return $value;
+    }
+
+    public function getBlockersAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($this->blockers_translations && isset($this->blockers_translations[$locale])) {
+            return $this->blockers_translations[$locale];
+        }
+        return $value;
+    }
 
     // =====================
     // RELATIONS

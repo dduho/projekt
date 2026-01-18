@@ -13,9 +13,14 @@ class Category extends Model
 
     protected $fillable = [
         'name',
+        'name_translations',
         'slug',
         'color',
         'description',
+    ];
+
+    protected $casts = [
+        'name_translations' => 'array',
     ];
 
     protected static function booted(): void
@@ -25,6 +30,15 @@ class Category extends Model
                 $category->slug = Str::slug($category->name);
             }
         });
+    }
+
+    public function getNameAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($this->name_translations && isset($this->name_translations[$locale])) {
+            return $this->name_translations[$locale];
+        }
+        return $value;
     }
 
     public function projects(): HasMany

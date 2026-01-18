@@ -17,8 +17,22 @@ class Comment extends Model
         'commentable_type',
         'commentable_id',
         'content',
+        'content_translations',
         'parent_id',
     ];
+
+    protected $casts = [
+        'content_translations' => 'array',
+    ];
+
+    public function getContentAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($this->content_translations && isset($this->content_translations[$locale])) {
+            return $this->content_translations[$locale];
+        }
+        return $value;
+    }
 
     public function user(): BelongsTo
     {

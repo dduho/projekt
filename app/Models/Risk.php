@@ -17,14 +17,26 @@ class Risk extends Model
         'project_id',
         'type',
         'description',
+        'description_translations',
         'impact',
         'probability',
         'risk_score',
         'mitigation_plan',
+        'mitigation_plan_translations',
+        'response_plan',
+        'response_plan_translations',
         'owner_id',
         'status',
     ];
 
+    protected $casts = [
+        'description_translations' => 'array',
+        'mitigation_plan_translations' => 'array',
+        'response_plan_translations' => 'array',
+    ];
+
+    // =====================
+    // BOOT
     // =====================
     // BOOT
     // =====================
@@ -45,6 +57,37 @@ class Risk extends Model
                 $risk->risk_code = 'RISK-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
             }
         });
+    }
+
+    // =====================
+    // ACCESSORS FOR TRANSLATIONS
+    // =====================
+
+    public function getDescriptionAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($this->description_translations && isset($this->description_translations[$locale])) {
+            return $this->description_translations[$locale];
+        }
+        return $value;
+    }
+
+    public function getMitigationPlanAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($this->mitigation_plan_translations && isset($this->mitigation_plan_translations[$locale])) {
+            return $this->mitigation_plan_translations[$locale];
+        }
+        return $value;
+    }
+
+    public function getResponsePlanAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($this->response_plan_translations && isset($this->response_plan_translations[$locale])) {
+            return $this->response_plan_translations[$locale];
+        }
+        return $value;
     }
 
     // =====================

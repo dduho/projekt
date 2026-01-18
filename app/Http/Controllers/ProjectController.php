@@ -254,8 +254,10 @@ class ProjectController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
+            'name_fr' => 'sometimes|required|string|max:255',
+            'name_en' => 'nullable|string|max:255',
+            'description_fr' => 'nullable|string',
+            'description_en' => 'nullable|string',
             'category_id' => 'sometimes|required|exists:categories,id',
             'business_area' => 'nullable|string|max:100',
             'priority' => 'sometimes|required|in:High,Medium,Low',
@@ -265,15 +267,60 @@ class ProjectController extends Controller
             'submission_date' => 'nullable|date',
             'target_date' => 'nullable|date',
             'go_live_date' => 'nullable|date',
-            'planned_release' => 'nullable|string|max:50',
+            'planned_release' => 'nullable|date',
             'completion_percent' => 'nullable|integer|min:0|max:100',
-            'blockers' => 'nullable|string',
-            'current_progress' => 'nullable|string',
+            'current_progress_fr' => 'nullable|string',
+            'current_progress_en' => 'nullable|string',
+            'blockers_fr' => 'nullable|string',
+            'blockers_en' => 'nullable|string',
             'owner_id' => 'nullable|exists:users,id',
             'need_po' => 'nullable|boolean',
         ]);
 
-        $project->update($validated);
+        // Préparer les données avec les traductions
+        $updateData = $validated;
+        
+        // Construire name et name_translations
+        if (isset($validated['name_fr'])) {
+            $updateData['name'] = $validated['name_fr'];
+            $updateData['name_translations'] = [
+                'fr' => $validated['name_fr'],
+                'en' => $validated['name_en'] ?? $validated['name_fr']
+            ];
+            unset($updateData['name_fr'], $updateData['name_en']);
+        }
+        
+        // Construire description et description_translations
+        if (isset($validated['description_fr'])) {
+            $updateData['description'] = $validated['description_fr'];
+            $updateData['description_translations'] = [
+                'fr' => $validated['description_fr'],
+                'en' => $validated['description_en'] ?? $validated['description_fr']
+            ];
+            unset($updateData['description_fr'], $updateData['description_en']);
+        }
+        
+        // Construire current_progress et current_progress_translations
+        if (isset($validated['current_progress_fr'])) {
+            $updateData['current_progress'] = $validated['current_progress_fr'];
+            $updateData['current_progress_translations'] = [
+                'fr' => $validated['current_progress_fr'],
+                'en' => $validated['current_progress_en'] ?? $validated['current_progress_fr']
+            ];
+            unset($updateData['current_progress_fr'], $updateData['current_progress_en']);
+        }
+        
+        // Construire blockers et blockers_translations
+        if (isset($validated['blockers_fr'])) {
+            $updateData['blockers'] = $validated['blockers_fr'];
+            $updateData['blockers_translations'] = [
+                'fr' => $validated['blockers_fr'],
+                'en' => $validated['blockers_en'] ?? $validated['blockers_fr']
+            ];
+            unset($updateData['blockers_fr'], $updateData['blockers_en']);
+        }
+
+        $project->update($updateData);
 
         ActivityLog::create([
             'user_id' => Auth::id(),
