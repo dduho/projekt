@@ -217,9 +217,24 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $categories = Category::orderBy('name')->get();
+        $users = User::orderBy('name')->get();
+        
+        // Format dates for input[type=date]
+        $projectData = $project->toArray();
+        if ($project->submission_date) {
+            $projectData['submission_date'] = $project->submission_date->format('Y-m-d');
+        }
+        if ($project->target_date) {
+            $projectData['target_date'] = $project->target_date->format('Y-m-d');
+        }
+        if ($project->planned_release) {
+            $projectData['planned_release'] = $project->planned_release->format('Y-m-d');
+        }
+        
         return Inertia::render('Projects/Edit', [
-            'project' => $project,
-            'categories' => $categories
+            'project' => $projectData,
+            'categories' => $categories,
+            'users' => $users,
         ]);
     }
 

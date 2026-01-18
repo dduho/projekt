@@ -1,5 +1,5 @@
 <template>
-  <AppLayout page-title="Modifier Projet" page-description="Édition du projet">
+  <AppLayout :page-title="t('Edit Project')" :page-description="t('Edit project information')">
     <div class="max-w-4xl mx-auto space-y-6">
       <!-- Header -->
       <div class="flex items-center gap-4">
@@ -10,8 +10,8 @@
           <ArrowLeft class="w-5 h-5" />
         </GlassButton>
         <div>
-          <h1 class="text-3xl font-bold text-white mb-2">Edit Project</h1>
-          <p class="text-slate-300">{{ project.name }} ({{ project.project_code }})</p>
+          <h1 :class="['text-3xl font-bold mb-2', textPrimary]">{{ t('Edit Project') }}</h1>
+          <p :class="['text-sm', textPrimary]">{{ project.name }} ({{ project.project_code }})</p>
         </div>
       </div>
 
@@ -21,17 +21,17 @@
           <div class="space-y-6">
             <!-- Basic Information -->
             <div>
-              <h2 class="text-xl font-semibold text-white mb-4">Basic Information</h2>
+              <h2 :class="['text-xl font-semibold mb-4', textPrimary]">{{ t('Basic Information') }}</h2>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <GlassInput
                   v-model="form.project_code"
-                  label="Project Code"
+                  :label="t('Project Code')"
                   :error="form.errors.project_code"
                   required
                 />
                 <GlassInput
                   v-model="form.name"
-                  label="Project Name"
+                  :label="t('Project Name')"
                   :error="form.errors.name"
                   required
                 />
@@ -41,7 +41,7 @@
             <!-- Description -->
             <GlassTextarea
               v-model="form.description"
-              label="Description"
+              :label="t('Description')"
               :error="form.errors.description"
               rows="4"
             />
@@ -50,15 +50,15 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <GlassSelect
                 v-model="form.category_id"
-                label="Category"
+                :label="t('Category')"
                 :options="categoryOptions"
                 :error="form.errors.category_id"
                 required
               />
               <GlassInput
                 v-model="form.business_area"
-                label="Business Area"
-                placeholder="e.g., Payment Services"
+                :label="t('Business Area')"
+                :placeholder="t('e.g., Payment Services')"
                 :error="form.errors.business_area"
               />
             </div>
@@ -67,14 +67,14 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <GlassSelect
                 v-model="form.priority"
-                label="Priority"
+                :label="t('Priority')"
                 :options="priorityOptions"
                 :error="form.errors.priority"
                 required
               />
               <GlassSelect
                 v-model="form.owner_id"
-                label="Owner"
+                :label="t('Owner')"
                 :options="ownerOptions"
                 :error="form.errors.owner_id"
               />
@@ -82,25 +82,25 @@
 
             <!-- Status Section -->
             <div>
-              <h2 class="text-xl font-semibold text-white mb-4">Status</h2>
+              <h2 :class="['text-xl font-semibold mb-4', textPrimary]">{{ t('Status') }}</h2>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <GlassSelect
                   v-model="form.rag_status"
-                  label="RAG Status"
+                  :label="t('RAG Status')"
                   :options="ragStatusOptions"
                   :error="form.errors.rag_status"
                   required
                 />
                 <GlassSelect
                   v-model="form.frs_status"
-                  label="FRS Status"
+                  :label="t('FRS Status')"
                   :options="frsStatusOptions"
                   :error="form.errors.frs_status"
                   required
                 />
                 <GlassSelect
                   v-model="form.dev_status"
-                  label="Development Status"
+                  :label="t('Development Status')"
                   :options="devStatusOptions"
                   :error="form.errors.dev_status"
                   required
@@ -112,13 +112,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <GlassInput
                 v-model="form.current_progress"
-                label="Current Progress"
-                placeholder="e.g., Integration phase completed"
+                :label="t('Current Progress')"
+                :placeholder="t('e.g., Integration phase completed')"
                 :error="form.errors.current_progress"
               />
               <GlassInput
                 v-model.number="form.completion_percent"
-                label="Completion (%)"
+                :label="t('Completion')"
                 type="number"
                 min="0"
                 max="100"
@@ -128,24 +128,24 @@
 
             <!-- Timeline -->
             <div>
-              <h2 class="text-xl font-semibold text-white mb-4">Timeline</h2>
+              <h2 :class="['text-xl font-semibold mb-4', textPrimary]">{{ t('Timeline') }}</h2>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <GlassInput
                   v-model="form.submission_date"
-                  label="Submission Date"
+                  :label="t('Submission Date')"
                   type="date"
                   :error="form.errors.submission_date"
                 />
                 <GlassInput
                   v-model="form.target_date"
-                  label="Target Date"
+                  :label="t('Target Date')"
                   type="date"
                   :error="form.errors.target_date"
                 />
                 <GlassInput
                   v-model="form.planned_release"
-                  label="Planned Release"
-                  placeholder="e.g., v2.0"
+                  :label="t('Planned Release')"
+                  type="date"
                   :error="form.errors.planned_release"
                 />
               </div>
@@ -154,8 +154,8 @@
             <!-- Blockers -->
             <GlassTextarea
               v-model="form.blockers"
-              label="Blockers (Optional)"
-              placeholder="Describe any blockers or issues"
+              :label="t('Blockers')"
+              :placeholder="t('Describe any blockers or issues')"
               :error="form.errors.blockers"
               rows="3"
             />
@@ -170,7 +170,7 @@
             @click="$inertia.visit(route('projects.show', project.id))"
             :disabled="form.processing"
           >
-            Cancel
+            {{ t('Cancel') }}
           </GlassButton>
           <GlassButton
             variant="primary"
@@ -179,7 +179,7 @@
           >
             <Loader2 v-if="form.processing" class="w-5 h-5 mr-2 animate-spin" />
             <Save v-else class="w-5 h-5 mr-2" />
-            Save Changes
+            {{ t('Save Changes') }}
           </GlassButton>
         </div>
       </form>
@@ -190,6 +190,8 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3'
 import { route } from '@/Composables/useRoute'
+import { useTranslation } from '@/Composables/useTranslation'
+import { useTheme } from '@/Composables/useTheme'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import GlassCard from '@/Components/Glass/GlassCard.vue'
 import GlassButton from '@/Components/Glass/GlassButton.vue'
@@ -198,6 +200,11 @@ import GlassSelect from '@/Components/Glass/GlassSelect.vue'
 import GlassTextarea from '@/Components/Glass/GlassTextarea.vue'
 import { ArrowLeft, Save, Loader2 } from 'lucide-vue-next'
 import { computed } from 'vue'
+
+const { t, te } = useTranslation()
+const { isDarkText } = useTheme()
+
+const textPrimary = computed(() => isDarkText.value ? 'text-gray-900' : 'text-white')
 
 const props = defineProps({
   project: Object,
@@ -229,35 +236,35 @@ const categoryOptions = computed(() =>
 )
 
 const ownerOptions = computed(() => [
-  { value: '', label: 'Select owner...' },
+  { value: '', label: t('Select owner...') },
   ...(props.users?.map(user => ({ value: user.id, label: user.name })) || [])
 ])
 
-const priorityOptions = [
-  { value: 'High', label: 'High' },
-  { value: 'Medium', label: 'Medium' },
-  { value: 'Low', label: 'Low' },
-]
+const priorityOptions = computed(() => [
+  { value: 'High', label: te('priority', 'High') },
+  { value: 'Medium', label: te('priority', 'Medium') },
+  { value: 'Low', label: te('priority', 'Low') },
+])
 
-const ragStatusOptions = [
-  { value: 'Green', label: 'Green - On Track' },
-  { value: 'Amber', label: 'Amber - At Risk' },
-  { value: 'Red', label: 'Red - Critical' },
-]
+const ragStatusOptions = computed(() => [
+  { value: 'Green', label: te('rag_status', 'Green') },
+  { value: 'Amber', label: te('rag_status', 'Amber') },
+  { value: 'Red', label: te('rag_status', 'Red') },
+])
 
-const frsStatusOptions = [
-  { value: 'Draft', label: 'Draft' },
-  { value: 'Review', label: 'Review' },
-  { value: 'Signoff', label: 'Signoff' },
-]
+const frsStatusOptions = computed(() => [
+  { value: 'Draft', label: te('frs_status', 'Draft') },
+  { value: 'Review', label: te('frs_status', 'Review') },
+  { value: 'Signoff', label: te('frs_status', 'Signoff') },
+])
 
-const devStatusOptions = [
-  { value: 'Not Started', label: 'Not Started' },
-  { value: 'In Development', label: 'In Development' },
-  { value: 'Testing', label: 'Testing' },
-  { value: 'UAT', label: 'UAT' },
-  { value: 'Deployed', label: 'Deployed' },
-]
+const devStatusOptions = computed(() => [
+  { value: 'Not Started', label: te('dev_status', 'Not Started') },
+  { value: 'In Development', label: te('dev_status', 'In Development') },
+  { value: 'Testing', label: te('dev_status', 'Testing') },
+  { value: 'UAT', label: te('dev_status', 'UAT') },
+  { value: 'Deployed', label: te('dev_status', 'Deployed') },
+])
 
 const submit = () => {
   form.put(route('projects.update', props.project.id), {

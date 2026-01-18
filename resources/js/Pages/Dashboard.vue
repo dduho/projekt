@@ -174,7 +174,7 @@
                             </span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span :class="['text-xs', textMuted]">{{ t('Target') }}: {{ project.target_date }}</span>
+                            <span :class="['text-xs', textMuted]">{{ t('Target') }}: {{ formatDate(project.target_date) }}</span>
                             <ProgressBar :progress="project.completion_percent" class="w-24" />
                         </div>
                     </div>
@@ -209,8 +209,18 @@
                                 <p :class="['font-semibold text-sm', textPrimary]">{{ project.name }}</p>
                                 <p :class="['text-xs', textMuted]">{{ project.code }} • {{ project.owner }}</p>
                             </div>
-                            <span :class="['text-xs px-2 py-1 rounded', isDarkText ? 'bg-gray-200' : 'bg-white/20']">
-                                {{ project.days_blocked }}j
+                            <span 
+                                v-if="project.days_until_deadline !== null"
+                                :class="[
+                                    'text-xs px-2 py-1 rounded font-bold',
+                                    project.days_until_deadline < 0 
+                                        ? 'bg-red-500 text-white' 
+                                        : project.days_until_deadline <= 7
+                                            ? 'bg-orange-500 text-white'
+                                            : isDarkText ? 'bg-gray-200' : 'bg-white/20'
+                                ]"
+                            >
+                                {{ project.days_until_deadline < 0 ? Math.abs(project.days_until_deadline) + 'j retard' : project.days_until_deadline + 'j' }}
                             </span>
                         </div>
                         <p :class="['text-xs p-2 rounded', isDarkText ? 'bg-amber-100 text-amber-800' : 'bg-amber-500/20 text-amber-200']">
@@ -297,7 +307,7 @@
                                 ]">
                                     {{ project.days_remaining }}j
                                 </p>
-                                <p :class="['text-xs', textMuted]">{{ project.target_date }}</p>
+                                <p :class="['text-xs', textMuted]">{{ formatDate(project.target_date) }}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
