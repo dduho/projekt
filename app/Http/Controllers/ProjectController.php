@@ -334,8 +334,18 @@ class ProjectController extends Controller
             'changes' => $project->getChanges(),
         ]);
 
+        // Message spécifique selon le champ modifié
+        $message = 'Projet mis à jour avec succès!';
+        if (isset($validated['owner']) && count($validated) === 1) {
+            $message = 'Responsable mis à jour avec succès';
+        } elseif (isset($validated['blockers']) && count($validated) === 1) {
+            $message = 'Blocages mis à jour avec succès';
+        } elseif (isset($validated['need_po']) && count($validated) === 1) {
+            $message = 'Statut PO mis à jour avec succès';
+        }
+
         return redirect()->route('projects.show', $project)
-            ->with('success', 'Projet mis a jour avec succes!');
+            ->with('success', $message);
     }
 
     /**
