@@ -322,8 +322,6 @@ const devStatusOptions = computed(() => [
 ])
 
 const submit = () => {
-  console.log('📤 Form data before submit:', JSON.stringify(form.data(), null, 2))
-  console.log('📤 form.owner value:', form.owner)
   form.put(route('projects.update', props.project.id), {
     onSuccess: () => {
       // Will be redirected by the controller

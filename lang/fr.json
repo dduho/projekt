@@ -422,5 +422,9 @@
     "Budget Change": "Changement de budget",
     "Resource Change": "Changement de ressources",
     "Very Low": "Très faible",
-    "Very High": "Très élevé"
+    "Very High": "Très élevé",
+    "Owner updated successfully": "Responsable mis à jour avec succès",
+    "Failed to update owner": "Échec de la mise à jour du responsable",
+    "Blockers updated successfully": "Blocages mis à jour avec succès",
+    "Failed to update blockers": "Échec de la mise à jour des blocages"
 }

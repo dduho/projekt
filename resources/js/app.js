@@ -21,15 +21,19 @@ createInertiaApp({
         const app = createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(pinia)
-            .use(VueApexCharts)
-            .component('NotificationToast', NotificationToast);
+            .use(VueApexCharts);
         
-        // Mount notification toast globally
+        app.mount(el);
+        
+        // Mount notification toast globally after main app
         const toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
         document.body.appendChild(toastContainer);
-        createApp(NotificationToast).use(pinia).mount(toastContainer);
+        const toastApp = createApp(NotificationToast);
+        toastApp.use(pinia);
+        toastApp.mount(toastContainer);
         
-        return app.mount(el);
+        return app;
     },
     progress: {
         color: '#667eea',

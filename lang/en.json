@@ -413,5 +413,9 @@
     "Budget Change": "Budget Change",
     "Resource Change": "Resource Change",
     "Very Low": "Very Low",
-    "Very High": "Very High"
+    "Very High": "Very High",
+    "Owner updated successfully": "Owner updated successfully",
+    "Failed to update owner": "Failed to update owner",
+    "Blockers updated successfully": "Blockers updated successfully",
+    "Failed to update blockers": "Failed to update blockers"
 }

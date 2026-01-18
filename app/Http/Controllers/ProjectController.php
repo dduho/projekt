@@ -271,7 +271,8 @@ class ProjectController extends Controller
             'current_progress_en' => 'nullable|string',
             'blockers_fr' => 'nullable|string',
             'blockers_en' => 'nullable|string',
-            'owner_id' => 'nullable|exists:users,id',
+            'owner' => 'nullable|string|max:100',
+            'blockers' => 'nullable|string',
             'need_po' => 'nullable|boolean',
         ]);
 

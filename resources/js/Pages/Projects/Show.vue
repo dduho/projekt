@@ -643,6 +643,7 @@ import { router, usePage } from '@inertiajs/vue3'
 import { route } from '@/Composables/useRoute'
 import { useTheme } from '@/Composables/useTheme'
 import { useTranslation } from '@/Composables/useTranslation'
+import { useToast } from '@/Composables/useToast'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import GlassCard from '@/Components/Glass/GlassCard.vue'
 import GlassButton from '@/Components/Glass/GlassButton.vue'
@@ -663,6 +664,7 @@ const props = defineProps({
 const page = usePage()
 const { isDarkText } = useTheme()
 const { t, te, formatDate, formatDateTime, formatPlannedRelease } = useTranslation()
+const { toast } = useToast()
 
 // Classes de texte dynamiques selon le thème
 const textPrimary = computed(() => isDarkText.value ? 'text-gray-900' : 'text-white')
@@ -877,6 +879,10 @@ const updateOwner = () => {
     preserveScroll: true,
     onSuccess: () => {
       editingOwner.value = false
+      toast.success(t('Owner updated successfully'))
+    },
+    onError: () => {
+      toast.error(t('Failed to update owner'))
     }
   })
 }
@@ -889,6 +895,10 @@ const updateBlockers = () => {
     preserveScroll: true,
     onSuccess: () => {
       editingBlockers.value = false
+      toast.success(t('Blockers updated successfully'))
+    },
+    onError: () => {
+      toast.error(t('Failed to update blockers'))
     }
   })
 }
