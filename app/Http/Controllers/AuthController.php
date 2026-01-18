@@ -113,7 +113,7 @@ class AuthController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Profil mis a jour avec succes.');
+        return back()->with('success', 'Profile updated successfully');
     }
 
     /**
@@ -142,6 +142,6 @@ class AuthController extends Controller
             return response()->json(['message' => 'Mot de passe mis a jour avec succes.']);
         }
 
-        return back()->with('success', 'Mot de passe mis a jour avec succes.');
+        return back()->with('success', 'Password updated successfully');
     }
 }

@@ -35,7 +35,7 @@ class CommentController extends Controller
             'description' => 'Commentaire ajouté: ' . substr($validated['content'], 0, 50) . '...',
         ]);
 
-        return back()->with('success', 'Commentaire ajouté avec succès.');
+        return back()->with('success', 'Comment added successfully');
     }
 
     /**
@@ -56,7 +56,7 @@ class CommentController extends Controller
             'content' => $validated['content'],
         ]);
 
-        return back()->with('success', 'Commentaire mis à jour.');
+        return back()->with('success', 'Comment updated');
     }
 
     /**
@@ -85,6 +85,6 @@ class CommentController extends Controller
             'description' => 'Commentaire supprimé',
         ]);
 
-        return back()->with('success', 'Commentaire supprimé.');
+        return back()->with('success', 'Comment deleted');
     }
 }

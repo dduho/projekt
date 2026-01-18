@@ -135,7 +135,7 @@ class ChangeRequestController extends Controller
         ]);
 
         return redirect()->route('change-requests.show', $changeRequest)
-            ->with('success', 'Demande de changement creee avec succes!');
+            ->with('success', 'Change request created successfully!');
     }
 
     /**
@@ -190,7 +190,7 @@ class ChangeRequestController extends Controller
             'changes' => $changeRequest->getChanges(),
         ]);
 
-        return back()->with('success', 'Demande de changement mise a jour!');
+        return back()->with('success', 'Change request updated!');
     }
 
     /**

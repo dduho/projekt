@@ -176,7 +176,7 @@ class ProjectController extends Controller
         event(new ProjectCreated($project, Auth::user()));
 
         return redirect()->route('projects.show', $project)
-            ->with('success', 'Projet cree avec succes!');
+            ->with('success', 'Project created successfully!');
     }
 
     /**
@@ -335,13 +335,13 @@ class ProjectController extends Controller
         ]);
 
         // Message spécifique selon le champ modifié
-        $message = 'Projet mis à jour avec succès!';
+        $message = 'Project updated successfully!';
         if (isset($validated['owner']) && count($validated) === 1) {
-            $message = 'Responsable mis à jour avec succès';
+            $message = 'Owner updated successfully';
         } elseif (isset($validated['blockers']) && count($validated) === 1) {
-            $message = 'Blocages mis à jour avec succès';
+            $message = 'Blockers updated successfully';
         } elseif (isset($validated['need_po']) && count($validated) === 1) {
-            $message = 'Statut PO mis à jour avec succès';
+            $message = 'PO status updated successfully';
         }
 
         return redirect()->route('projects.show', $project)

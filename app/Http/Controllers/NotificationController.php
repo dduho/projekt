@@ -80,7 +80,7 @@ class NotificationController extends Controller
             return response()->json(['success' => true, 'message' => 'All notifications marked as read']);
         }
 
-        return back()->with('success', 'Toutes les notifications ont ete marquees comme lues.');
+        return back()->with('success', 'All notifications marked as read');
     }
 
     /**
@@ -108,6 +108,6 @@ class NotificationController extends Controller
             return response()->json(['success' => true, 'message' => 'All notifications deleted']);
         }
 
-        return back()->with('success', 'Toutes les notifications ont ete supprimees.');
+        return back()->with('success', 'All notifications deleted');
     }
 }

@@ -181,7 +181,7 @@ class RiskController extends Controller
         event(new RiskCreated($risk, Auth::user()));
 
         return redirect()->route('risks.index')
-            ->with('success', 'Risque cree avec succes!');
+            ->with('success', 'Risk created successfully!');
     }
 
     /**
@@ -271,7 +271,7 @@ class RiskController extends Controller
             'changes' => $risk->getChanges(),
         ]);
 
-        return back()->with('success', 'Risque mis a jour avec succes!');
+        return back()->with('success', 'Risk updated successfully!');
     }
 
     /**

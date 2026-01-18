@@ -64,7 +64,7 @@ class ProjectPhaseController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Phase mise à jour avec succès');
+        return back()->with('success', 'Phase updated successfully');
     }
 
     /**
@@ -120,6 +120,6 @@ class ProjectPhaseController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Phases mises à jour avec succès');
+        return back()->with('success', 'Phases updated successfully');
     }
 }
