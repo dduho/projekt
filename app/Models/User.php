@@ -9,6 +9,10 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @method \Illuminate\Notifications\DatabaseNotificationCollection notifications()
+ * @method \Illuminate\Notifications\DatabaseNotificationCollection unreadNotifications()
+ */
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
